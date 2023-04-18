@@ -30,12 +30,15 @@ fun AddTodoDialog(
                     onValueChange = {
                         onEvent(TodoEvent.setTitle(it))
                     },
+                    label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
                 )
                 TextField(
                     value = state.description,
                     onValueChange = {
                         onEvent(TodoEvent.setDescription(it))
                     },
+                    label = { Text("Provide a brief description") } // This line adds a hint to the TextField
+
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)) {
