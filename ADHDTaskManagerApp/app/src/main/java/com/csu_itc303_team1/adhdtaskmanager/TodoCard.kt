@@ -79,16 +79,3 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
         }
     }
 }
-
-
-/*@Composable
-@Preview(showBackground = true)
-fun DefaultPreview() {
-    TodoCard(todo = Todo(
-        title = "Title",
-        description = "Description",
-        priority = Priority.HIGH,
-        dueDate = "Date",
-        dueTime = "Time",
-    ), onEvent = {})
-}*/
