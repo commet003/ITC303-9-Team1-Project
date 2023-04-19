@@ -64,8 +64,8 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
             verticalAlignment = CenterVertically
         ){
             Text(text = todo.priority.name)
-            //Text(text = todo.dueDate)
-            //Text(text = todo.dueTime)
+            Text(text = todo.dueDate)
+            Text(text = todo.dueTime)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = {
