@@ -64,7 +64,9 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
             verticalAlignment = CenterVertically
         ){
             Text(text = todo.priority.name)
+            Spacer(Modifier.width(4.dp))// adds spacing in the displayed items
             Text(text = todo.dueDate)
+            Spacer(Modifier.width(4.dp))// adds spacing in the displayed items
             Text(text = todo.dueTime)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(
@@ -76,6 +78,7 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
                     contentDescription = "Delete Todo"
                 )
             }
+
         }
     }
 }
