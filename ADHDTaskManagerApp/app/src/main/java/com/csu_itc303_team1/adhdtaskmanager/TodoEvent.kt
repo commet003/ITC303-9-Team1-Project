@@ -23,7 +23,5 @@ sealed interface TodoEvent {
     object showTimeSelector: TodoEvent
     object hideTimeSelector: TodoEvent
 
-    object showReminderAlert: TodoEvent
-    object hideReminderAlert: TodoEvent
 
 }
