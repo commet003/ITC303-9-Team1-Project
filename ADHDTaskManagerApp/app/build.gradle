@@ -82,7 +82,4 @@ dependencies {
 
     // Date and Time Picker
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
-
-    // Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0-beta01"
 }

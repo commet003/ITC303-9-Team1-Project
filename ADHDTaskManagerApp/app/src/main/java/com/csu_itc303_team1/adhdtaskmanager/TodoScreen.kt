@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TodoScreen(
     state: TodoState,
-    onEvent: (TodoEvent) -> Unit
+    onEvent: (TodoEvent) -> Unit,
 ) {
     Scaffold(
         floatingActionButton = {
