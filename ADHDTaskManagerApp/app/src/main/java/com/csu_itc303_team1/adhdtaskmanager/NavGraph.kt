@@ -19,7 +19,7 @@ fun SetupNavGraph(
     // NavHost for controlling the pages.
     NavHost(
         navController = navController,
-        startDestination = Screen.SettingsScreen.route   // Screen that displays when app is first opened
+        startDestination = Screen.TodoScreen.route   // Screen that displays when app is first opened
     ){
 
         // Home screen/to-do screen
