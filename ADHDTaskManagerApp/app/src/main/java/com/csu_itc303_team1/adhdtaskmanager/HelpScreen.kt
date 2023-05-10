@@ -55,7 +55,7 @@ fun HelpScreen() {
             }
         },
 
-        ) { innerPadding ->
+        ) {
         Column(
             modifier = Modifier
                 .padding(20.dp, 20.dp, 0.dp, 0.dp)
