@@ -12,6 +12,9 @@ class TodoViewModel(
     private val _state = MutableStateFlow(TodoState())
     private val _sortType = MutableStateFlow(SortType.BY_DATE)
     @OptIn(ExperimentalCoroutinesApi::class)
+
+
+
     private val _todos = _sortType
         .flatMapLatest { sortType ->
         when(sortType){
@@ -34,6 +37,7 @@ class TodoViewModel(
                 viewModelScope.launch {
                     todoDao.deleteTodo(event.todo)
                 }
+
             }
             TodoEvent.hideDialog -> {
                 _state.update {
@@ -140,4 +144,11 @@ class TodoViewModel(
             else -> {}
         }
     }
+// Gets called in MainActivity
+    suspend fun getTotalRowCount(): Int {
+        val todos = todoDao.getAllTodos()
+        return todos.size
+    }
+
+
 }

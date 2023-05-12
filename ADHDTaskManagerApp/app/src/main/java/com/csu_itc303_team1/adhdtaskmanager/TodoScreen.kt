@@ -16,9 +16,11 @@ fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
 ) {
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
+
                 onEvent(TodoEvent.showDialog)
             }) {
                 Icon(
@@ -34,6 +36,7 @@ fun TodoScreen(
                 state = state,
                 onEvent = onEvent,
             )
+
         }
 
         LazyColumn(
