@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
-
+     val todoDao: TodoDao
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,6 +65,7 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                         val completedTodo = todo.markAsCompleted()
 
                         // onEvent(TodoEvent.markTodoAsCompleted(todo))
+
                     }
                 ) {
                     Icon(

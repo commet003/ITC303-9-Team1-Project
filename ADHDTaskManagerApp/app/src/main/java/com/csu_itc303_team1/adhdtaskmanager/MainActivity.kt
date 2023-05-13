@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
 
                     Button(onClick = {
                         lifecycleScope.launch {
-                            rowCount = todoViewModel.getTotalRowCount()
+                            rowCount = todoViewModel.getTotalRowCount()-todoViewModel.getCountOfCompletedTodos()
                         }
                     }) {
                         Text(text = "Tap to see updated number of tasks.")
@@ -99,16 +99,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        lifecycleScope.launch {
-            val rowCount = todoViewModel.getTotalRowCount()
-            // Use the rowCount value as needed. This was used for testing Logcat output.
-            println("Hello " + rowCount)
 
-        }
 
         lifecycleScope.launch{
             val x = todoViewModel.getCountOfCompletedTodos()
             println("x is " + x)
+        }
+
+        lifecycleScope.launch {
+            val rowCount = todoViewModel.getTotalRowCount() - todoViewModel.getCountOfCompletedTodos()
+            // Use the rowCount value as needed. This was used for testing Logcat output.
+            println("Hello " + rowCount)
+
         }
 
     }

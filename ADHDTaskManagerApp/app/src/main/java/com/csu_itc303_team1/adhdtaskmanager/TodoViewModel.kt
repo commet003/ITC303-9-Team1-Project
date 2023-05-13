@@ -170,15 +170,18 @@ class TodoViewModel(
         }
     }
 // Gets called in MainActivity
-    suspend fun getTotalRowCount(): Int {
-        var todos  = todoDao.getAllTodos()
-        return todos.size
-    }
+
 
     suspend fun getCountOfCompletedTodos(): Int {
         val num = todoDao.getCountOfCompletedTodos()
         return num
     }
+    suspend fun getTotalRowCount(): Int {
+        var todos  = todoDao.getAllTodos() - getCountOfCompletedTodos()
+        return todos.size
+    }
+
+
 
 
 }
