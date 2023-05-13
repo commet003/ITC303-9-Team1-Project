@@ -16,6 +16,11 @@ interface TodoDao {
     suspend fun deleteTodo(todo: Todo)
     @Update
     suspend fun updateTodo(todo: Todo)
+    @Update
+    suspend fun updateTodoIsCompleted(todo: Todo)
+
+    @Query("SELECT COUNT(*) FROM Todo WHERE isCompleted = 1")
+    suspend fun getCountOfCompletedTodos(): Int
 
 
     // Sort Todos by Priority

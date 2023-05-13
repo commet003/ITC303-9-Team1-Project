@@ -69,7 +69,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
+        lifecycleScope.launch{
+            val x = todoViewModel.getCountOfCompletedTodos()
+            println("x is " + x)
+        }
         setContent {
             ADHDTaskManagerTheme {
                 val state by viewModel.state.collectAsState()
@@ -99,8 +102,13 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val rowCount = todoViewModel.getTotalRowCount()
             // Use the rowCount value as needed. This was used for testing Logcat output.
-            //println("Hello " + rowCount)
+            println("Hello " + rowCount)
 
+        }
+
+        lifecycleScope.launch{
+            val x = todoViewModel.getCountOfCompletedTodos()
+            println("x is " + x)
         }
 
     }

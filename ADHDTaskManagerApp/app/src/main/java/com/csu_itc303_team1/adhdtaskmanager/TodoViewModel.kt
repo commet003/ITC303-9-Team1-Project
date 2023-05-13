@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
@@ -32,7 +33,31 @@ class TodoViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TodoState())
 
     fun onEvent(event: TodoEvent){
+
         when(event){
+//            is TodoEvent.markTodoAsCompleted -> {
+//               var todo = TodoState(isCompleted = true)
+//                todo.isCompleted
+//                todoDao.updateTodo()
+//
+//                println("completed")
+//                viewModelScope.launch {
+//                    //todoDao.deleteTodo(event.todo)
+//
+//                    var todo = TodoState(isCompleted = true)
+//                }
+//            }
+
+            is TodoEvent.markTodoAsCompleted -> {
+                val todo = state.value.todos.find { it.id == event.todo.id }
+                todo?.let {
+                    val updatedTodo = it.copy(isCompleted = true)
+                    println("Com")
+                    viewModelScope.launch {
+                        todoDao.updateTodoIsCompleted(updatedTodo)
+                    }}}
+
+
             is TodoEvent.deleteTodo -> {
                 viewModelScope.launch {
                     todoDao.deleteTodo(event.todo)
@@ -146,8 +171,13 @@ class TodoViewModel(
     }
 // Gets called in MainActivity
     suspend fun getTotalRowCount(): Int {
-        val todos = todoDao.getAllTodos()
+        var todos  = todoDao.getAllTodos()
         return todos.size
+    }
+
+    suspend fun getCountOfCompletedTodos(): Int {
+        val num = todoDao.getCountOfCompletedTodos()
+        return num
     }
 
 

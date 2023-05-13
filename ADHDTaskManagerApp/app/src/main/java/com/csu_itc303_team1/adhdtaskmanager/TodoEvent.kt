@@ -11,6 +11,10 @@ sealed interface TodoEvent {
     // Data class to sort by sort type
     data class sortBy(val sortType: SortType): TodoEvent
 
+    data class markTodoAsCompleted(val todo: Todo): TodoEvent
+
+    
+    
     object showDialog: TodoEvent
     object hideDialog: TodoEvent
 
@@ -22,4 +26,6 @@ sealed interface TodoEvent {
 
     object showTimeSelector: TodoEvent
     object hideTimeSelector: TodoEvent
+
+
 }
