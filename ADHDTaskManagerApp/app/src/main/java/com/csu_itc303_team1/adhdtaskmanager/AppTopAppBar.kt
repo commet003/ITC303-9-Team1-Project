@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
+fun TopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 
     // This is for the Bar at the top of the application. This will be present on every page.
     TopAppBar(
@@ -28,6 +28,18 @@ fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
                 Icon(Icons.Filled.Menu, "")     // Can change icon of the Navigation Icon here
             }
         },
+        backgroundColor = MaterialTheme.colors.primary,         // Colours of the bar
+        contentColor = MaterialTheme.colors.onPrimary
+    )
+}
+
+// Topbar for Sign In Screen
+@Composable
+fun SignInTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
+
+    // This is for the Bar at the top of the application. This will be present on every page.
+    TopAppBar(
+        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp) }, // Label on the bar
         backgroundColor = MaterialTheme.colors.primary,         // Colours of the bar
         contentColor = MaterialTheme.colors.onPrimary
     )

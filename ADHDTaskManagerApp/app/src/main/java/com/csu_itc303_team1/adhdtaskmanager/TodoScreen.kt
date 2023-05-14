@@ -11,12 +11,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit
 ) {
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = "ToDo List")
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 onEvent(TodoEvent.showDialog)

@@ -1,15 +1,15 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -29,30 +29,44 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.GoogleAuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
+
+    private val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
 
     private val db by lazy {
         Room.databaseBuilder(
@@ -98,7 +112,7 @@ class MainActivity : ComponentActivity() {
                         ,
                         scaffoldState = scaffoldState,
                         // Creating the Top Bar
-                        topBar = { AppTopAppBar(scope = scope, scaffoldState = scaffoldState) },
+                        topBar = { SignInTopAppBar(scope = scope, scaffoldState = scaffoldState) },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
                         drawerContent = {
@@ -125,17 +139,80 @@ class MainActivity : ComponentActivity() {
 
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
-                        val state by viewModel.state.collectAsState()
-                        SetupNavGraph(
+                        val todoState by viewModel.state.collectAsState()
+                        /*SetupNavGraph(
                             navController = navController,
                             state = state,
                             event = viewModel::onEvent
-                        )
+                        )*/
+
+                        val navController = rememberNavController()
+                        NavHost(navController = navController, startDestination = "sign_in") {
+                            composable("sign_in") {
+                                val viewModel = viewModel<SignInViewModel>()
+                                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                                LaunchedEffect(key1 = Unit) {
+                                    if (googleAuthUiClient.getSignedInUser() != null) {
+                                        navController.navigate("profile")
+                                    }
+                                }
+
+                                val launcher = rememberLauncherForActivityResult(
+                                    contract = ActivityResultContracts.StartIntentSenderForResult(),
+                                    onResult = { result ->
+                                        if (result.resultCode == RESULT_OK) {
+                                            lifecycleScope.launch {
+                                                val signInResult =
+                                                    googleAuthUiClient.signInWithIntent(
+                                                        intent = result.data ?: return@launch
+                                                    )
+                                                viewModel.onSignInResult(signInResult)
+                                            }
+                                        }
+                                    }
+                                )
+
+                                LaunchedEffect(key1 = state.isSignInSuccessful) {
+                                    if (state.isSignInSuccessful) {
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Sign in successful",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+
+                                        navController.navigate("profile")
+                                        viewModel.resetState()
+                                    }
+                                }
+
+                                SignInScreen(
+                                    state = state,
+                                    onSignInClick = {
+                                        lifecycleScope.launch {
+                                            val signInIntentSender = googleAuthUiClient.signIn()
+                                            launcher.launch(
+                                                IntentSenderRequest.Builder(
+                                                    signInIntentSender ?: return@launch
+                                                ).build()
+                                            )
+                                        }
+                                    }
+                                )
+                            }
+                            composable(
+                                Screen.TodoScreen.route
+                            ) {
+                                TodoScreen(
+                                    state = todoState,
+                                    onEvent = viewModel::onEvent,
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
-        //HelpScreen()
     }
 
 
