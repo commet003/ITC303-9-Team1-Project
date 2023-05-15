@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
+
 }
 configurations.all {
     resolutionStrategy {
@@ -38,11 +39,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
@@ -58,16 +59,36 @@ android {
 }
 
 dependencies {
+    //Compose
+    implementation platform("androidx.compose:compose-bom:$compose_bom_version")
+    implementation "androidx.compose.material:material"
+    //Hilt
+    //implementation "com.google.dagger:hilt-android:$hilt_version"
+    //kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    //Navigation Navigation Compose
+    //implementation "androidx.hilt:hilt-navigation-compose:$hilt_navigation_compose_version"
+    //Firebase
+    implementation platform("com.google.firebase:firebase-bom:$firebase_bom_version")
+    implementation "com.google.firebase:firebase-auth-ktx"
+    implementation "com.google.firebase:firebase-firestore-ktx"
+    //Play Services Auth
+    implementation "com.google.android.gms:play-services-auth:$play_services_auth_version"
+    implementation "com.google.android.gms:play-services-base:18.2.0"
+    //Accompanist
+    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-permissions:0.19.0"
+    //Coil
+    implementation "io.coil-kt:coil-compose:$coil_compose_version"
 
     // Firebase
-    implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
-    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    //implementation 'com.google.firebase:firebase-auth-ktx:22.0.0'
+    //implementation 'com.google.android.gms:play-services-auth:20.5.0'
 
     // Coil
-    implementation "io.coil-kt:coil-compose:2.2.2"
+    //implementation "io.coil-kt:coil-compose:2.2.2"
 
     implementation 'androidx.core:core-ktx:1.10.0'
-    implementation "com.google.accompanist:accompanist-permissions:0.19.0"
+
 
     // Lifecycle dependencies
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
@@ -77,22 +98,27 @@ dependencies {
     // ktx dependencies
     //implementation("androidx.core:core-ktx:1.10.0")
     implementation("androidx.room:room-ktx:2.5.1")
-    implementation 'androidx.compose.material:material:1.4.1'
+    implementation 'androidx.compose.material:material:1.4.3'
     //Room dependencies
     def room_version = "2.5.1"
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.0'
+    implementation 'androidx.activity:activity-compose:1.7.1'
+    //noinspection GradleDependency
     implementation "androidx.compose.ui:ui:$compose_version"
+    //noinspection GradleDependency
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.compose.material3:material3:1.1.0-beta02'
+    implementation 'androidx.compose.material3:material3:1.1.0-rc01'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    //noinspection GradleDependency
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
+    //noinspection GradleDependency
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    //noinspection GradleDependency
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
     // Date and Time Picker

@@ -34,7 +34,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +54,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.GoogleAuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
+
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
@@ -87,8 +87,8 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity() {
 
                                 LaunchedEffect(key1 = Unit) {
                                     if (googleAuthUiClient.getSignedInUser() != null) {
-                                        navController.navigate("profile")
+                                        navController.navigate("todo_screen")
                                     }
                                 }
 
@@ -181,7 +181,7 @@ class MainActivity : ComponentActivity() {
                                             Toast.LENGTH_LONG
                                         ).show()
 
-                                        navController.navigate("profile")
+                                        navController.navigate("todo_screen")
                                         viewModel.resetState()
                                     }
                                 }
