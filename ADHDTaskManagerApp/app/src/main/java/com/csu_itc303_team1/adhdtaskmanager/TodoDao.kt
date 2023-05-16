@@ -22,6 +22,9 @@ interface TodoDao {
     @Query("SELECT COUNT(*) FROM Todo WHERE isCompleted = 1")
     suspend fun getCountOfCompletedTodos(): Int
 
+//    @Query("SELECT * FROM Todo WHERE priority = 'Low' OR priority = 'Medium' OR priority = 'High'")
+//    fun getStatus(): String
+
 
     // Sort Todos by Priority
     @Query("SELECT * FROM Todo ORDER BY priority DESC")

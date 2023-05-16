@@ -13,7 +13,8 @@ data class Todo(
     val dueTime: String,
     var isCompleted: Boolean = false,
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0
+    val id: Int = 0,
+    //var points: Int
 
 
 
@@ -25,3 +26,4 @@ data class Todo(
         return copy(isCompleted = true)
     }
 }
+

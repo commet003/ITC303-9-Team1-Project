@@ -12,8 +12,10 @@ class TodoViewModel(
 ): ViewModel() {
     private val _state = MutableStateFlow(TodoState())
     private val _sortType = MutableStateFlow(SortType.BY_DATE)
-    @OptIn(ExperimentalCoroutinesApi::class)
 
+    //val UserID : Int = 5;
+
+    @OptIn(ExperimentalCoroutinesApi::class)
 
 
     private val _todos = _sortType
@@ -49,7 +51,7 @@ class TodoViewModel(
 //            }
 
             is TodoEvent.markTodoAsCompleted -> {
-                val todo = state.value.todos.find { it.id == event.todo.id }
+                val todo = state.value.todos.find { it.id == event.todo.id}
                 todo?.let {
                     val updatedTodo = it.copy(isCompleted = true)
                     println("Com")
@@ -70,6 +72,7 @@ class TodoViewModel(
                 }
             }
             TodoEvent.saveTodo -> {
+
                 val title = state.value.title
                 val description = state.value.description
                 val priority = state.value.priority
@@ -86,6 +89,8 @@ class TodoViewModel(
                     priority = priority,
                     dueDate = dueDate,
                     dueTime = dueTime,
+
+
                 )
 
                 viewModelScope.launch {
@@ -169,9 +174,13 @@ class TodoViewModel(
             else -> {}
         }
     }
+
+
 // Gets called in MainActivity
-
-
+    /**
+     * getCountOfCompletedTodos() returns the number of tasks assigned as completed
+     * getTotalRowCount() returns the total number of rows
+     */
     suspend fun getCountOfCompletedTodos(): Int {
         val num = todoDao.getCountOfCompletedTodos()
         return num
@@ -180,8 +189,6 @@ class TodoViewModel(
         var todos  = todoDao.getAllTodos() - getCountOfCompletedTodos()
         return todos.size
     }
-
-
 
 
 }

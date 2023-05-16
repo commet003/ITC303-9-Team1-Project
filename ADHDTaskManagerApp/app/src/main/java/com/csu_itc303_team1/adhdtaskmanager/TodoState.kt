@@ -13,4 +13,5 @@ data class TodoState(
     val showDateSelector: Boolean = false,
     val showTimeSelector: Boolean = false,
     var isCompleted: Boolean = false,
+
 )
