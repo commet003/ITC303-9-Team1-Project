@@ -2,6 +2,8 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
+import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -9,6 +11,7 @@ import kotlinx.coroutines.launch
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
+
     private val _state = MutableStateFlow(TodoState())
     private val _sortType = MutableStateFlow(SortType.BY_DATE)
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -137,7 +140,7 @@ class TodoViewModel(
                     it.copy(showTimeSelector = true)
                 }
             }
-            else -> {}
+
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.database.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -9,6 +9,6 @@ import androidx.room.RoomDatabase
     exportSchema = false
 )
 abstract class TodoDatabase: RoomDatabase() {
-
     abstract val todoDao: TodoDao
+
 }

@@ -8,9 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 
 @Composable
 fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
@@ -21,7 +21,8 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
             .height(160.dp)
     ) {
         Column(
-            modifier = Modifier.padding(10.dp)) {
+            modifier = Modifier.padding(10.dp)
+        ) {
             Row{
                 Row(
                     modifier = Modifier

@@ -1,5 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
+
 sealed interface TodoEvent {
     object saveTodo: TodoEvent
     data class setTitle(val title: String): TodoEvent
