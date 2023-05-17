@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun TopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
+fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 
     // This is for the Bar at the top of the application. This will be present on every page.
     TopAppBar(

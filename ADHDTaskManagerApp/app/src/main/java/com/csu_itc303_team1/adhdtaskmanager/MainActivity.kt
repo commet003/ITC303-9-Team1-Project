@@ -54,12 +54,13 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.GoogleAuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
-
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
+
+
 
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
@@ -186,6 +187,20 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
 
+                                // LaunchedEffect for continue without sign in
+                                LaunchedEffect(key1 = state.continueWithoutSignIn) {
+                                    if (state.continueWithoutSignIn) {
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Continuing without sign in",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+
+                                        navController.navigate("todo_screen")
+                                        viewModel.resetState()
+                                    }
+                                }
+
                                 SignInScreen(
                                     state = state,
                                     onSignInClick = {
@@ -196,6 +211,12 @@ class MainActivity : ComponentActivity() {
                                                     signInIntentSender ?: return@launch
                                                 ).build()
                                             )
+                                        }
+                                    },
+                                    onContinueWithoutSignInClick = {
+                                        lifecycleScope.launch {
+                                            viewModel.onContinueWithoutSignIn()
+                                            navController.navigate("todo_screen")
                                         }
                                     }
                                 )

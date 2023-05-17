@@ -19,11 +19,6 @@ fun TodoScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "ToDo List")
-                },
-            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
