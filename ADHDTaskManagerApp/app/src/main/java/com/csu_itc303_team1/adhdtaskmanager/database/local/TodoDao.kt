@@ -1,6 +1,7 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.database.local
 
 import androidx.room.*
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 import kotlinx.coroutines.flow.Flow
 
 
