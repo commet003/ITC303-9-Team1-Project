@@ -37,18 +37,6 @@ class TodoViewModel(
     fun onEvent(event: TodoEvent){
 
         when(event){
-//            is TodoEvent.markTodoAsCompleted -> {
-//               var todo = TodoState(isCompleted = true)
-//                todo.isCompleted
-//                todoDao.updateTodo()
-//
-//                println("completed")
-//                viewModelScope.launch {
-//                    //todoDao.deleteTodo(event.todo)
-//
-//                    var todo = TodoState(isCompleted = true)
-//                }
-//            }
 
             is TodoEvent.markTodoAsCompleted -> {
                 val todo = state.value.todos.find { it.id == event.todo.id}
