@@ -35,6 +35,13 @@ fun SetupNavGraph(
         ) {
             SettingsScreen()
         }
+
+        // Leaderboard Screen
+        composable(
+            route = Screen.LeaderboardScreen.route
+        ) {
+            LeaderboardScreen()
+        }
     }
 }
 
