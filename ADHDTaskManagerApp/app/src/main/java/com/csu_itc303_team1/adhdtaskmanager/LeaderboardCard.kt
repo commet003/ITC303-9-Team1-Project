@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -15,7 +16,8 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun LeaderboardCard(
-    user: Users
+    user: Users,
+    rank: Int
 ) {
     Card(
         shape = MaterialTheme.shapes.small,
@@ -34,24 +36,52 @@ fun LeaderboardCard(
                 .fillMaxWidth()
                 .padding(all = 12.dp)
         ){
-            user.displayName?.let { displayName ->
+            Column(
+                horizontalAlignment = Alignment.Start
+            ) {
                 Text(
-                    text = displayName,
+                    text = rank.toString(),
                     modifier = Modifier
-                        .fillMaxWidth(0.85f)
                         .wrapContentWidth(Alignment.Start),
                     color = Color.DarkGray,
-                    fontSize = 25.sp
+                    fontSize = 22.sp
                 )
             }
-            user.points?.let { points ->
+
+            Spacer(modifier = Modifier.width(30.dp))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = points.toString(),
-                    modifier = Modifier
-                        .wrapContentWidth(Alignment.End)
-                    ,
+                    text = user.displayName.toString(),
+                    modifier = Modifier,
                     color = Color.DarkGray,
-                    fontSize = 25.sp
+                    fontSize = 22.sp
+                )
+            }
+            Spacer(modifier = Modifier.width(30.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = user.country.toString(),
+                    modifier = Modifier,
+                    color = Color.DarkGray,
+                    fontSize = 22.sp
+                )
+            }
+            Spacer(modifier = Modifier.width(15.dp))
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = user.points.toString(),
+                    modifier = Modifier
+                        .wrapContentWidth(Alignment.End),
+                    color = Color.DarkGray,
+                    fontSize = 22.sp,
+                    textAlign = TextAlign.End
                 )
             }
         }
