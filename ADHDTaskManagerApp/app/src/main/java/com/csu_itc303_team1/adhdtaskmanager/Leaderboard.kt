@@ -2,9 +2,6 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,39 +13,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
-@Composable
-fun leaderboardUsers(): ArrayList<Users> {
-    val db = Firebase.firestore
+fun usersList(response: Response) {
 
-    val userList = ArrayList<Users>()
+    // for each user, add them to the arraylist
 
-    db.collection("users")
-        .get()
-        .addOnSuccessListener { documents ->
-            for (document in documents) {
-                Log.d(TAG, "${document.id} => ${document.data}")
-                val user = document.toObject(Users::class.java)
-                userList.add(user)
+    response.users?.let { users ->
+            users.forEach{ user ->
+                Final.addToList(user)
+                user.displayName?.let { Log.i(TAG, it) }
+
             }
         }
-        .addOnFailureListener { exception ->
-            Log.d(TAG, "Error getting Documents: ", exception)
+        response.exception?.message?.let {
+            Log.e(TAG, it)
         }
 
-    return userList
 }
+
 
 @Composable
 fun LeaderboardItem(user: Users, rank: Int) {
+
+    // This will be each row in the leaderboard
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -57,30 +46,38 @@ fun LeaderboardItem(user: Users, rank: Int) {
             .height(45.dp)
             .padding(start = 10.dp)
     ) {
-        // Menu Icon for the Drawer Item
 
         Text(
             text = rank.toString(),
-            fontSize = 16.sp,
+            fontSize = 22.sp,
             color = Color.Black
         )
 
-        Spacer(modifier = Modifier.width(7.dp))
+        Spacer(modifier = Modifier.width(15.dp))
 
-        Spacer(modifier = Modifier.width(7.dp))
+        Spacer(modifier = Modifier.width(15.dp))
         // Text for the Drawer Item
         Text(
             text = user.displayName.toString(),
-            fontSize = 16.sp,
+            fontSize = 22.sp,
             color = Color.Black
         )
 
-        Spacer(modifier = Modifier.width(7.dp))
+        Spacer(modifier = Modifier.width(15.dp))
+        // Text for the Drawer Item
+        Text(
+            text = user.country.toString(),
+            fontSize = 22.sp,
+            color = Color.Black
+        )
+
+        Spacer(modifier = Modifier.width(50.dp))
         // Text for the Drawer Item
         Text(
             text = user.points.toString(),
-            fontSize = 16.sp,
+            fontSize = 22.sp,
             color = Color.Black
         )
     }
 }
+

@@ -14,7 +14,7 @@ import androidx.navigation.compose.composable
 fun SetupNavGraph(
     navController: NavHostController,
     state: TodoState,
-    event: (TodoEvent) -> Unit
+    event: (TodoEvent) -> Unit,
 ) {
     // NavHost for controlling the pages.
     NavHost(

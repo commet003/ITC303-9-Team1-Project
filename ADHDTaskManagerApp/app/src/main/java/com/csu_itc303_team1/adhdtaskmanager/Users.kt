@@ -13,3 +13,13 @@ data class Users (
     val username: String? = null,
     val country: String? = null,
         )
+
+// Final list of users ready for displaying
+class Final: ArrayList<Users>() {
+    companion object {
+        var finalDataList = ArrayList<Users>()
+        fun addToList(user: Users) {
+            finalDataList.add(user)
+        }
+    }
+}
