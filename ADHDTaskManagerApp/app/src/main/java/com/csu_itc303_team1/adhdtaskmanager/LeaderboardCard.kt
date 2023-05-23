@@ -48,7 +48,7 @@ fun LeaderboardCard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(30.dp))
+            Spacer(modifier = Modifier.width(50.dp))
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -60,7 +60,7 @@ fun LeaderboardCard(
                     fontSize = 22.sp
                 )
             }
-            Spacer(modifier = Modifier.width(30.dp))
+            Spacer(modifier = Modifier.width(45.dp))
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -71,7 +71,7 @@ fun LeaderboardCard(
                     fontSize = 22.sp
                 )
             }
-            Spacer(modifier = Modifier.width(15.dp))
+            Spacer(modifier = Modifier.width(60.dp))
             Column(
                 horizontalAlignment = Alignment.End
             ) {
