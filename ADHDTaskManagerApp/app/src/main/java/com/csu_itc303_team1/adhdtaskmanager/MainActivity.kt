@@ -2,9 +2,11 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -70,6 +72,7 @@ class MainActivity : ComponentActivity() {
         })
 
     private lateinit var navController: NavHostController
+    private lateinit var leadViewModel: LeaderboardViewModel
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
@@ -77,6 +80,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // Retrieve's Leaderboard data onCreate
+            leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
+            // Puts it into a readable format
+            getResponseUsingCallback()
+
             ADHDTaskManagerTheme {
 
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
@@ -127,7 +135,7 @@ class MainActivity : ComponentActivity() {
                         SetupNavGraph(
                             navController = navController,
                             state = state,
-                            event = viewModel::onEvent
+                            event = viewModel::onEvent,
                         )
                     }
                 }
@@ -190,8 +198,13 @@ class MainActivity : ComponentActivity() {
             }
         )
     }
+
+    // creates Arraylist of users from the firestore database
+    private fun getResponseUsingCallback() {
+        leadViewModel.getResponseUsingCallback((object : FirebaseCallback {
+            override fun onResponse(response: Response) {
+                usersList(response)
+            }
+        }))
+    }
 }
-
-
-
-
