@@ -135,6 +135,7 @@ class MainActivity : ComponentActivity() {
                         SetupNavGraph(
                             navController = navController,
                             state = state,
+                            context = applicationContext,
                             event = viewModel::onEvent,
                         )
                     }

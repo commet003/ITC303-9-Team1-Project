@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -13,16 +14,16 @@ import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 
 @Composable
-fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit){
+fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, onClick: () -> Unit){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
             .height(160.dp)
+            .clickable { onClick() }
     ) {
         Column(
-            modifier = Modifier.padding(10.dp)
-        ) {
+            modifier = Modifier.padding(10.dp)) {
             Row{
                 Row(
                     modifier = Modifier

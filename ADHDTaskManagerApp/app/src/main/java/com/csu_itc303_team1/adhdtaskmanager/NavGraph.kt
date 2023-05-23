@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,6 +15,7 @@ import androidx.navigation.compose.composable
 fun SetupNavGraph(
     navController: NavHostController,
     state: TodoState,
+    context: Context,
     event: (TodoEvent) -> Unit,
 ) {
     // NavHost for controlling the pages.
@@ -33,7 +35,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.SettingsScreen.route
         ) {
-            SettingsScreen()
+            SettingsScreen(context)
         }
 
         // Leaderboard Screen
