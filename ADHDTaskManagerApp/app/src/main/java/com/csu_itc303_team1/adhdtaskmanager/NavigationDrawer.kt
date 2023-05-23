@@ -84,7 +84,8 @@ fun DrawerBody(scope: CoroutineScope, scaffoldState: ScaffoldState, navControlle
     // Create a list of Screen objects
     val screens = listOf(
         Screen.TodoScreen,
-        Screen.SettingsScreen
+        Screen.SettingsScreen,
+        Screen.LeaderboardScreen
     )
 
     // Column to store all the items
