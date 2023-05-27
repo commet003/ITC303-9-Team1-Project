@@ -42,6 +42,13 @@ fun SetupNavGraph(
         ) {
             LeaderboardScreen()
         }
+
+        // Rewards Screen
+        composable(
+            route = Screen.RewardsScreen.route
+        ) {
+            RewardsScreen()
+        }
     }
 }
 
