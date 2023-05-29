@@ -66,6 +66,7 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
 
                         //val completedTodo = todo.markAsCompleted()
 
+
                         // onEvent(TodoEvent.markTodoAsCompleted(todo))
 
                     }
