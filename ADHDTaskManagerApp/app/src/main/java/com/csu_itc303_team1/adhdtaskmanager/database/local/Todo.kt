@@ -12,7 +12,7 @@ data class Todo(
     val priority: Priority,
     val dueDate: String,
     val dueTime: String,
-    val isCompleted: Boolean = false,
+    var isCompleted: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 )

@@ -17,6 +17,12 @@ interface TodoDao {
     @Update
     suspend fun updateTodo(todo: Todo)
 
+    @Update
+    suspend fun updateTodoIsCompleted(todo: Todo)
+
+    //reads database for tasks checked as completed.
+    @Query("SELECT COUNT(*) FROM Todo WHERE isCompleted = 1")
+    suspend fun getCountOfCompletedTodos(): Int
 
     // Sort Todos by Priority
     @Query("SELECT * FROM Todo ORDER BY priority DESC")
