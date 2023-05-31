@@ -36,16 +36,25 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import androidx.room.util.query
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
+import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
+import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDatabase
 import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+import okhttp3.Dispatcher
 
 
 @Suppress("UNCHECKED_CAST")
@@ -61,6 +70,24 @@ class MainActivity : ComponentActivity() {
         )/*.openHelperFactory(factory)*/.build()
     }
 
+    private val rewardDB by lazy {
+    Room.databaseBuilder(
+        applicationContext,
+        RewardDatabase::class.java, "reward_database.db"
+    ).createFromAsset("reward.db").build()}
+
+    private val rewardViewModel by viewModels<RewardViewModel>(
+        factoryProducer = {
+            object: ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RewardViewModel(rewardDB.rewardDao) as T
+                }
+            }
+        }
+    )
+
+
+
 
     private val viewModel by viewModels<TodoViewModel>(
         factoryProducer = {
@@ -69,10 +96,15 @@ class MainActivity : ComponentActivity() {
                     return TodoViewModel(db.todoDao) as T
                 }
             }
-        })
+        }
+    )
+
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
+    private lateinit var rewardDao: RewardDao
+
+
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
@@ -84,6 +116,8 @@ class MainActivity : ComponentActivity() {
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
+            //initialRewards(rewardViewModel)
+
 
             ADHDTaskManagerTheme {
 
@@ -132,16 +166,28 @@ class MainActivity : ComponentActivity() {
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
                         val state by viewModel.state.collectAsState()
+                        //val rState by rewardViewModel.state.collectAsState()
+
                         SetupNavGraph(
                             navController = navController,
                             state = state,
                             event = viewModel::onEvent,
+                            rewardViewModel = rewardViewModel
+//                            rState = rState,
+//                            rEvent = rewardViewModel::onEvent
                         )
                     }
                 }
             }
         }
-        //HelpScreen()
+//        val rewardDB = Room.databaseBuilder(
+//            applicationContext,
+//            RewardDatabase::class.java, "reward_database.db"
+//        ).createFromAsset("reward.db").build()
+//
+//
+//        rewardDao = rewardDB.rewardDao
+
     }
 
 

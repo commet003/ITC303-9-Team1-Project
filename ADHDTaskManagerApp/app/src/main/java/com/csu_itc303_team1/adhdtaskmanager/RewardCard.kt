@@ -11,10 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
 
 @Composable
-fun RewardCard(){
-
+fun RewardCard(reward: Reward){
+    val total: Int = reward.timesAchieved * reward.pointsAwarded
     Card(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
@@ -32,11 +33,11 @@ fun RewardCard(){
         ){
             Column(){
                 Text(
-                    text = "Completed Task Badge",
+                    text = reward.title,
                     fontSize = 24.sp
                 )
                 Text(
-                    text = "You have achieved: " + "4" + " Times",
+                    text = "You have achieved: " + reward.timesAchieved + " Times",
                     fontSize = 20.sp
                 )
             }
@@ -47,7 +48,7 @@ fun RewardCard(){
                     fontSize = 20.sp
                 )
                 Text(
-                    text = "12",
+                    text = total.toString(),
                     fontSize = 20.sp
                 )
             }

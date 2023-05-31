@@ -13,28 +13,38 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
+import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
-fun RewardsScreen() {
+fun RewardsScreen(rewardViewModel: RewardViewModel) {
+
+    val rewardList = rewardViewModel.allRewards.collectAsState(initial = emptyList())
+    val final = rewardList.value
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(150.dp),
-    verticalAlignment = Alignment.Top
-    ){
+        verticalAlignment = Alignment.Top
+    ) {
         Box(
             modifier = Modifier
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(20.dp, 20.dp, 20.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
@@ -44,24 +54,30 @@ fun RewardsScreen() {
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(20.dp, 0.dp, 20.dp)
             ) {
-                Text(text = "Total Points",
+                Text(
+                    text = "Total Points",
                     fontSize = 26.sp,
-                    modifier = Modifier.absoluteOffset(50.dp,100.dp)
-                    )
-                Text(text = "350",
+                    modifier = Modifier.absoluteOffset(50.dp, 100.dp)
+                )
+                Text(
+                    text = "350",
                     fontSize = 26.sp,
-                    modifier = Modifier.absoluteOffset(100.dp,100.dp)
-                    )
+                    modifier = Modifier.absoluteOffset(100.dp, 100.dp)
+                )
             }
         }
     }
 
     LazyColumn(
-        modifier = Modifier.padding(10.dp, 150.dp,10.dp)
-    ){
+        modifier = Modifier.padding(10.dp, 150.dp, 10.dp)
+    ) {
+        items(final) {reward ->
+            RewardCard(reward)
 
+        }
     }
 }

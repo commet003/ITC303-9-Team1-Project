@@ -3,7 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.database.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity (tableName = "rewards")
 data class Reward(
     val title: String,
     val description: String,
@@ -12,3 +12,10 @@ data class Reward(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 )
+
+//data class Reward(
+//    val title: String,
+//    val description: String,
+//    val pointsAwarded: Int,
+//    val timesAchieved: Int
+//)
