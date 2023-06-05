@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
 
 /**
  * This is Navigation Controller code. This page points to the screen that is requested.
@@ -17,6 +18,7 @@ fun SetupNavGraph(
     state: TodoState,
     context: Context,
     event: (TodoEvent) -> Unit,
+    rewardViewModel: RewardViewModel
 ) {
     // NavHost for controlling the pages.
     NavHost(
@@ -43,6 +45,13 @@ fun SetupNavGraph(
             route = Screen.LeaderboardScreen.route
         ) {
             LeaderboardScreen()
+        }
+
+        // Rewards Screen
+        composable(
+            route = Screen.RewardsScreen.route
+        ) {
+            RewardsScreen(rewardViewModel)
         }
     }
 }
