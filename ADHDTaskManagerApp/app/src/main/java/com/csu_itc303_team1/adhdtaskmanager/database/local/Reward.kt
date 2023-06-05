@@ -12,10 +12,3 @@ data class Reward(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
 )
-
-//data class Reward(
-//    val title: String,
-//    val description: String,
-//    val pointsAwarded: Int,
-//    val timesAchieved: Int
-//)

@@ -2,11 +2,9 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -36,26 +34,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
-import androidx.room.util.query
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
-import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
 import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDatabase
 import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
-import okhttp3.Dispatcher
-
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
@@ -86,9 +75,6 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-
-
-
     private val viewModel by viewModels<TodoViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
@@ -99,12 +85,8 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
-    private lateinit var rewardDao: RewardDao
-
-
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
@@ -173,21 +155,11 @@ class MainActivity : ComponentActivity() {
                             state = state,
                             event = viewModel::onEvent,
                             rewardViewModel = rewardViewModel
-//                            rState = rState,
-//                            rEvent = rewardViewModel::onEvent
                         )
                     }
                 }
             }
         }
-//        val rewardDB = Room.databaseBuilder(
-//            applicationContext,
-//            RewardDatabase::class.java, "reward_database.db"
-//        ).createFromAsset("reward.db").build()
-//
-//
-//        rewardDao = rewardDB.rewardDao
-
     }
 
 

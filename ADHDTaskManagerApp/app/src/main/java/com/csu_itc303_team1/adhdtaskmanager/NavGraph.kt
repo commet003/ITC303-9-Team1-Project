@@ -17,8 +17,6 @@ fun SetupNavGraph(
     state: TodoState,
     event: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel
-//    rState: RewardState,
-//    rEvent: (RewardEvent) -> Unit
 ) {
     // NavHost for controlling the pages.
     NavHost(
