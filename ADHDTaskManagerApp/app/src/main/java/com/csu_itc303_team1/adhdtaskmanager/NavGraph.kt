@@ -16,7 +16,6 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
 fun SetupNavGraph(
     navController: NavHostController,
     state: TodoState,
-    context: Context,
     event: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel
 ) {
@@ -37,7 +36,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.SettingsScreen.route
         ) {
-            SettingsScreen(context)
+            SettingsScreen()
         }
 
         // Leaderboard Screen

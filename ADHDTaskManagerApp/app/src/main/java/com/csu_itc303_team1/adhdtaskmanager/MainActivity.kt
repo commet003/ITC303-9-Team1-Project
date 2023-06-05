@@ -60,10 +60,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private val rewardDB by lazy {
-    Room.databaseBuilder(
-        applicationContext,
-        RewardDatabase::class.java, "reward_database.db"
-    ).createFromAsset("reward.db").build()}
+        Room.databaseBuilder(
+            applicationContext,
+            RewardDatabase::class.java, "reward_database.db"
+        ).createFromAsset("reward.db").build()}
 
     private val rewardViewModel by viewModels<RewardViewModel>(
         factoryProducer = {
@@ -153,7 +153,6 @@ class MainActivity : ComponentActivity() {
                         SetupNavGraph(
                             navController = navController,
                             state = state,
-                            context = applicationContext,
                             event = viewModel::onEvent,
                             rewardViewModel = rewardViewModel
                         )
