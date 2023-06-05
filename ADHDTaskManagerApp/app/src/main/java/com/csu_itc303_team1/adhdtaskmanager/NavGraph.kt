@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,6 +16,7 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
 fun SetupNavGraph(
     navController: NavHostController,
     state: TodoState,
+    context: Context,
     event: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel
 ) {
@@ -35,7 +37,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.SettingsScreen.route
         ) {
-            SettingsScreen()
+            SettingsScreen(context)
         }
 
         // Leaderboard Screen

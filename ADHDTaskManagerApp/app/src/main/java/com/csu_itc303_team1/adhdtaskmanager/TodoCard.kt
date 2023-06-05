@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -16,27 +17,38 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
 
 @Composable
-fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
+
+fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, onClick: () -> Unit){
     val todoDao: TodoDao
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
             .height(160.dp)
+            .clickable { onClick() }
     ) {
         Column(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(25.dp),
-                verticalAlignment = CenterVertically,
-            ) {
-                Text(
-                    text = todo.title,
-                    fontSize = 22.sp,
-                )
+            modifier = Modifier.padding(10.dp)) {
+            Row{
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(25.dp),
+                    verticalAlignment = CenterVertically,
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(25.dp),
+                        verticalAlignment = CenterVertically,
+                    ) {
+                        Text(
+                            text = todo.title,
+                            fontSize = 22.sp,
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
