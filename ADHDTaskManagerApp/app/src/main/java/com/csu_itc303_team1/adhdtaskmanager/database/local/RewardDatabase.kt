@@ -19,15 +19,17 @@ abstract class RewardDatabase: RoomDatabase() {
         private var INSTANCE: RewardDatabase? = null
 
         fun getInstance(context: Context): RewardDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    RewardDatabase::class.java,
-                    "reward_database.db"
-                ).build()
-
-                INSTANCE = instance
-                instance
+            synchronized(this) {
+                var instance = INSTANCE
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        RewardDatabase::class.java,
+                        "reward_database.db"
+                    ).createFromAsset("reward.db").build()
+                    INSTANCE = instance
+                }
+                return instance
             }
         }
     }

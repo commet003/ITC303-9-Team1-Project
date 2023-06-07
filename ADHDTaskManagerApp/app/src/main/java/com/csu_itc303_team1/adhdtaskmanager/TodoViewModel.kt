@@ -140,6 +140,13 @@ class TodoViewModel(
                     it.copy(showTimeSelector = true)
                 }
             }
+            is TodoEvent.markTodoAsCompleted -> {
+                val todo = state.value.todos.find { it.id == event.todo.id}
+                todo?.let {
+                    val updatedTodo = it.copy(isCompleted = true)
+                    viewModelScope.launch {
+                        todoDao.updateTodoIsCompleted(updatedTodo)
+                    }}}
 
         }
     }

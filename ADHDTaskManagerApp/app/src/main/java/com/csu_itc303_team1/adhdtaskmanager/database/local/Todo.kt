@@ -15,4 +15,8 @@ data class Todo(
     val isCompleted: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
-)
+) {
+    fun markAsCompleted(): Todo {
+            return copy(isCompleted = true)
+        }
+}

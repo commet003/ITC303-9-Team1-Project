@@ -9,15 +9,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
-import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
+
+
 
 @Composable
-fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
-    val todoDao: TodoDao
+fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
+
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,18 +59,27 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
-                        //todo.isCompleted = true
-                        //val updatedTodo = true
-                        val updatedTodo = todo.copy(isCompleted = true)
-                        // Handle completed task event
-                        println("Completed" + todo.isCompleted)
-                        //onEvent(TodoEvent.markTodoAsCompleted(updatedTodo))
+                        if (!todo.isCompleted) {
+                            val updatedTodo = todo.copy(isCompleted = true)
+                            // Handle completed task event
+                            //println("Completed" + todo.isCompleted)
+                            onEvent(TodoEvent.markTodoAsCompleted(updatedTodo))
 
-                        //val completedTodo = todo.markAsCompleted()
+                            //val reward:
 
-
-                        // onEvent(TodoEvent.markTodoAsCompleted(todo))
-
+                            //val updatedReward = rewardViewModel.findReward("Completed Task Reward")
+                            rewardViewModel.findReward("Completed Task Reward")
+                            val completedReward = rewardViewModel.searchResults.value?.get(0)
+                            val completedAchieved = completedReward?.timesAchieved
+                            val newAchievement = completedAchieved?.plus(1)
+                            if (completedReward != null) {
+                                newAchievement?.let {
+                                    Reward(completedReward.title, completedReward.description, completedReward.pointsAwarded,
+                                        it
+                                    )
+                                }?.let { rewardViewModel.updateReward(it) }
+                            }
+                        }
                     }
                 ) {
                     Icon(

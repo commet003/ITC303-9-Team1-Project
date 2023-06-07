@@ -1,6 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
@@ -30,21 +31,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
 import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDatabase
 import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
@@ -59,21 +67,23 @@ class MainActivity : ComponentActivity() {
         )/*.openHelperFactory(factory)*/.build()
     }
 
-    private val rewardDB by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            RewardDatabase::class.java, "reward_database.db"
-        ).createFromAsset("reward.db").build()}
+//    private val rewardDB by lazy {
+//        Room.databaseBuilder(
+//            applicationContext,
+//            RewardDatabase::class.java, "reward_database.db"
+//        ).createFromAsset("reward.db").build()}
 
     private val rewardViewModel by viewModels<RewardViewModel>(
         factoryProducer = {
             object: ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RewardViewModel(rewardDB.rewardDao) as T
+                    return RewardViewModel(application) as T
                 }
             }
         }
     )
+
+
 
     private val viewModel by viewModels<TodoViewModel>(
         factoryProducer = {
@@ -87,6 +97,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
+    //private lateinit var rewardViewModel: RewardViewModel
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
@@ -99,6 +110,7 @@ class MainActivity : ComponentActivity() {
             // Puts it into a readable format
             getResponseUsingCallback()
             //initialRewards(rewardViewModel)
+            //rewardViewModel = ViewModelProvider(this) [RewardViewModel::class.java]
 
 
             ADHDTaskManagerTheme {
@@ -143,12 +155,21 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        val owner = LocalViewModelStoreOwner.current
+
+                        owner?.let{
+                            val rewardViewModel: RewardViewModel = viewModel(
+                                it,
+                                "RewardViewModel",
+                                RewardViewModelFactory(LocalContext.current.applicationContext as Application))
+                            RewardSetup(rewardViewModel)
+                        }
 
 
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
                         val state by viewModel.state.collectAsState()
-                        //val rState by rewardViewModel.state.collectAsState()
+                        //val rewardState by rewardViewModel.collectAsState()
 
                         SetupNavGraph(
                             navController = navController,
@@ -161,7 +182,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 
     //Shows the notification
     // TODO - Make this show the notification when a task is due
@@ -225,4 +245,12 @@ class MainActivity : ComponentActivity() {
             }
         }))
     }
+
+    class RewardViewModelFactory(val application: Application):
+            ViewModelProvider.Factory{
+                override fun <T: ViewModel> create(modelClass: Class<T>): T {
+                    return RewardViewModel(application) as T
+                }
+            }
+
 }

@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.database.local
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface RewardDao {
 
     @Query("SELECT * FROM rewards")
-    fun getAllRewards(): Flow<List<Reward>>
+    fun getAllRewards(): LiveData<List<Reward>>
 
     @Update
     suspend fun updateReward(reward: Reward)
@@ -21,4 +22,7 @@ interface RewardDao {
 
     @Delete
     suspend fun deleteReward(reward: Reward)
+
+    @Query("SELECT * FROM rewards WHERE title = :name")
+    fun findReward(name: String): List<Reward>
 }
