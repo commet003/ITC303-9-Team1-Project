@@ -7,8 +7,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +38,8 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                 Text(
                     text = todo.title,
                     fontSize = 22.sp,
+                    // Line through if completed
+                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
@@ -50,12 +54,22 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                 }
             }
             Row(
-                modifier = Modifier.height(60.dp)
+                modifier = Modifier.height(60.dp),
+                verticalAlignment = CenterVertically
             ) {
-                Text(text = todo.description)
+                Checkbox(
+                    checked = todo.isCompleted, onCheckedChange = {
+                    onEvent(TodoEvent.toggleCompleted(todo))
+                })
+                Spacer(modifier = Modifier.width(10.dp))
 
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
+                Text(
+                    text = todo.description,
+                    // Line through if completed
+                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                )
+
+                /*IconButton(
                     onClick = {
                         onEvent(TodoEvent.toggleCompleted(todo))
                     }
@@ -64,7 +78,9 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                         imageVector = Icons.Default.Check,
                         contentDescription = "Mark as Completed"
                     )
-                }
+                }*/
+
+
             }
             Row(
                 modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
