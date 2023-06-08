@@ -140,6 +140,16 @@ class TodoViewModel(
                     it.copy(showTimeSelector = true)
                 }
             }
+            // Toggle the completed state of the todo
+            is TodoEvent.toggleCompleted -> {
+                viewModelScope.launch {
+                    todoDao.updateTodo(
+                        event.todo.copy(
+                            isCompleted = !event.todo.isCompleted
+                        )
+                    )
+                }
+            }
 
         }
     }

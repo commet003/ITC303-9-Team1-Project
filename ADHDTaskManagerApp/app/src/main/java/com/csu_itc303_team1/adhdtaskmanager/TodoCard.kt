@@ -57,18 +57,7 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
-                        //todo.isCompleted = true
-                        //val updatedTodo = true
-                        val updatedTodo = todo.copy(isCompleted = true)
-                        // Handle completed task event
-                        println("Completed" + todo.isCompleted)
-                        //onEvent(TodoEvent.markTodoAsCompleted(updatedTodo))
-
-                        //val completedTodo = todo.markAsCompleted()
-
-
-                        // onEvent(TodoEvent.markTodoAsCompleted(todo))
-
+                        onEvent(TodoEvent.toggleCompleted(todo))
                     }
                 ) {
                     Icon(
