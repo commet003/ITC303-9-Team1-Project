@@ -68,7 +68,6 @@ fun RewardsScreen(rewardViewModel: RewardViewModel) {
     ) {
         items(allRewards) { reward ->
             RewardCard(reward)
-
         }
     }
 }

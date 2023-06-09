@@ -24,6 +24,16 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
 
     val searchResults by rewardViewModel.searchResults.observeAsState()
+    if (searchResults == null) {
+        val newReward = Reward(
+            title = "Completed Task Reward",
+            description = "Reward for completing a task",
+            pointsAwarded = 3,
+            timesAchieved = 0,
+            id = 0
+        )
+        rewardViewModel.insertReward(newReward)
+    }
     rewardViewModel.findReward("Completed Task Reward")
 
     Card(
@@ -65,18 +75,24 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardVi
             ) {
                 Checkbox(
                     checked = todo.isCompleted, onCheckedChange = {
-                    onEvent(TodoEvent.toggleCompleted(todo))
-                    
-                      // get the Completed Reward Entity and update the times achieved.
-                            val completedReward = searchResults?.get(0)
+                        onEvent(TodoEvent.toggleCompleted(todo))
+
+                        // get the Completed Reward Entity and update the times achieved.
+
+                        val completedReward = searchResults?.get(0)
+
+                        if (!todo.isCompleted) {
                             if (completedReward != null) {
-                                completedReward.timesAchieved = completedReward.timesAchieved + 1
+
+                                completedReward.timesAchieved =
+                                    completedReward.timesAchieved + 1
                             }
                             if (completedReward != null) {
                                 rewardViewModel.updateReward(completedReward)
                             }
-                    
-                })
+
+                        }
+                    })
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
@@ -84,19 +100,6 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardVi
                     // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
-
-                /*IconButton(
-                    onClick = {
-                        onEvent(TodoEvent.toggleCompleted(todo))
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Mark as Completed"
-                    )
-                }*/
-
-
             }
             Row(
                 modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
