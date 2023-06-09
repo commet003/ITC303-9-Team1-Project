@@ -9,8 +9,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
@@ -41,6 +44,8 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardVi
                 Text(
                     text = todo.title,
                     fontSize = 22.sp,
+                    // Line through if completed
+                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
@@ -55,20 +60,14 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardVi
                 }
             }
             Row(
-                modifier = Modifier.height(60.dp)
+                modifier = Modifier.height(60.dp),
+                verticalAlignment = CenterVertically
             ) {
-                Text(text = todo.description)
-
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        if (!todo.isCompleted) {
-
-                            // If To-do is complete, mark to do as completed and update database
-                            val updatedTodo = todo.copy(isCompleted = true)
-                            onEvent(TodoEvent.markTodoAsCompleted(updatedTodo))
-
-                            // get the Completed Reward Entity and update the times achieved.
+                Checkbox(
+                    checked = todo.isCompleted, onCheckedChange = {
+                    onEvent(TodoEvent.toggleCompleted(todo))
+                    
+                      // get the Completed Reward Entity and update the times achieved.
                             val completedReward = searchResults?.get(0)
                             if (completedReward != null) {
                                 completedReward.timesAchieved = completedReward.timesAchieved + 1
@@ -76,14 +75,28 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardVi
                             if (completedReward != null) {
                                 rewardViewModel.updateReward(completedReward)
                             }
-                        }
+                    
+                })
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Text(
+                    text = todo.description,
+                    // Line through if completed
+                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                )
+
+                /*IconButton(
+                    onClick = {
+                        onEvent(TodoEvent.toggleCompleted(todo))
                     }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Mark as Completed"
                     )
-                }
+                }*/
+
+
             }
             Row(
                 modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
