@@ -27,7 +27,4 @@ sealed interface TodoEvent {
     object showTimeSelector: TodoEvent
     object hideTimeSelector: TodoEvent
 
-    data class markTodoAsCompleted(val todo: Todo): TodoEvent
-
-
 }
