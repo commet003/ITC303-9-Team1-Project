@@ -14,7 +14,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TodoScreen(
     state: TodoState,
-    onEvent: (TodoEvent) -> Unit
+    onEvent: (TodoEvent) -> Unit,
+    rewardViewModel: RewardViewModel
 ) {
     Scaffold(
         floatingActionButton = {
@@ -42,7 +43,7 @@ fun TodoScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ){
             items(state.todos){ todo ->
-                TodoCard(todo = todo, onEvent = onEvent)
+                TodoCard(todo = todo, onEvent = onEvent, rewardViewModel = rewardViewModel)
             }
         }
     }

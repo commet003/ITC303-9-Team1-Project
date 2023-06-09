@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -14,12 +16,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
-import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
+
 
 @Composable
-fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
-    val todoDao: TodoDao
+fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
+
+    val searchResults by rewardViewModel.searchResults.observeAsState()
+    rewardViewModel.findReward("Completed Task Reward")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -60,6 +66,16 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit) {
                 Checkbox(
                     checked = todo.isCompleted, onCheckedChange = {
                     onEvent(TodoEvent.toggleCompleted(todo))
+                    
+                      // get the Completed Reward Entity and update the times achieved.
+                            val completedReward = searchResults?.get(0)
+                            if (completedReward != null) {
+                                completedReward.timesAchieved = completedReward.timesAchieved + 1
+                            }
+                            if (completedReward != null) {
+                                rewardViewModel.updateReward(completedReward)
+                            }
+                    
                 })
                 Spacer(modifier = Modifier.width(10.dp))
 

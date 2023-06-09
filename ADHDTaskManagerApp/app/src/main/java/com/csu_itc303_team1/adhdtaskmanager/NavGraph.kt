@@ -17,7 +17,8 @@ fun SetupNavGraph(
     navController: NavHostController,
     state: TodoState,
     event: (TodoEvent) -> Unit,
-    rewardViewModel: RewardViewModel
+    rewardViewModel: RewardViewModel,
+
 ) {
     // NavHost for controlling the pages.
     NavHost(
@@ -29,7 +30,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.TodoScreen.route
         ) {
-            TodoScreen(state = state, onEvent = event)
+            TodoScreen(state = state, onEvent = event, rewardViewModel = rewardViewModel)
         }
 
         // Settings Screen

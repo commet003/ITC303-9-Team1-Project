@@ -1,37 +1,28 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
-import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun RewardsScreen(rewardViewModel: RewardViewModel) {
 
-    val rewardList = rewardViewModel.allRewards.collectAsState(initial = emptyList())
-    val final = rewardList.value
+    val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
 
     Row(
         modifier = Modifier
@@ -75,7 +66,7 @@ fun RewardsScreen(rewardViewModel: RewardViewModel) {
     LazyColumn(
         modifier = Modifier.padding(10.dp, 150.dp, 10.dp)
     ) {
-        items(final) {reward ->
+        items(allRewards) { reward ->
             RewardCard(reward)
 
         }
