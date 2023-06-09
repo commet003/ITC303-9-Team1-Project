@@ -36,20 +36,16 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
-import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDatabase
 import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
@@ -155,15 +151,16 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        val owner = LocalViewModelStoreOwner.current
-
-                        owner?.let{
-                            val rewardViewModel: RewardViewModel = viewModel(
-                                it,
-                                "RewardViewModel",
-                                RewardViewModelFactory(LocalContext.current.applicationContext as Application))
-                            RewardSetup(rewardViewModel)
-                        }
+//                        val owner = LocalViewModelStoreOwner.current
+//
+//                        owner?.let{
+//                            val rewardViewModel: RewardViewModel = viewModel(
+//                                it,
+//                                "RewardViewModel",
+//                                RewardViewModelFactory(LocalContext.current.applicationContext as Application))
+//                            RewardSetup(rewardViewModel)
+//                            TodoRewardSetup(rewardViewModel)
+//                        }
 
 
                         // The content itself is the navController's current state, or Home Screen
@@ -246,11 +243,11 @@ class MainActivity : ComponentActivity() {
         }))
     }
 
-    class RewardViewModelFactory(val application: Application):
-            ViewModelProvider.Factory{
-                override fun <T: ViewModel> create(modelClass: Class<T>): T {
-                    return RewardViewModel(application) as T
-                }
-            }
+//    class RewardViewModelFactory(val application: Application):
+//            ViewModelProvider.Factory{
+//                override fun <T: ViewModel> create(modelClass: Class<T>): T {
+//                    return RewardViewModel(application) as T
+//                }
+//            }
 
 }

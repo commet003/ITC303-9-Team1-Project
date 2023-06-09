@@ -21,6 +21,4 @@ data class Reward (
 
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
-
-
 )

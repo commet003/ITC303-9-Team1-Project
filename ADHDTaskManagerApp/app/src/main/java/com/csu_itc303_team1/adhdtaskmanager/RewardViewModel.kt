@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
 import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
 import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDatabase
@@ -27,9 +28,11 @@ import javax.inject.Inject
 
 class RewardViewModel(application: Application): ViewModel() {
 
-    val allRewards: LiveData<List<Reward>>
+    var allRewards: LiveData<List<Reward>>
     private val repo: RewardRepo
-    val searchResults: LiveData<List<Reward>>
+    private var _searchResults = MutableLiveData<List<Reward>>((emptyList()))
+    var searchResults: LiveData<List<Reward>> = _searchResults
+
 
     init {
         val rewardDb = RewardDatabase.getInstance(application)
@@ -37,7 +40,6 @@ class RewardViewModel(application: Application): ViewModel() {
         repo = RewardRepo(rewardDao)
 
         allRewards = repo.allRewards
-        searchResults = repo.searchResults
     }
 
     fun insertReward(reward: Reward) {
@@ -45,7 +47,9 @@ class RewardViewModel(application: Application): ViewModel() {
     }
 
     fun findReward(name: String) {
-        repo.findReward(name)
+        viewModelScope.launch {
+            searchResults = repo.findReward(name)
+        }
     }
 
     fun updateReward(reward: Reward) {

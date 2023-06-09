@@ -35,15 +35,7 @@ class RewardRepo(private val rewardDao: RewardDao) {
         }
     }
 
-    fun findReward(name: String) {
-        coroutineScope.launch(Dispatchers.Main) {
-            searchResults.value = asyncFind(name).await()
-        }
+    fun findReward(name: String): LiveData<List<Reward>> {
+        return rewardDao.findReward(name)
     }
-
-    private fun asyncFind(name: String): Deferred<List<Reward>?> =
-        coroutineScope.async(Dispatchers.IO){
-            return@async rewardDao.findReward(name)
-        }
-
 }

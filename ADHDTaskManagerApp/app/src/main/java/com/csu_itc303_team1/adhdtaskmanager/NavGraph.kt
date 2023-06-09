@@ -51,7 +51,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.RewardsScreen.route
         ) {
-            rewardViewModel.allRewards.value?.let { it1 -> RewardsScreen(it1) }
+            RewardsScreen(rewardViewModel)
         }
     }
 }

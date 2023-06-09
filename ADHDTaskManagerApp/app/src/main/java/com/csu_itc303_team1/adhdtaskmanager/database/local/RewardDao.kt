@@ -24,5 +24,5 @@ interface RewardDao {
     suspend fun deleteReward(reward: Reward)
 
     @Query("SELECT * FROM rewards WHERE title = :name")
-    fun findReward(name: String): List<Reward>
+    fun findReward(name: String): LiveData<List<Reward>>
 }
