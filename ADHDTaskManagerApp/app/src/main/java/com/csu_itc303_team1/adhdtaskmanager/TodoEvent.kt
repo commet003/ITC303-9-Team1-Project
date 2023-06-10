@@ -10,6 +10,9 @@ sealed interface TodoEvent {
     data class setDueDate(val dueDate: String): TodoEvent
     data class setDueTime(val dueTime: String): TodoEvent
     data class deleteTodo(val todo: Todo): TodoEvent
+
+    data class setPomodoroTime(val pomodoroTime: String): TodoEvent
+    data class setBreakTime(val breakTime: String): TodoEvent
     // Data class to sort by sort type
     data class sortBy(val sortType: SortType): TodoEvent
 

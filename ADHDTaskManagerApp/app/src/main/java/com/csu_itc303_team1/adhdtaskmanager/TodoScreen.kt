@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.pomodoro.MainTimer
+import com.csu_itc303_team1.adhdtaskmanager.pomodoro.NewTimer
 
 @Composable
 fun TodoScreen(
@@ -34,14 +35,6 @@ fun TodoScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                FloatingActionButton(onClick = {
-                    context.startActivity(Intent(context, MainTimer::class.java))
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Face,
-                        contentDescription = "Go To Timer"
-                    )
-                }
             }
         },
 
@@ -71,7 +64,12 @@ fun TodoScreen(
                     editor?.putString("task", todo.title)
                     editor?.apply()
 
-                    context.startActivity(Intent(context, MainTimer::class.java))
+                    val intent = Intent(context, NewTimer::class.java).apply {
+                        putExtra("TASK_NAME", todo.title)
+                        putExtra("POMORO_TIME", todo.pomodoroTime)
+                        putExtra("BREAK_TIME", todo.breakTime)
+                    }
+                    context.startActivity(intent)
                 }
             }
         }

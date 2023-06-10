@@ -18,18 +18,19 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
 
 @Composable
 
-fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, onClick: () -> Unit){
+fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, onClick: () -> Unit) {
     val todoDao: TodoDao
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .height(160.dp)
+            .height(180.dp)
             .clickable { onClick() }
     ) {
         Column(
-            modifier = Modifier.padding(10.dp)) {
-            Row{
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Row {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
@@ -50,68 +51,83 @@ fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, onClick: () -> Unit){
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        onEvent(TodoEvent.showEditTodoDialog)
+                Row {
+                    IconButton(
+                        onClick = {
+                            onEvent(TodoEvent.showEditTodoDialog)
+                        }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Todo"
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Todo"
-                    )
                 }
             }
             Row(
-                modifier = Modifier.height(60.dp)
+                modifier = Modifier.height(30.dp)
             ) {
                 Text(text = todo.description)
 
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        //todo.isCompleted = true
-                        //val updatedTodo = true
-                        val updatedTodo = todo.copy(isCompleted = true)
-                        // Handle completed task event
-                        println("Completed" + todo.isCompleted)
-                        //onEvent(TodoEvent.markTodoAsCompleted(updatedTodo))
-
-                        //val completedTodo = todo.markAsCompleted()
-
-
-                        // onEvent(TodoEvent.markTodoAsCompleted(todo))
-
-                    }
+                Row(
+                    modifier = Modifier.height(20.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Mark as Completed"
-                    )
+                    Text(text = "PomodoroTime: ")
+                    Text(text = todo.pomodoroTime)
                 }
-            }
-            Row(
-                modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
-                verticalAlignment = CenterVertically
-            ) {
-                Text(text = todo.priority.name)
-                Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueDate)
-                Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueTime)
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        onEvent(TodoEvent.deleteTodo(todo))
-                    }
+                Row(
+                    modifier = Modifier.height(20.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Todo"
+                    Text(text = "BreakTime: ")
+                    Text(text = todo.breakTime)
 
-                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(
+                        onClick = {
+                            //todo.isCompleted = true
+                            //val updatedTodo = true
+                            val updatedTodo = todo.copy(isCompleted = true)
+                            // Handle completed task event
+                            println("Completed" + todo.isCompleted)
+                            //onEvent(TodoEvent.markTodoAsCompleted(updatedTodo))
+
+                            //val completedTodo = todo.markAsCompleted()
+
+
+                            // onEvent(TodoEvent.markTodoAsCompleted(todo))
+
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Mark as Completed"
+                        )
+                    }
                 }
+                Row(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
+                    verticalAlignment = CenterVertically
+                ) {
+                    Text(text = todo.priority.name)
+                    Spacer(Modifier.width(4.dp))
+                    Text(text = todo.dueDate)
+                    Spacer(Modifier.width(4.dp))
+                    Text(text = todo.dueTime)
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(
+                        onClick = {
+                            onEvent(TodoEvent.deleteTodo(todo))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Todo"
 
+                        )
+                    }
+
+                }
             }
         }
     }
 }
+

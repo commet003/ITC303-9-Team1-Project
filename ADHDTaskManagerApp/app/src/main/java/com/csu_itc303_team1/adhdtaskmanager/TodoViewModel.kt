@@ -49,6 +49,8 @@ class TodoViewModel(
                 val priority = state.value.priority
                 val dueDate = state.value.dueDate
                 val dueTime = state.value.dueTime
+                val pomodoroTime = state.value.pomodoroTime
+                val breakTime = state.value.breakTime
 
                 if (title.isBlank() || description.isBlank()){
                     return
@@ -60,6 +62,8 @@ class TodoViewModel(
                     priority = priority,
                     dueDate = dueDate,
                     dueTime = dueTime,
+                    pomodoroTime = pomodoroTime,
+                    breakTime = breakTime,
                 )
 
                 viewModelScope.launch {
@@ -73,7 +77,9 @@ class TodoViewModel(
                         priority = Priority.LOW,
                         dueDate = "",
                         dueTime = "",
-                        showDialog = false
+                        showDialog = false,
+                        pomodoroTime = "",
+                        breakTime = "",
                     )
                 }
             }
@@ -102,6 +108,19 @@ class TodoViewModel(
                     it.copy(title = event.title)
                 }
             }
+
+            is TodoEvent.setPomodoroTime -> {
+                _state.update {
+                    it.copy(pomodoroTime = event.pomodoroTime)
+                }
+            }
+
+            is TodoEvent.setBreakTime -> {
+                _state.update {
+                    it.copy(breakTime = event.breakTime)
+                }
+            }
+
             TodoEvent.showDialog -> {
                 _state.update {
                     it.copy(showDialog = true)

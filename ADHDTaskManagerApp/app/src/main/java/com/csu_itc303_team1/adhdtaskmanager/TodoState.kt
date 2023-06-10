@@ -14,4 +14,6 @@ data class TodoState(
     val showEditTodoDialog: Boolean = false,
     val showDateSelector: Boolean = false,
     val showTimeSelector: Boolean = false,
+    val pomodoroTime: String = "",
+    val breakTime: String = "",
 )

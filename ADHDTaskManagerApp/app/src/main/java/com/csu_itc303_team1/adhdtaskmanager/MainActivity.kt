@@ -2,9 +2,11 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.annotation.SuppressLint
 import android.app.NotificationManager
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -45,6 +47,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
@@ -93,6 +96,8 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dbPath = applicationContext.getDatabasePath("todo.db").canonicalPath
+        Log.e("dbContentValues", "Database path: $dbPath")
         setContent {
             // Retrieve's Leaderboard data onCreate
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
@@ -161,6 +166,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        //HelpScreen()
     }
 
 

@@ -1,11 +1,16 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -14,6 +19,15 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+import androidx.compose.foundation.border
+
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.TextField
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.csu_itc303_team1.adhdtaskmanager.db.DBHelper
 
 @Composable
 fun AddTodoDialog(
@@ -145,6 +159,21 @@ fun AddTodoDialog(
                         Text(text = formattedTime)
                     }
                 }
+                // PomodoroTimer
+                val pomodoroTimerDialogState = rememberMaterialDialogState()
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+
+                    ) {
+                    Button(onClick = {
+                        pomodoroTimerDialogState.show()
+                    }) {
+                        Text(text = "PomodoroTimer")
+                    }
+                }
 
                 // Inside the Date Dialog Screen, Ok and Cancel Buttons
                 MaterialDialog(
@@ -176,6 +205,7 @@ fun AddTodoDialog(
                     dialogState = timeDialogState,
                     buttons = {
                         positiveButton(text = "Ok") {
+
                         }
                         negativeButton(text = "Cancel")
                     }
@@ -192,6 +222,43 @@ fun AddTodoDialog(
                         onEvent(TodoEvent.setDueTime(formattedTime))
                     }
 
+                }
+
+                MaterialDialog(
+                    // Inside the Time Dialog Screen, Ok and Cancel Buttons
+                    dialogState = pomodoroTimerDialogState,
+
+                    buttons = {
+                        positiveButton(text = "Ok") {
+                        }
+                        negativeButton(text = "Cancel")
+                    }
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(30.dp)
+                            .background(color = Color(0x6750a4)),
+                    ) {
+                        val messagePomo = remember{mutableStateOf("00:00")}
+                        val messageBreak = remember{mutableStateOf("00:00")}
+                        var buttonClicked by remember { mutableStateOf(false) }
+
+                        PomodoroTabs(messagePomo, messageBreak)
+                        Button(
+                            onClick = {
+                                buttonClicked = true
+                            },
+                            modifier = Modifier.width(250.dp)
+                        ) {
+                            Text(text = "Set")
+                        }
+                        if (buttonClicked) {
+                            onEvent(TodoEvent.setPomodoroTime(messagePomo.value))
+                            onEvent(TodoEvent.setBreakTime(messageBreak.value))
+                        }
+                    }
                 }
 
             }
@@ -216,3 +283,86 @@ fun AddTodoDialog(
         }
     )
 }
+
+@Composable
+fun PomodoroTabs(pomodoroTime: MutableState<String>, breakTime: MutableState<String>) {
+    val tabs = listOf("Pomodoro", "Break")
+    var selectedTabIndex by remember {
+        mutableStateOf(0)
+    }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            indicator = { tabPositions ->
+                Box(
+                    modifier = Modifier
+                        .tabIndicatorOffset(tabPositions[selectedTabIndex])
+                        .height(2.dp)
+                        .fillMaxWidth(),
+                ) {
+                    RoundedCornerShape(5.dp)
+                }
+            },
+        ) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = {
+                        selectedTabIndex = index
+                    },
+                    text = {
+                        Text(
+                            text = title,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                color = if (selectedTabIndex == index) Color(103, 80, 164) else Color.White,
+                                background = if (selectedTabIndex == index) Color.White else Color(103, 80, 164)
+                            ),
+                        )
+                    },
+                    modifier = Modifier
+                        .background(
+                            color = if (selectedTabIndex == index) Color.White else Color(
+                                103,
+                                80,
+                                164
+                            )
+                        )
+                        .border(2.dp, Color(103, 80, 164), RoundedCornerShape(20.dp))
+                )
+            }
+        }
+        when (selectedTabIndex) {
+            0 -> TabContent(pomodoroTime)
+            1 -> TabContent(breakTime)
+        }
+    }
+}
+
+
+@Composable
+fun TabContent(message: MutableState<String>) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextField(
+            value = message.value,
+            onValueChange = {
+                newText -> message.value = newText
+            },
+            textStyle = TextStyle(
+                fontSize = 80.sp
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp)
+
+        )
+    }
+}
+
