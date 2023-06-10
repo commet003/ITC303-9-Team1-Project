@@ -29,14 +29,14 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun HelpScreen() {
     Scaffold(
-         topBar = {
+        topBar = {
             TopAppBar(
                 title = { Text("Welcome To The Help Page",style = TextStyle(fontSize = 24.sp,
                     color = Color.Blue, fontStyle = FontStyle.Italic)
                 )
-                    },
+                },
 
-            )
+                )
         },
         bottomBar = {
             BottomAppBar(
@@ -62,7 +62,7 @@ fun HelpScreen() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.Start,
 
-        ) {
+            ) {
             Spacer(modifier = Modifier.height(86.dp))
             Text("Hello",style = TextStyle(fontSize = 20.sp))
 
