@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csu_itc303_team1.EditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
+
 
     private val _state = MutableStateFlow(TodoState())
     private val _sortType = MutableStateFlow(SortType.BY_DATE)
@@ -33,16 +35,29 @@ class TodoViewModel(
 
     fun onEvent(event: TodoEvent){
         when(event){
+            is TodoEvent.updateTodo -> {
+                viewModelScope.launch {
+                    todoDao.updateTodo(event.todo)
+                }
+
+                _state.update {
+                    it.copy(showEditTodoDialog = false)
+                }
+
+            }
             is TodoEvent.deleteTodo -> {
                 viewModelScope.launch {
                     todoDao.deleteTodo(event.todo)
                 }
             }
+
             TodoEvent.hideDialog -> {
                 _state.update {
                     it.copy(showDialog = false)
                 }
             }
+
+
             TodoEvent.saveTodo -> {
                 val title = state.value.title
                 val description = state.value.description
@@ -63,7 +78,7 @@ class TodoViewModel(
                 )
 
                 viewModelScope.launch {
-                    todoDao.insertTodo(todo)
+                    todoDao.upsertTodo(todo)
                 }
 
                 _state.update {
@@ -73,7 +88,8 @@ class TodoViewModel(
                         priority = Priority.LOW,
                         dueDate = "",
                         dueTime = "",
-                        showDialog = false
+                        showDialog = false,
+                        showEditTodoDialog = false
                     )
                 }
             }
