@@ -111,7 +111,8 @@ fun EditTodoDialog(
                 var pickedTime by remember { // time variable stored to remember
                     mutableStateOf(LocalTime.NOON)
                 }
-                val formattedDate by remember {         // date variable formatted to string
+                val formattedDate by remember { // date variable formatted to string
+
                     derivedStateOf {
                         DateTimeFormatter
                             .ofPattern("dd MMM yyyy")   // Format Selected
