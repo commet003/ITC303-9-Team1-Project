@@ -24,16 +24,6 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
 
     val searchResults by rewardViewModel.searchResults.observeAsState()
-    if (searchResults == null) {
-        val newReward = Reward(
-            title = "Completed Task Reward",
-            description = "Reward for completing a task",
-            pointsAwarded = 3,
-            timesAchieved = 0,
-            id = 0
-        )
-        rewardViewModel.insertReward(newReward)
-    }
     rewardViewModel.findReward("Completed Task Reward")
 
     Card(
