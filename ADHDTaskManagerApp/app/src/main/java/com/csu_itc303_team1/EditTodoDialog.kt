@@ -1,5 +1,6 @@
 package com.csu_itc303_team1
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,7 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun EditTodoDialog(
     todo: Todo,
@@ -27,6 +29,12 @@ fun EditTodoDialog(
     onEvent: (TodoEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    state.title = todo.title
+    state.description = todo.description
+    state.priority = todo.priority
+    state.dueDate = todo.dueDate
+    state.dueTime = todo.dueTime
+
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {onEvent(TodoEvent.hideDialog)},
@@ -39,6 +47,7 @@ fun EditTodoDialog(
                 TextField(
                     value = state.title,
                     onValueChange = {
+                        todo.title = it
                         onEvent(TodoEvent.setTitle(it))
                     },
                     label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
@@ -46,6 +55,7 @@ fun EditTodoDialog(
                 TextField(
                     value = state.description,
                     onValueChange = {
+                        todo.description = it
                         onEvent(TodoEvent.setDescription(it))
                     },
                     label = { Text("Provide a brief description") } // This line adds a hint to the TextField
@@ -57,10 +67,11 @@ fun EditTodoDialog(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
-                        ) {
+                    ) {
                         RadioButton(
                             selected = state.priority == Priority.LOW,
                             onClick = {
+                                todo.priority = Priority.LOW
                                 onEvent(TodoEvent.setPriority(Priority.LOW))
                             })
                         Text(text = Priority.LOW.name)
@@ -72,6 +83,7 @@ fun EditTodoDialog(
                         RadioButton(
                             selected = state.priority == Priority.MEDIUM,
                             onClick = {
+                                todo.priority = Priority.MEDIUM
                                 onEvent(TodoEvent.setPriority(Priority.MEDIUM))
                             })
                         Text(text = Priority.MEDIUM.name)
@@ -83,16 +95,20 @@ fun EditTodoDialog(
                         RadioButton(
                             selected = state.priority == Priority.HIGH,
                             onClick = {
+                                todo.priority = Priority.HIGH
                                 onEvent(TodoEvent.setPriority(Priority.HIGH))
                             })
                         Text(text = Priority.HIGH.name)
                     }
                 }
+
+
                 // Date Picker && Time Picker
-                var pickedDate by remember {            // date variable stored to remember
+                var pickedDate by remember { // date variable stored to remember
                     mutableStateOf(LocalDate.now())
                 }
-                var pickedTime by remember {            // time variable stored to remember
+
+                var pickedTime by remember { // time variable stored to remember
                     mutableStateOf(LocalTime.NOON)
                 }
                 val formattedDate by remember {         // date variable formatted to string
@@ -120,7 +136,7 @@ fun EditTodoDialog(
                     verticalAlignment = Alignment.CenterVertically,
 
 
-                ) {
+                    ) {
                     // On Button Click it opens the date Dialog Screen,
                     // the text displays default or whatever is chosen
                     Column(
@@ -173,6 +189,7 @@ fun EditTodoDialog(
                         // Date Chosen becomes the date variable
                         // the formatted date is then added to the TodoEvent
                         pickedDate = it
+
                         onEvent(TodoEvent.setDueDate(formattedDate))
                     }
 
