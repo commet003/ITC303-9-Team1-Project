@@ -16,104 +16,118 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.EditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 
 
 @Composable
-fun TodoCard(todo: Todo, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
+fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
 
-    val searchResults by rewardViewModel.searchResults.observeAsState()
-    rewardViewModel.findReward("Completed Task Reward")
+    Scaffold() {
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-            .height(160.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(10.dp)
+        if (todoState.showEditTodoDialog) {
+            EditTodoDialog(
+                todo = todo,
+                state = todoState,
+                onEvent = onEvent,
+            )
+        }
+
+        val searchResults by rewardViewModel.searchResults.observeAsState()
+        rewardViewModel.findReward("Completed Task Reward")
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .height(160.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(25.dp),
-                verticalAlignment = CenterVertically,
+            Column(
+                modifier = Modifier.padding(10.dp)
             ) {
-                Text(
-                    text = todo.title,
-                    fontSize = 22.sp,
-                    // Line through if completed
-                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        onEvent(TodoEvent.showEditTodoDialog)
-                    }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(25.dp),
+                    verticalAlignment = CenterVertically,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit Todo"
+                    Text(
+                        text = todo.title,
+                        fontSize = 22.sp,
+                        // Line through if completed
+                        textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                     )
-                }
-            }
-            Row(
-                modifier = Modifier.height(60.dp),
-                verticalAlignment = CenterVertically
-            ) {
-                Checkbox(
-                    checked = todo.isCompleted, onCheckedChange = {
-                        onEvent(TodoEvent.toggleCompleted(todo))
-
-                        // get the Completed Reward Entity and update the times achieved.
-
-                        val completedReward = searchResults?.get(0)
-
-                        if (!todo.isCompleted) {
-                            if (completedReward != null) {
-
-                                completedReward.timesAchieved =
-                                    completedReward.timesAchieved + 1
-                            }
-                            if (completedReward != null) {
-                                rewardViewModel.updateReward(completedReward)
-                            }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(
+                        onClick = {
+                            onEvent(TodoEvent.showEditTodoDialog)
 
                         }
-                    })
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Text(
-                    text = todo.description,
-                    // Line through if completed
-                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
-                )
-            }
-            Row(
-                modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
-                verticalAlignment = CenterVertically
-            ) {
-                Text(text = todo.priority.name)
-                Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueDate)
-                Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueTime)
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = {
-                        onEvent(TodoEvent.deleteTodo(todo))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Todo"
+                        )
                     }
+                }
+                Row(
+                    modifier = Modifier.height(60.dp),
+                    verticalAlignment = CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Todo"
+                    Checkbox(
+                        checked = todo.isCompleted, onCheckedChange = {
+                            onEvent(TodoEvent.toggleCompleted(todo))
 
+                            // get the Completed Reward Entity and update the times achieved.
+
+                            val completedReward = searchResults?.get(0)
+
+                            if (!todo.isCompleted) {
+                                if (completedReward != null) {
+
+                                    completedReward.timesAchieved =
+                                        completedReward.timesAchieved + 1
+                                }
+                                if (completedReward != null) {
+                                    rewardViewModel.updateReward(completedReward)
+                                }
+
+                            }
+                        })
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Text(
+                        text = todo.description,
+                        // Line through if completed
+                        textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                     )
                 }
+                Row(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
+                    verticalAlignment = CenterVertically
+                ) {
+                    Text(text = todo.priority.name)
+                    Spacer(Modifier.width(4.dp))
+                    Text(text = todo.dueDate)
+                    Spacer(Modifier.width(4.dp))
+                    Text(text = todo.dueTime)
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(
+                        onClick = {
+                            onEvent(TodoEvent.deleteTodo(todo))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete Todo"
 
+                        )
+                    }
+
+                }
             }
         }
     }
+
 }
