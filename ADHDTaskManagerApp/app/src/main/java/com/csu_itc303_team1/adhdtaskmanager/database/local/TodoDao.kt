@@ -10,8 +10,8 @@ interface TodoDao {
 
     @Query("SELECT * FROM Todo")
     suspend fun getAllTodos(): List<Todo>
-    @Upsert
-    suspend fun upsertTodo(todo: Todo)
+    @Insert
+    suspend fun insertTodo(todo: Todo)
     @Delete
     suspend fun deleteTodo(todo: Todo)
     @Update

@@ -78,7 +78,7 @@ class TodoViewModel(
                 )
 
                 viewModelScope.launch {
-                    todoDao.upsertTodo(todo)
+                    todoDao.insertTodo(todo)
                 }
 
                 _state.update {

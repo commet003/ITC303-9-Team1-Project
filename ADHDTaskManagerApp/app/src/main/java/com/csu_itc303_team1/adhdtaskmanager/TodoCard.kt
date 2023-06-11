@@ -24,7 +24,10 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 @Composable
 fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
 
-    Scaffold() {
+    val searchResults by rewardViewModel.searchResults.observeAsState()
+    rewardViewModel.findReward("Completed Task Reward")
+
+ //   Scaffold() {
 
         if (todoState.showEditTodoDialog) {
             EditTodoDialog(
@@ -33,9 +36,6 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                 onEvent = onEvent,
             )
         }
-
-        val searchResults by rewardViewModel.searchResults.observeAsState()
-        rewardViewModel.findReward("Completed Task Reward")
 
         Card(
             modifier = Modifier
@@ -128,6 +128,6 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                 }
             }
         }
-    }
+ //   }
 
 }
