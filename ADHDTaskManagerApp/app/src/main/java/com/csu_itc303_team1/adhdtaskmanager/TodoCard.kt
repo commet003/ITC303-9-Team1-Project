@@ -27,6 +27,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
     val searchResults by rewardViewModel.searchResults.observeAsState()
     rewardViewModel.findReward("Completed Task Reward")
 
+
  //   Scaffold() {
 
         if (todoState.showEditTodoDialog) {
@@ -81,7 +82,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
 
                             // get the Completed Reward Entity and update the times achieved.
 
-                            val completedReward = searchResults?.get(0)
+                            val completedReward = searchResults?.get(1)
 
                             if (!todo.isCompleted) {
                                 if (completedReward != null) {
