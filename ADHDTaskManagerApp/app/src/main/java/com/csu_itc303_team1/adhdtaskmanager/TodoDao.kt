@@ -28,4 +28,11 @@ interface TodoDao {
     // Sort Todos by Due Time
     @Query("SELECT * FROM Todo ORDER BY dueTime DESC")
     fun sortByDueTime(): Flow<List<Todo>>
+
+    @Update
+    suspend fun updateTodoIsCompleted(todo: Todo)
+
+    @Query("SELECT COUNT(*) FROM Todo WHERE isCompleted = 1")
+    suspend fun getCountOfCompletedTodos(): Int
+
 }

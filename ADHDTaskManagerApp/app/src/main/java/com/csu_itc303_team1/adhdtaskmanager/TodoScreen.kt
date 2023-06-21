@@ -10,12 +10,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.EditTodoDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
-    onEvent: (TodoEvent) -> Unit
+    onEvent: (TodoEvent) -> Unit,
+    rewardViewModel: RewardViewModel
 ) {
     Scaffold(
         topBar = {
@@ -39,13 +41,14 @@ fun TodoScreen(
             )
         }
 
+
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ){
             items(state.todos){ todo ->
-                TodoCard(todo = todo, onEvent = onEvent)
+                TodoCard(todo = todo, todoState = state, onEvent = onEvent, rewardViewModel = rewardViewModel)
             }
         }
     }

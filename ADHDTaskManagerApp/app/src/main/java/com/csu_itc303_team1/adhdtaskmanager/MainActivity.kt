@@ -1,16 +1,13 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
@@ -29,53 +26,60 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
-import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
+import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.GoogleAuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.launch
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
+
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-
-
-    private val googleAuthUiClient by lazy {
-        GoogleAuthUiClient(
-            context = applicationContext,
-            oneTapClient = Identity.getSignInClient(applicationContext)
-        )
-    }
-
+    private val passPhrase = "passPhrase"
+    private val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        ).build()
+        )/*.openHelperFactory(factory)*/.build()
     }
+
+//    private val rewardDB by lazy {
+//        Room.databaseBuilder(
+//            applicationContext,
+//            RewardDatabase::class.java, "reward_database.db"
+//        ).createFromAsset("reward.db").build()}
+
+    private val rewardViewModel by viewModels<RewardViewModel>(
+        factoryProducer = {
+            object: ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RewardViewModel(application) as T
+                }
+            }
+        }
+    )
+
+
 
     private val viewModel by viewModels<TodoViewModel>(
         factoryProducer = {
@@ -84,16 +88,27 @@ class MainActivity : ComponentActivity() {
                     return TodoViewModel(db.todoDao) as T
                 }
             }
-        })
+        }
+    )
 
     private lateinit var navController: NavHostController
+    private lateinit var leadViewModel: LeaderboardViewModel
+    //private lateinit var rewardViewModel: RewardViewModel
 
-    @OptIn(ExperimentalPermissionsApi::class)
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @OptIn(ExperimentalPermissionsApi::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // Retrieve's Leaderboard data onCreate
+            leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
+            // Puts it into a readable format
+            getResponseUsingCallback()
+            //initialRewards(rewardViewModel)
+            //rewardViewModel = ViewModelProvider(this) [RewardViewModel::class.java]
+
+
             ADHDTaskManagerTheme {
 
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
@@ -113,7 +128,7 @@ class MainActivity : ComponentActivity() {
                         ,
                         scaffoldState = scaffoldState,
                         // Creating the Top Bar
-                        topBar = { SignInTopAppBar(scope = scope, scaffoldState = scaffoldState) },
+                        topBar = { AppTopAppBar(scope = scope, scaffoldState = scaffoldState) },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
                         drawerContent = {
@@ -136,106 +151,34 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+//                        val owner = LocalViewModelStoreOwner.current
+//
+//                        owner?.let{
+//                            val rewardViewModel: RewardViewModel = viewModel(
+//                                it,
+//                                "RewardViewModel",
+//                                RewardViewModelFactory(LocalContext.current.applicationContext as Application))
+//                            RewardSetup(rewardViewModel)
+//                            TodoRewardSetup(rewardViewModel)
+//                        }
 
 
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
-                        val todoState by viewModel.state.collectAsState()
-                        /*SetupNavGraph(
+                        val state by viewModel.state.collectAsState()
+                        //val rewardState by rewardViewModel.collectAsState()
+
+                        SetupNavGraph(
                             navController = navController,
                             state = state,
-                            event = viewModel::onEvent
-                        )*/
-
-                        val navController = rememberNavController()
-                        NavHost(navController = navController, startDestination = "sign_in") {
-                            composable("sign_in") {
-                                val viewModel = viewModel<SignInViewModel>()
-                                val state by viewModel.state.collectAsStateWithLifecycle()
-
-                                LaunchedEffect(key1 = Unit) {
-                                    if (googleAuthUiClient.getSignedInUser() != null) {
-                                        navController.navigate("todo_screen")
-                                    }
-                                }
-
-                                val launcher = rememberLauncherForActivityResult(
-                                    contract = ActivityResultContracts.StartIntentSenderForResult(),
-                                    onResult = { result ->
-                                        if (result.resultCode == RESULT_OK) {
-                                            lifecycleScope.launch {
-                                                val signInResult =
-                                                    googleAuthUiClient.signInWithIntent(
-                                                        intent = result.data ?: return@launch
-                                                    )
-                                                viewModel.onSignInResult(signInResult)
-                                            }
-                                        }
-                                    }
-                                )
-
-                                LaunchedEffect(key1 = state.isSignInSuccessful) {
-                                    if (state.isSignInSuccessful) {
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Sign in successful",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                        navController.navigate("todo_screen")
-                                        viewModel.resetState()
-                                    }
-                                }
-
-                                // LaunchedEffect for continue without sign in
-                                LaunchedEffect(key1 = state.continueWithoutSignIn) {
-                                    if (state.continueWithoutSignIn) {
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Continuing without sign in",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                        navController.navigate("todo_screen")
-                                        viewModel.resetState()
-                                    }
-                                }
-
-                                SignInScreen(
-                                    state = state,
-                                    onSignInClick = {
-                                        lifecycleScope.launch {
-                                            val signInIntentSender = googleAuthUiClient.signIn()
-                                            launcher.launch(
-                                                IntentSenderRequest.Builder(
-                                                    signInIntentSender ?: return@launch
-                                                ).build()
-                                            )
-                                        }
-                                    },
-                                    onContinueWithoutSignInClick = {
-                                        lifecycleScope.launch {
-                                            viewModel.onContinueWithoutSignIn()
-                                            navController.navigate("todo_screen")
-                                        }
-                                    }
-                                )
-                            }
-                            composable(
-                                Screen.TodoScreen.route
-                            ) {
-                                TodoScreen(
-                                    state = todoState,
-                                    onEvent = viewModel::onEvent,
-                                )
-                            }
-                        }
+                            event = viewModel::onEvent,
+                            rewardViewModel = rewardViewModel
+                        )
                     }
                 }
             }
         }
     }
-
 
     //Shows the notification
     // TODO - Make this show the notification when a task is due
@@ -290,8 +233,21 @@ class MainActivity : ComponentActivity() {
             }
         )
     }
+
+    // creates Arraylist of users from the firestore database
+    private fun getResponseUsingCallback() {
+        leadViewModel.getResponseUsingCallback((object : FirebaseCallback {
+            override fun onResponse(response: Response) {
+                usersList(response)
+            }
+        }))
+    }
+
+//    class RewardViewModelFactory(val application: Application):
+//            ViewModelProvider.Factory{
+//                override fun <T: ViewModel> create(modelClass: Class<T>): T {
+//                    return RewardViewModel(application) as T
+//                }
+//            }
+
 }
-
-
-
-

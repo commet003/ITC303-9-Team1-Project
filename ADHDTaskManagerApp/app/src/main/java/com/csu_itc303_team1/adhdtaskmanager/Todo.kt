@@ -6,11 +6,11 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Todo(
-    val title: String,
-    val description: String,
-    val priority: Priority,
-    val dueDate: String,
-    val dueTime: String,
+    var title: String,
+    var description: String,
+    var priority: Priority,
+    var dueDate: String,
+    var dueTime: String,
     val isCompleted: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0
