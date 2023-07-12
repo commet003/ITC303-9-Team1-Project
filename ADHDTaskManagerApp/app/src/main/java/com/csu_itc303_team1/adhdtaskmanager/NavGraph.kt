@@ -53,6 +53,12 @@ fun SetupNavGraph(
         ) {
             RewardsScreen(rewardViewModel)
         }
+
+        composable(
+            route = Screen.CompletedScreen.route
+        ){
+            CompletedScreen()
+        }
     }
 }
 

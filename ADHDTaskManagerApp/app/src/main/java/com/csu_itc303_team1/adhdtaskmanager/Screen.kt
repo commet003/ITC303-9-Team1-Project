@@ -10,4 +10,5 @@ sealed class Screen(val route: String, var icon: Int, val title: String) {
     object SettingsScreen: Screen("settings_screen", R.drawable.ic_settings,"Settings")
     object LeaderboardScreen: Screen("leaderboard_screen", R.drawable.ic_leaderboard,"Leaderboard")
     object RewardsScreen: Screen("reward_screen", R.drawable.ic_rewards,"Rewards")
+    object CompletedScreen: Screen("completed_screen",R.drawable.ic_complete,"Completed Tasks")
 }
