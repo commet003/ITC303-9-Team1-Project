@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,38 +41,56 @@ fun SignInScreen(
             ).show()
         }
     }
+    Column {
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        Button(
-            modifier = Modifier.padding(bottom = 48.dp),
-            shape = RoundedCornerShape(6.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = colorResource(R.color.black),
-            ),
-            onClick = onSignInClick
+        // TODO: Add a logo image here
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter,
         ) {
-            Image(
-                painter = painterResource(
-                    id = R.drawable.ic_google_logo
-                ),
-                contentDescription = null
-            )
+            Column {
+                Button(
+                    modifier = Modifier.padding(bottom = 48.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(R.color.black),
+                        contentColor = colorResource(R.color.white)
+                    ),
+                    onClick = onSignInClick
+                ) {
+                    Image(
+                        painter = painterResource(
+                            id = R.drawable.ic_google_logo
+                        ),
+                        contentDescription = null
+                    )
 
-            Text(
-                text = "Sign in with Google",
-                modifier = Modifier.padding(6.dp),
-                fontSize = 18.sp
-            )
+                    Text(
+                        text = "Sign in with Google",
+                        modifier = Modifier.padding(6.dp),
+                        fontSize = 18.sp
+                    )
+                }
+
+                Button(
+                    modifier = Modifier.padding(bottom = 48.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(R.color.white),
+                        contentColor = colorResource(R.color.black)
+                    ),
+                    onClick = onSignInClick
+                ) {
+                    Text(
+                        text = "Sign in Anonymously",
+                        modifier = Modifier.padding(6.dp),
+                        fontSize = 18.sp
+                    )
+                }
+            }
         }
-            ClickableText(
-                text = AnnotatedString("Continue without signing in"),
-                onClick = {onSignInClick}
-            )
-
     }
 }
