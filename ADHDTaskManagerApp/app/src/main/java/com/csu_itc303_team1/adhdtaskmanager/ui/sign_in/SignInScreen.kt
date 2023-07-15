@@ -28,8 +28,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.SignInState
 @Composable
 fun SignInScreen(
     state: SignInState,
-    onSignInClick: () -> Unit,
-    onContinueWithoutSignInClick: () -> Unit
+    onSignInClick: () -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(key1 = state.signInError) {
@@ -52,7 +51,7 @@ fun SignInScreen(
             modifier = Modifier.padding(bottom = 48.dp),
             shape = RoundedCornerShape(6.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = colorResource(R.color.purple_700)
+                backgroundColor = colorResource(R.color.black),
             ),
             onClick = onSignInClick
         ) {
@@ -71,7 +70,7 @@ fun SignInScreen(
         }
             ClickableText(
                 text = AnnotatedString("Continue without signing in"),
-                onClick = {onContinueWithoutSignInClick()}
+                onClick = {onSignInClick}
             )
 
     }

@@ -11,10 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.EditTodoDialog
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
+    userData: UserData?,
+    onSignOut: () -> Unit,
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel

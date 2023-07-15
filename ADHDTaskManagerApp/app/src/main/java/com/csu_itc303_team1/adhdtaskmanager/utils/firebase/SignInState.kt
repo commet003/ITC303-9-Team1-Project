@@ -2,6 +2,5 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
 data class SignInState(
     val isSignInSuccessful: Boolean = false,
-    var continueWithoutSignIn: Boolean = false,
     val signInError: String? = null
 )

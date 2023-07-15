@@ -19,7 +19,8 @@ fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
     // This is for the Bar at the top of the application. This will be present on every page.
     TopAppBar(
         title = { Text(text = "ADHD Task Manager", fontSize = 18.sp) }, // Label on the bar
-        navigationIcon = {                                              // Navigation Icon
+        navigationIcon = {
+            // Navigation Icon
             IconButton(onClick = {
                 scope.launch {                          // Opens Navigation Drawer
                     scaffoldState.drawerState.open()

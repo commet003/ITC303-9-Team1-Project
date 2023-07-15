@@ -22,9 +22,6 @@ class SignInViewModel: ViewModel() {
         ) }
     }
 
-    fun onContinueWithoutSignIn() {
-        _state.update { it.copy(continueWithoutSignIn = true) }
-    }
 
     fun resetState() {
         _state.update { SignInState() }
