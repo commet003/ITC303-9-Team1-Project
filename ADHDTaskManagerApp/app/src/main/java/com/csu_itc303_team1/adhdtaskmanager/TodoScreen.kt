@@ -16,8 +16,6 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
-    userData: UserData?,
-    onSignOut: () -> Unit,
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel

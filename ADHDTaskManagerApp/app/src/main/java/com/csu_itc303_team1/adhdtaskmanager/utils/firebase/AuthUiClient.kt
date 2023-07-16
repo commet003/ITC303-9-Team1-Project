@@ -12,7 +12,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 
-class GoogleAuthUiClient(
+class AuthUiClient(
     private val context: Context,
     private val oneTapClient: SignInClient
 ) {
@@ -86,5 +86,29 @@ class GoogleAuthUiClient(
             )
             .setAutoSelectEnabled(true)
             .build()
+    }
+
+    // private function to allow the user to sign in anonymously
+    suspend fun signInAnonymously(): SignInResult {
+        return try {
+            val user = auth.signInAnonymously().await().user
+            SignInResult(
+                data = user?.run {
+                    UserData(
+                        userId = uid,
+                        username = displayName,
+                        profilePictureUrl = photoUrl?.toString()
+                    )
+                },
+                errorMessage = null
+            )
+        } catch(e: Exception) {
+            e.printStackTrace()
+            if(e is CancellationException) throw e
+            SignInResult(
+                data = null,
+                errorMessage = e.message
+            )
+        }
     }
 }

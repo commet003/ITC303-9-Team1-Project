@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">ADHDTaskManager</string>
     <string name="title_activity_main_timer">MainTimer</string>
-    <string name="setting_timer">Settigns</string>
+    <string name="setting_timer">Settings</string>
     <string name="back">Back</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -16,6 +16,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="channel_name">Pomodoro Timer channel </string>
     <string name="channel_description">Send notification when timer finish</string>
-    <string name="web_client_id" />
+    <string name="web_client_id">525253102394-s29vu43otv2br84kgvfjjtje4pgpmoa0.apps.googleusercontent.com</string>
     <string name="pass_phrase">passPhrase</string>
 </resources>

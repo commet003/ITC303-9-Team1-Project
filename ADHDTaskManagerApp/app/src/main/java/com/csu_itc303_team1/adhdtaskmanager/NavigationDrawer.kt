@@ -1,5 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,8 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.SignInState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -79,7 +86,7 @@ fun DrawerItem(item: Screen, selected: Boolean, onItemClick: (Screen) -> Unit){
 
 // This section is the main part of the Navigation Menu, the Drawer Body.
 @Composable
-fun DrawerBody(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController) {
+fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController, currentUser: AuthUiClient) {
 
     // Create a list of Screen objects
     val screens = listOf(
@@ -88,7 +95,7 @@ fun DrawerBody(scope: CoroutineScope, scaffoldState: ScaffoldState, navControlle
         Screen.LeaderboardScreen,
         Screen.SettingsScreen,
 
-    )
+        )
 
     // Column to store all the items
     Column(
@@ -119,6 +126,48 @@ fun DrawerBody(scope: CoroutineScope, scaffoldState: ScaffoldState, navControlle
                     scaffoldState.drawerState.close()
                 }
             })
+        }
+
+        if (currentUser.getSignedInUser() != null) {
+            // Sign out suspend clickable text
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        scope.launch {
+                            currentUser.signOut()
+                            Toast
+                                .makeText(
+                                    context,
+                                    "Signed out",
+                                    Toast.LENGTH_LONG
+                                )
+                                .show()
+                            navController.popBackStack()
+                        }
+                    }
+                    .height(45.dp)
+                    .padding(start = 10.dp)
+            ) {
+                // Menu Icon for the Drawer Item
+                Icon(
+                    imageVector = Icons.Filled.ExitToApp,
+                    contentDescription = "Sign Out",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .background(color = Color.Black)
+                        .height(24.dp)
+                        .width(24.dp)
+                )
+                Spacer(modifier = Modifier.width(7.dp))
+                // Text for the Drawer Item
+                Text(
+                    text = "Sign Out",
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+            }
         }
     }
 }

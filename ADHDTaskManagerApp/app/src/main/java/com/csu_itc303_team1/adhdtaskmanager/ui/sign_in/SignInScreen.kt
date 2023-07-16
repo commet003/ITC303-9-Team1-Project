@@ -29,7 +29,8 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.SignInState
 @Composable
 fun SignInScreen(
     state: SignInState,
-    onSignInClick: () -> Unit
+    onSignInClick: () -> Unit,
+    onAnonymousSignIn: () -> Unit
 ) {
     val context = LocalContext.current
     LaunchedEffect(key1 = state.signInError) {
@@ -82,7 +83,7 @@ fun SignInScreen(
                         backgroundColor = colorResource(R.color.white),
                         contentColor = colorResource(R.color.black)
                     ),
-                    onClick = onSignInClick
+                    onClick = onAnonymousSignIn
                 ) {
                     Text(
                         text = "Sign in Anonymously",

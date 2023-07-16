@@ -49,7 +49,7 @@ import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.GoogleAuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
@@ -62,6 +62,16 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
+
+    private val passPhrase = "passPhrase"
+    private val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            TodoDatabase::class.java,
+            "todo.db"
+        )/*.openHelperFactory(factory)*/.build()
+    }
 
 
 //    private val rewardDB by lazy {
@@ -89,7 +99,7 @@ class MainActivity : ComponentActivity() {
     //private lateinit var rewardViewModel: RewardViewModel
 
     private val googleAuthUiClient by lazy {
-        GoogleAuthUiClient(
+        AuthUiClient(
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
@@ -101,15 +111,6 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val passPhrase = getString(R.string.pass_phrase)
-        val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
-        val db by lazy {
-            Room.databaseBuilder(
-                applicationContext,
-                TodoDatabase::class.java,
-                "todo.db"
-            )/*.openHelperFactory(factory)*/.build()
-        }
 
         val viewModel by viewModels<TodoViewModel>(
             factoryProducer = {
@@ -149,12 +150,23 @@ class MainActivity : ComponentActivity() {
                         ,
                         scaffoldState = scaffoldState,
                         // Creating the Top Bar
-                        topBar = { AppTopAppBar(scope = scope, scaffoldState = scaffoldState) },
+                        topBar = {
+                            AppTopAppBar(scope = scope, scaffoldState = scaffoldState, currentUser = googleAuthUiClient)
+                                 },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
+                        // If the user is signed in, show the drawer
                         drawerContent = {
-                            DrawerHeader()
-                            DrawerBody(scope = scope, scaffoldState = scaffoldState, navController = navController)
+                            if (googleAuthUiClient.getSignedInUser() != null) {
+                                DrawerHeader()
+                                DrawerBody(
+                                    context = applicationContext,
+                                    scope = scope,
+                                    scaffoldState = scaffoldState,
+                                    navController = navController,
+                                    currentUser = googleAuthUiClient
+                                )
+                            }
                         }
                     ) { // In this Section is contents of the actual screen. A padding value had to
                         // be added in the lambda form.
@@ -216,18 +228,7 @@ class MainActivity : ComponentActivity() {
                             composable(
                                 route = Screen.TodoScreen.route
                             ) {
-                                TodoScreen(userData = googleAuthUiClient.getSignedInUser(), onSignOut = {
-                                    lifecycleScope.launch {
-                                        googleAuthUiClient.signOut()
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Signed out",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                        navController.popBackStack()
-                                    }
-                                },
+                                TodoScreen(
                                     state = state,
                                     onEvent = todoEvent,
                                     rewardViewModel = rewardViewModel)
@@ -263,9 +264,9 @@ class MainActivity : ComponentActivity() {
                                 LaunchedEffect(key1 = Unit) {
                                     if(googleAuthUiClient.getSignedInUser() != null) {
                                         navController.navigate("todo_screen")
+                                        // Update top bar and drawer
                                     }
                                 }
-
 
 
                                 LaunchedEffect(key1 = signInState.isSignInSuccessful) {
@@ -291,6 +292,18 @@ class MainActivity : ComponentActivity() {
                                                     signInIntentSender ?: return@launch
                                                 ).build()
                                             )
+                                        }
+                                    },
+                                    onAnonymousSignIn = {
+                                        lifecycleScope.launch {
+                                            googleAuthUiClient.signInAnonymously()
+                                            Toast.makeText(
+                                                applicationContext,
+                                                "Signed in anonymously",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+
+                                            navController.navigate("todo_screen")
                                         }
                                     }
                                 )
