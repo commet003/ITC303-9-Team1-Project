@@ -22,6 +22,9 @@
             android:exported="false"
             android:label="@string/title_activity_main_timer"
             android:theme="@style/Theme.AppCompat" />
+        <!--for viewing webpage-->
+        <activity android:name=".WebViewActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
