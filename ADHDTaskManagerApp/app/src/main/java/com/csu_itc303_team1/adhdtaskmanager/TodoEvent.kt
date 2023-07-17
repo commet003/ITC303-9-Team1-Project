@@ -1,7 +1,5 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
-
 sealed interface TodoEvent {
 
     // Data class to update todo

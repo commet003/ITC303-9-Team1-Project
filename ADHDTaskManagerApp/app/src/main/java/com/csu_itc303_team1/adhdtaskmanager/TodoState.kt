@@ -1,7 +1,5 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
-
 data class TodoState(
     val todos: List<Todo> = emptyList(),
     var title: String = "",

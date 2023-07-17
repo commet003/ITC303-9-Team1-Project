@@ -1,8 +1,7 @@
-package com.csu_itc303_team1.adhdtaskmanager.database.local
+package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.csu_itc303_team1.adhdtaskmanager.Priority
 
 
 @Entity
