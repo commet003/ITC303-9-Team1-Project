@@ -8,6 +8,7 @@ import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class TodoViewModel(
     private val todoDao: TodoDao
@@ -162,11 +163,29 @@ class TodoViewModel(
                 viewModelScope.launch {
                     todoDao.updateTodo(
                         event.todo.copy(
-                            isCompleted = !event.todo.isCompleted
+                            isCompleted = !event.todo.isCompleted,
+                            completionDate = LocalDateTime.now().toString()
                         )
                     )
                 }
+//                viewModelScope.launch {
+//                    todoDao.updateTodo(
+//                        event.todo.copy(
+//                            completionDate = LocalDateTime.now().toString()
+//                        )
+//                    )
+//                }
             }
+
+//            is TodoEvent.setCompletedDate -> {
+//                viewModelScope.launch {
+//                    todoDao.updateTodo(
+//                        event.todo.copy(
+//                            completionDate = LocalDateTime.now().toString()
+//                        )
+//                    )
+//                }
+//            }
 
             else -> {}
         }

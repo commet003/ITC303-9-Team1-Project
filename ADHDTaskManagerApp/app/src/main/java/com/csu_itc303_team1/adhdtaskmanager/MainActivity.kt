@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        )/*.openHelperFactory(factory)*/.build()
+        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
     }
 
 //    private val rewardDB by lazy {

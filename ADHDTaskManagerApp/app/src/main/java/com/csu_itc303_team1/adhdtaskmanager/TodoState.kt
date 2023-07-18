@@ -14,4 +14,5 @@ data class TodoState(
     val showEditTodoDialog: Boolean = false,
     val showDateSelector: Boolean = false,
     val showTimeSelector: Boolean = false,
+    val completedTodos: List<Todo> = emptyList()
 )

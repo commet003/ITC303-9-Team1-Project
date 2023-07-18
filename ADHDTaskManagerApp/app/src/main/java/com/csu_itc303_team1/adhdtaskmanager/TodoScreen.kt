@@ -8,6 +8,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.EditTodoDialog
@@ -18,6 +20,7 @@ fun TodoScreen(
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel
 ) {
+    rewardViewModel.allRewards.observeAsState(listOf())
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {

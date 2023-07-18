@@ -36,4 +36,6 @@ interface TodoDao {
     @Query("SELECT COUNT(*) FROM Todo WHERE isCompleted = 1")
     suspend fun getCountOfCompletedTodos(): Int
 
+    @Query("SELECT * FROM Todo WHERE isCompleted = 1")
+    fun getAllCompletedTodos(): Flow<List<Todo>>
 }
