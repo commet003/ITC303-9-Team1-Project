@@ -31,5 +31,6 @@ sealed interface TodoEvent {
 
     object showTimeSelector: TodoEvent
     object hideTimeSelector: TodoEvent
+    object ShowCompletedTasks: TodoEvent
 
 }

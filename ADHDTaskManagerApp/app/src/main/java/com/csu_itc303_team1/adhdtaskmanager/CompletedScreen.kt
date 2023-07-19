@@ -1,28 +1,38 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import java.time.LocalDateTime
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
-fun CompletedScreen(state: TodoState,
-                    onEvent: (TodoEvent) -> Unit,
-                    rewardViewModel: RewardViewModel) {
+fun CompletedScreen(state: TodoState, event: (TodoEvent) -> Unit) {
 
+    event(TodoEvent.sortBy(SortType.BY_COMPLETED))
 
+    val completedTodos = state.todos
+    val something: List<Todo>
+    something = completedTodos
+
+    for (i in something) {
+        println(i.title)
+    }
+
+    LazyColumn(
+        modifier = Modifier,
+        contentPadding = PaddingValues(0.dp, 20.dp, 0.dp)
+    ) {
+        items(something) { todo ->
+            CompletedTaskCard(todo)
+        }
+    }
 }

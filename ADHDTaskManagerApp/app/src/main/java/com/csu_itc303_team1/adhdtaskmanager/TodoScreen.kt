@@ -20,7 +20,9 @@ fun TodoScreen(
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel
 ) {
+    onEvent(TodoEvent.sortBy(SortType.BY_NOT_COMPLETED))
     rewardViewModel.allRewards.observeAsState(listOf())
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {

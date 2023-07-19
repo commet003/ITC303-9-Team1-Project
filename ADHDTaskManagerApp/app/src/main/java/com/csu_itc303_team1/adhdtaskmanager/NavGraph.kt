@@ -57,7 +57,7 @@ fun SetupNavGraph(
         composable(
             route = Screen.CompletedScreen.route
         ){
-            CompletedScreen()
+            CompletedScreen(state,event)
         }
     }
 }
