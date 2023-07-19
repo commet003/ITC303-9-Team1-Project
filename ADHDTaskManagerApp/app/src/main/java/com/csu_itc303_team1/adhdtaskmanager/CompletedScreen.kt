@@ -17,22 +17,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun CompletedScreen(state: TodoState, event: (TodoEvent) -> Unit) {
 
-    event(TodoEvent.sortBy(SortType.BY_COMPLETED))
-
-    val completedTodos = state.todos
-    val something: List<Todo>
-    something = completedTodos
-
-    for (i in something) {
-        println(i.title)
-    }
-
     LazyColumn(
         modifier = Modifier,
         contentPadding = PaddingValues(0.dp, 20.dp, 0.dp)
     ) {
-        items(something) { todo ->
+        items(state.todos) { todo ->
             CompletedTaskCard(todo)
         }
+        event(TodoEvent.sortBy(SortType.BY_COMPLETED))
+
     }
+
+
 }

@@ -86,9 +86,9 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
 
                         // get the Completed Reward Entity and update the times achieved.
                         rewardViewModel.findReward("Completed Task Reward")
-                        val completedReward = searchResults?.get(0)
+                        //val completedReward = searchResults?.get(0)
 
-                        if (!todo.isCompleted) {
+                        /*if (!todo.isCompleted) {
                             if (completedReward != null) {
 
                                 completedReward.timesAchieved =
@@ -98,7 +98,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                                 rewardViewModel.updateReward(completedReward)
                             }
 
-                        }
+                        }*/
                     }){
                         Icon(
                             imageVector = Icons.Default.Check,
