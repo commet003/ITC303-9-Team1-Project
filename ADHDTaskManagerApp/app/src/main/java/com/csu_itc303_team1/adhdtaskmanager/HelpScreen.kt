@@ -258,6 +258,16 @@ fun HelpScreen() {
             }
         }
     }
+
+    // Add a Back button that calls the JavaScript function to show the help screen
+//    androidx.compose.material3.Button(onClick = {
+//        // Call the JavaScript function to show the help screen
+//        //val webView:Webview
+//          val webView: WebView()
+//        webView.evaluateJavascript("showHelpScreen();", null)
+//    }) {
+//        Text("Back")
+//    }
 }
 
 
@@ -283,6 +293,7 @@ fun HelpScreen() {
 //}
 
 class WebViewActivity : ComponentActivity() {
+    private lateinit var webView: WebView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val webView = WebView(this)
@@ -319,7 +330,19 @@ class WebViewActivity : ComponentActivity() {
         // Load the video from the assets folder in the WebView
         //webView.loadUrl("https://youtu.be/H0hJHFFbrB0")
     }
+//    @Deprecated("Deprecated in Java")
+//    override fun onBackPressed() {
+//        // Check if the WebView can go back and handle the back button accordingly
+//        if (webView.canGoBack()) {
+//            webView.goBack()
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
+
 }
+
+
 
 
 
