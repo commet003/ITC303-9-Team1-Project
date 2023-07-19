@@ -20,6 +20,8 @@ class TodoViewModel(
             SortType.BY_DATE -> todoDao.sortByDueDate()
             SortType.BY_PRIORITY -> todoDao.sortByPriority()
             SortType.BY_TIME -> todoDao.sortByDueTime()
+            SortType.BY_COMPLETED -> todoDao.sortByCompleted()
+            SortType.BY_NOT_COMPLETED -> todoDao.sortByNotCompleted()
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
@@ -164,8 +166,9 @@ class TodoViewModel(
                     )
                 }
             }
-
-            else -> {}
+            is TodoEvent.sortBy -> {
+                _sortType.value = event.sortType
+            }
         }
     }
 }

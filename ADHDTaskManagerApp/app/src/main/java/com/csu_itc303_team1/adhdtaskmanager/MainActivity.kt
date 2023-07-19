@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         // Creating the Top Bar
                         topBar = {
-                            AppTopAppBar(scope = scope, scaffoldState = scaffoldState, currentUser = googleAuthUiClient)
+                            AppTopAppBar(scope = scope, scaffoldState = scaffoldState)
                                  },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
