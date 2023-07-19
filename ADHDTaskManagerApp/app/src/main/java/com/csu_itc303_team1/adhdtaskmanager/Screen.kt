@@ -13,4 +13,7 @@ sealed class Screen(val route: String, var icon: Int, val title: String) {
 
     // Sign In Screen
     object SignInScreen: Screen("sign_in_screen", R.drawable.ic_sign_in,"Sign In")
+
+    // Help Screen
+    object HelpScreen: Screen("help_screen", R.drawable.ic_help,"Help")
 }

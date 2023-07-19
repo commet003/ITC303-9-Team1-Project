@@ -308,6 +308,12 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
+
+                            composable(
+                                route = Screen.HelpScreen.route
+                            ) {
+                                HelpScreen()
+                            }
                         }
                     }
                 }
