@@ -32,6 +32,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +56,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.auth.ktx.auth
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+import com.google.firebase.ktx.Firebase
+
 
 
 @Suppress("UNCHECKED_CAST")
@@ -105,6 +110,13 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    // Boolean value to check if the user is signed in or not
+    private val isSignedIn by lazy {
+        mutableStateOf(false)
+    }
+
+
+
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class)
@@ -121,6 +133,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
+
+        googleAuthUiClient.addAuthStateListener {
+            isSignedIn.value = googleAuthUiClient.getSignedIn()
+        }
+
 
         setContent {
             // Retrieve's Leaderboard data onCreate
@@ -151,13 +168,18 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         // Creating the Top Bar
                         topBar = {
-                            AppTopAppBar(scope = scope, scaffoldState = scaffoldState)
+                            if (isSignedIn.value){
+                                AppTopAppBar(scope = scope, scaffoldState = scaffoldState)
+                            }else {
+                                SignInTopAppBar()
+                            }
                                  },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
                         // If the user is signed in, show the drawer
+
                         drawerContent = {
-                            if (googleAuthUiClient.getSignedInUser() != null) {
+                            if (isSignedIn.value) {
                                 DrawerHeader()
                                 DrawerBody(
                                     context = applicationContext,
@@ -167,6 +189,7 @@ class MainActivity : ComponentActivity() {
                                     currentUser = googleAuthUiClient
                                 )
                             }
+                            else null
                         }
                     ) { // In this Section is contents of the actual screen. A padding value had to
                         // be added in the lambda form.
@@ -199,6 +222,9 @@ class MainActivity : ComponentActivity() {
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
                         val state by viewModel.state.collectAsState()
+                        if (isSignedIn.value){
+                            state.userId = googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                        }
                         //val rewardState by rewardViewModel.collectAsState()
                         val todoEvent = viewModel::onEvent
                         val signInViewModel = viewModel<SignInViewModel>()
@@ -223,7 +249,6 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             startDestination = Screen.SignInScreen.route   // Screen that displays when app is first opened
                         ){
-
                             // Home screen/to-do screen
                             composable(
                                 route = Screen.TodoScreen.route

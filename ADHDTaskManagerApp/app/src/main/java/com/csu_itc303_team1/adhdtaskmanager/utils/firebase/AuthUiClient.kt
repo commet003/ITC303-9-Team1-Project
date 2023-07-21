@@ -17,6 +17,24 @@ class AuthUiClient(
     private val oneTapClient: SignInClient
 ) {
     private val auth = Firebase.auth
+    private var _isSignedIn = false
+
+    // Function to addAuthStateListener to the firebase auth
+    // Changes the value of _isSignedIn to true if the user is signed in
+    // Changes the value of _isSignedIn to false if the user is signed out
+    fun addAuthStateListener(listener: (Boolean) -> Unit) {
+        auth.addAuthStateListener {
+            _isSignedIn = it.currentUser != null
+            listener(_isSignedIn)
+        }
+    }
+
+    // Public getter fun for _isSignedIn
+    fun getSignedIn(): Boolean {
+        return _isSignedIn
+    }
+
+
 
     suspend fun signIn(): IntentSender? {
         val result = try {
@@ -84,7 +102,6 @@ class AuthUiClient(
                     .setServerClientId(context.getString(R.string.web_client_id))
                     .build()
             )
-            .setAutoSelectEnabled(true)
             .build()
     }
 

@@ -81,7 +81,9 @@ fun TodoScreen(
                 }
             }
             items(state.todos){ todo ->
-                TodoCard(todo = todo, todoState = state, onEvent = onEvent, rewardViewModel = rewardViewModel)
+                if (todo.userID == state.userId){
+                    TodoCard(todo = todo, todoState = state, onEvent = onEvent, rewardViewModel = rewardViewModel)
+                }
             }
         }
     }

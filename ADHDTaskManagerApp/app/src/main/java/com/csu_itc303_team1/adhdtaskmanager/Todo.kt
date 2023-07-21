@@ -13,5 +13,6 @@ data class Todo(
     var dueTime: String,
     val isCompleted: Boolean = false,
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0
+    val id: Int = 0,
+    val userID: String
 )

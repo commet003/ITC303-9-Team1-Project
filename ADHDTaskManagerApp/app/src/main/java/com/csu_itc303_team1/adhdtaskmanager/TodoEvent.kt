@@ -13,6 +13,9 @@ sealed interface TodoEvent {
     data class setDueTime(val dueTime: String): TodoEvent
     data class deleteTodo(val todo: Todo): TodoEvent
 
+    // setUserId
+    data class setUserId(val userId: String): TodoEvent
+
     data class toggleCompleted(val todo: Todo): TodoEvent
     // Data class to sort by sort type
     data class sortBy(val sortType: SortType): TodoEvent
