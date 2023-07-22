@@ -32,7 +32,14 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun CompletedTaskCard(todo: Todo) {
 
-    val parsedDate = LocalDateTime.parse(todo.completionDate, DateTimeFormatter.ISO_DATE_TIME)
+    // If completion date = "" then make parsedDate Minimum Date
+    val parsedDate: LocalDateTime = if (todo.completionDate == ""){
+        LocalDateTime.MIN
+    } else {
+        LocalDateTime.parse(todo.completionDate, DateTimeFormatter.ISO_DATE_TIME)
+
+    }
+
     val formattedDate = parsedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm a"))
 
     Card(

@@ -28,6 +28,7 @@ import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -151,18 +152,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-//                        val owner = LocalViewModelStoreOwner.current
-//
-//                        owner?.let{
-//                            val rewardViewModel: RewardViewModel = viewModel(
-//                                it,
-//                                "RewardViewModel",
-//                                RewardViewModelFactory(LocalContext.current.applicationContext as Application))
-//                            RewardSetup(rewardViewModel)
-//                            TodoRewardSetup(rewardViewModel)
-//                        }
-
-
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
                         val state by viewModel.state.collectAsState()
@@ -177,6 +166,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 
