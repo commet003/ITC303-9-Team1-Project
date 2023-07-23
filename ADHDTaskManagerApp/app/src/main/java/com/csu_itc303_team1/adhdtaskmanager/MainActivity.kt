@@ -34,7 +34,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,12 +56,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.ktx.auth
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
-import com.google.firebase.ktx.Firebase
-
 
 
 @Suppress("UNCHECKED_CAST")
