@@ -1,8 +1,7 @@
-package com.csu_itc303_team1.adhdtaskmanager.database.local
+package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.csu_itc303_team1.adhdtaskmanager.Priority
 
 
 @Entity
@@ -15,5 +14,6 @@ data class Todo(
     val isCompleted: Boolean = false,
     var completionDate: String = "",
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0
+    val id: Int = 0,
+    val userID: String
 )

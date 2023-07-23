@@ -8,10 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.Priority
+import com.csu_itc303_team1.adhdtaskmanager.Todo
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
 import com.csu_itc303_team1.adhdtaskmanager.TodoState
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
-import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker

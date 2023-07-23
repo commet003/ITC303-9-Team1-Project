@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.EditTodoDialog
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

@@ -3,9 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.csu_itc303_team1.EditTodoDialog
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
-import com.csu_itc303_team1.adhdtaskmanager.database.local.TodoDao
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -69,6 +67,7 @@ class TodoViewModel(
                 val priority = state.value.priority
                 val dueDate = state.value.dueDate
                 val dueTime = state.value.dueTime
+                val userId = state.value.userId
 
                 if (title.isBlank() || description.isBlank()) {
                     return
@@ -80,6 +79,7 @@ class TodoViewModel(
                     priority = priority,
                     dueDate = dueDate,
                     dueTime = dueTime,
+                    userID = userId
                 )
 
                 viewModelScope.launch {
@@ -184,6 +184,12 @@ class TodoViewModel(
                             completionDate = LocalDateTime.now().toString()
                         )
                     )
+                }
+            }
+
+            is TodoEvent.setUserId -> {
+                _state.update {
+                    it.copy(userId = event.userId)
                 }
             }
 

@@ -1,16 +1,13 @@
-package com.csu_itc303_team1.adhdtaskmanager.database.local
+package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Todo
 import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface TodoDao {
 
-    @Query("SELECT * FROM Todo")
-    suspend fun getAllTodos(): List<Todo>
     @Insert
     suspend fun insertTodo(todo: Todo)
     @Delete
