@@ -12,6 +12,7 @@ sealed interface TodoEvent {
     data class setDueDate(val dueDate: String): TodoEvent
     data class setDueTime(val dueTime: String): TodoEvent
     data class deleteTodo(val todo: Todo): TodoEvent
+    data class setCompletedDate(val todo: Todo): TodoEvent
 
     // setUserId
     data class setUserId(val userId: String): TodoEvent
@@ -31,5 +32,6 @@ sealed interface TodoEvent {
 
     object showTimeSelector: TodoEvent
     object hideTimeSelector: TodoEvent
+    object ShowCompletedTasks: TodoEvent
 
 }

@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        )/*.openHelperFactory(factory)*/.build()
+        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
     }
 
 
@@ -94,10 +95,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     )
-
-
-
-
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
@@ -173,7 +170,7 @@ class MainActivity : ComponentActivity() {
                             }else {
                                 SignInTopAppBar()
                             }
-                                 },
+                        },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
                         // If the user is signed in, show the drawer
@@ -280,6 +277,13 @@ class MainActivity : ComponentActivity() {
                                 RewardsScreen(rewardViewModel)
                             }
 
+                            // Completed Task Screen
+                            composable(
+                                route = Screen.CompletedScreen.route
+                            ) {
+                                CompletedScreen(state, todoEvent)
+                            }
+
                             // Sign In Screen
                             composable(
                                 route = Screen.SignInScreen.route
@@ -337,6 +341,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 
