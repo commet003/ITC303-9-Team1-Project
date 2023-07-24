@@ -26,12 +26,9 @@ fun TodoScreen(
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel
 ) {
-    onEvent(TodoEvent.sortBy(SortType.BY_NOT_COMPLETED))
     rewardViewModel.allRewards.observeAsState(listOf())
 
     Scaffold(
-        topBar = {
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 onEvent(TodoEvent.showDialog)
@@ -85,6 +82,7 @@ fun TodoScreen(
 
                 }
             }
+
             items(state.todos){ todo ->
                 if (todo.userID == state.userId){
                     TodoCard(todo = todo, todoState = state, onEvent = onEvent, rewardViewModel = rewardViewModel)
