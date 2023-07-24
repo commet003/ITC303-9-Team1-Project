@@ -108,6 +108,10 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
+    override fun onStart() {
+        super.onStart()
+    }
+
 
 
 
@@ -146,7 +150,7 @@ class MainActivity : ComponentActivity() {
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.surface
                 ) {
                     // variables for remembering the state of the Coroutine Scope and Scaffold
                     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))

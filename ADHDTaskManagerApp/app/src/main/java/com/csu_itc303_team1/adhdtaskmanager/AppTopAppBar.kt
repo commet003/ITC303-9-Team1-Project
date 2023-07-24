@@ -34,15 +34,14 @@ fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 
     // This is for the Bar at the top of the application. This will be present on every page.
     TopAppBar(
-        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp) }, // Label on the bar
+        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp, color = MaterialTheme.colors.onPrimary) }, // Label on the bar
         navigationIcon = {
             IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
-                Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = MaterialTheme.colors.onPrimary)
             }
 
         },
-        backgroundColor = MaterialTheme.colors.primary,         // Colours of the bar
-        contentColor = MaterialTheme.colors.onPrimary
+        backgroundColor = MaterialTheme.colors.primaryVariant         // Colours of the bar
     )
 }
 
@@ -51,8 +50,7 @@ fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
 @Composable
 fun SignInTopAppBar(){
     TopAppBar(
-        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp) }, // Label on the bar
-        backgroundColor = MaterialTheme.colors.primary,         // Colours of the bar
-        contentColor = MaterialTheme.colors.onPrimary
+        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp, color = MaterialTheme.colors.onPrimary) }, // Label on the bar
+        backgroundColor = MaterialTheme.colors.primaryVariant,         // Colours of the bar
     )
 }

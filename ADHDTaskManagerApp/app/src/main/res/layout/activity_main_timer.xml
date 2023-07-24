@@ -146,7 +146,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="55dp"
         android:layout_marginBottom="24dp"
-        android:textColor="@color/white"
+        android:textColor="#FFFFFF"
 
         android:textSize="@dimen/timerTextSize"
         app:layout_constraintBottom_toTopOf="@+id/fab_pause"

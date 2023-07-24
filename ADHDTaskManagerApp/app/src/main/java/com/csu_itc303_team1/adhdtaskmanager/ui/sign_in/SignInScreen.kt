@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -57,8 +58,8 @@ fun SignInScreen(
                     modifier = Modifier.padding(bottom = 48.dp),
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = colorResource(R.color.black),
-                        contentColor = colorResource(R.color.white)
+                        backgroundColor = Color.Black,
+                        contentColor = Color.White
                     ),
                     onClick = onSignInClick
                 ) {
@@ -80,8 +81,8 @@ fun SignInScreen(
                     modifier = Modifier.padding(bottom = 48.dp),
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = colorResource(R.color.white),
-                        contentColor = colorResource(R.color.black)
+                        backgroundColor = Color.White,
+                        contentColor = Color.Black
                     ),
                     onClick = onAnonymousSignIn
                 ) {
