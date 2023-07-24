@@ -46,117 +46,8 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 
-//@Composable
-//fun HelpScreen() {
-//    val context = LocalContext.current
-//    var viewManualClicked by remember { mutableStateOf(false) }
-//    val coroutineScope = rememberCoroutineScope()
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    Text(text = "Welcome to Help Page")
-//
-//                }
-//            )
-//            //Spacer(modifier = Modifier.height(46.dp))
-//        }
-//
-//    ) {
-//
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize() // Make the Column fill the available space
-//                .padding(79.dp)
-//
-//        ) {
-//            Text(
-//                text = "Click on One Of the Options: ",
-//                style = TextStyle(fontSize = 18.sp, fontStyle = FontStyle.Italic),
-//                color = Color.Blue
-//            )
-//
-//            Spacer(modifier = Modifier.height(15.dp))
-//
-//
-//
-//            // "View Manual" row
-//            Row(
-//                modifier = Modifier.clickable {
-//                    viewManualClicked = true
-//                    coroutineScope.launch {
-//                        //openUserManual(context)
-//                        //For simplicity,launching an Intent to open a web URL.
-//
-//                        val intent = Intent(context, WebViewActivity::class.java)
-//                        context.startActivity(intent)
-//                    }
-//                }
-//
-//
-//
-//            ) {
-//                Text(
-//                    text = "- View Manual",
-//                    style = TextStyle(fontSize = 20.sp),
-//                    textDecoration = if (viewManualClicked) TextDecoration.Underline else TextDecoration.None
-//                )
-//
-//            }
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//
-//            //Text(text = "- View Architecture Diagram", style = TextStyle(fontSize = 20.sp))
-//
-//            // "View Architecture Diagram" row
-//            Row(
-//                modifier = Modifier.clickable {
-//                    viewManualClicked = true
-//                    coroutineScope.launch {
-//                        //open Architecture Diagram (context)
-//                        //For simplicity,launching an Intent to open a web URL.
-//
-//                        val intent = Intent(context, WebViewActivity::class.java)
-//                        context.startActivity(intent)
-//                    }
-//                }
-//
-//
-//
-//            ) {
-//                Text(
-//                    text = "- View Architecture Diagram",
-//                    style = TextStyle(fontSize = 20.sp),
-//                    textDecoration = if (viewManualClicked) TextDecoration.Underline else TextDecoration.None
-//                )
-//
-//            }
-//            // "View the Video" row
-//            Row(
-//                modifier = Modifier.clickable {
-//                    viewManualClicked = true
-//                    coroutineScope.launch {
-//                        //open Video (context)
-//                        //For simplicity,launching an Intent to open a web URL.
-//
-//                        val intent = Intent(context, WebViewActivity::class.java)
-//                        context.startActivity(intent)
-//                    }
-//                }
-//
-//
-//
-//            ) {
-//                Text(
-//                    text = "- View the Demo Video",
-//                    style = TextStyle(fontSize = 20.sp),
-//                    textDecoration = if (viewManualClicked) TextDecoration.Underline else TextDecoration.None
-//                )
-//
-//            }
-//        }
-//    }
-//}
+
+
 
 @Composable
 fun HelpScreen() {
@@ -259,38 +150,13 @@ fun HelpScreen() {
         }
     }
 
-    // Add a Back button that calls the JavaScript function to show the help screen
-//    androidx.compose.material3.Button(onClick = {
-//        // Call the JavaScript function to show the help screen
-//        //val webView:Webview
-//          val webView: WebView()
-//        webView.evaluateJavascript("showHelpScreen();", null)
-//    }) {
-//        Text("Back")
-//    }
+
 }
 
 
 
 
-// Function to open the user manual in a WebView
-//private fun openUserManual(context: ComponentActivity) {
-//    val intent = Intent(context, WebViewActivity::class.java)
-//    context.startActivity(intent)
-//}
 
-// WebViewActivity that loads the HTML content in a WebView
-//class WebViewActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        val webView = WebView(this)
-//        setContentView(webView)
-//
-//        // Load the user manual HTML file from the assets folder
-//        webView.loadUrl("file:///android_asset/Manual.html")
-//
-//    }
-//}
 
 class WebViewActivity : ComponentActivity() {
     private lateinit var webView: WebView
@@ -327,18 +193,9 @@ class WebViewActivity : ComponentActivity() {
         // Set a custom WebChrome client to handle video playback
         webView.webChromeClient = WebChromeClient()
 
-        // Load the video from the assets folder in the WebView
-        //webView.loadUrl("https://youtu.be/H0hJHFFbrB0")
+
     }
-//    @Deprecated("Deprecated in Java")
-//    override fun onBackPressed() {
-//        // Check if the WebView can go back and handle the back button accordingly
-//        if (webView.canGoBack()) {
-//            webView.goBack()
-//        } else {
-//            super.onBackPressed()
-//        }
-//    }
+
 
 }
 
