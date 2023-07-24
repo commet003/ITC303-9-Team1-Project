@@ -18,12 +18,12 @@ configurations.all {
 
 android {
     namespace 'com.csu_itc303_team1.adhdtaskmanager'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.csu_itc303_team1.adhdtaskmanager"
         minSdk 28
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -119,7 +119,7 @@ dependencies {
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
 
     // Navigation
-    implementation "androidx.navigation:navigation-compose:2.6.0-beta01"
+    implementation "androidx.navigation:navigation-compose:2.7.0-beta02"
 
     // DataStore Preferences (For App Settings)
     implementation "androidx.datastore:datastore-preferences:1.0.0"
