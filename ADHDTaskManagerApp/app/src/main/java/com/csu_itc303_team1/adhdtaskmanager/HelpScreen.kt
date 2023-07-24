@@ -1,74 +1,210 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Bundle
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.*
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
+
+
+
+
 @Composable
 fun HelpScreen() {
+    val context = LocalContext.current
+    var viewManualClicked by remember { mutableStateOf(false) }
+    var viewArchitectureClicked by remember { mutableStateOf(false) }
+    var viewVideoClicked by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Welcome To The Help Page",style = TextStyle(fontSize = 24.sp,
-                    color = Color.Blue, fontStyle = FontStyle.Italic)
-                )
-                },
-
-                )
-        },
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /*TODO*/
-
+                title = {
+                    Text(text = "Welcome to the Help Page")
                 }
-            ) {
-                Icon(Icons.Filled.Home, contentDescription = "Home")
-            }
-        },
-
-        ) { innerPadding ->
+            )
+        }
+    ) {
         Column(
             modifier = Modifier
-                .padding(20.dp, 20.dp, 0.dp, 0.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.Start,
+                .fillMaxSize()
+                .padding(79.dp)
+        ) {
+            Text(
+                text = "Click on One Of the Options: ",
+                style = TextStyle(fontSize = 18.sp, fontStyle = FontStyle.Italic),
+                color = Color.Blue
+            )
 
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // "View Manual" row
+            Row(
+                modifier = Modifier.clickable {
+                    viewManualClicked = true
+                    viewArchitectureClicked = false
+                    viewVideoClicked = false
+                    coroutineScope.launch {
+                        val intent = Intent(context, WebViewActivity::class.java)
+                        intent.putExtra("URL", "file:///android_asset/Manual.html")
+                        context.startActivity(intent)
+                    }
+                }
             ) {
-            Spacer(modifier = Modifier.height(86.dp))
-            Text("Hello",style = TextStyle(fontSize = 20.sp))
+                Text(
+                    text = "- View Manual",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        textDecoration = if (viewManualClicked) TextDecoration.Underline else TextDecoration.None
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // "View Architecture Diagram" row
+            Row(
+                modifier = Modifier.clickable {
+                    viewManualClicked = false
+                    viewArchitectureClicked = true
+                    viewVideoClicked = false
+                    coroutineScope.launch {
+                        val intent = Intent(context, WebViewActivity::class.java)
+                        intent.putExtra("URL", "file:///android_asset/Developers Delight.html")
+                        context.startActivity(intent)
+                    }
+                }
+            ) {
+                Text(
+                    text = "- Developers Resources",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        textDecoration = if (viewArchitectureClicked) TextDecoration.Underline else TextDecoration.None
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(36.dp))
-            Text("World",style = TextStyle(fontSize = 20.sp))
+            // "View the Video" row
+            Row(
+                modifier = Modifier.clickable {
+                    viewManualClicked = false
+                    viewArchitectureClicked = false
+                    viewVideoClicked = true
+                    coroutineScope.launch {
+                        val intent = Intent(context, WebViewActivity::class.java)
+                        //intent.putExtra("URL", "file:///android_asset/p.mov")
+                        intent.putExtra("URL", "https://youtu.be/H0hJHFFbrB0")
+                        context.startActivity(intent)
+                    }
+                }
+            ) {
+                Text(
+                    text = "- View the Demo Video",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        textDecoration = if (viewVideoClicked) TextDecoration.Underline else TextDecoration.None
+                    )
+                )
+            }
         }
     }
+
+
+}
+
+
+
+
+
+
+class WebViewActivity : ComponentActivity() {
+    private lateinit var webView: WebView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val webView = WebView(this)
+        setContentView(webView)
+
+        // Retrieve the URL from the Intent extras
+        val url = intent.getStringExtra("URL")
+
+        // Enable JavaScript to play videos
+        webView.settings.javaScriptEnabled = true
+
+        // Load the URL in the WebView
+        if (url != null) {
+            webView.loadUrl(url)
+        } else {
+            // Handle the case where the URL is null or not provided.
+            // You can show an error message or load a default URL here.
+            webView.loadUrl("file:///android_asset/Error.html")
+
+        }
+
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                // Load assets from the app package instead of treating them as file URLs
+                //view?.loadUrl(request?.url?.toString())
+                val url = request?.url?.toString() ?: ""
+                view?.loadUrl(url)
+                return true
+            }
+        }
+        // Set a custom WebChrome client to handle video playback
+        webView.webChromeClient = WebChromeClient()
+
+
+    }
+
+
+}
+
+
+
+
+
+@Preview
+@Composable
+fun HelpScreenPreview() {
+    HelpScreen()
 }

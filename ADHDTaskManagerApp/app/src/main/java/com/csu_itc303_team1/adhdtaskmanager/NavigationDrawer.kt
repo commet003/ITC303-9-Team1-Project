@@ -95,7 +95,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
         Screen.RewardsScreen,
         Screen.LeaderboardScreen,
         Screen.SettingsScreen,
-
+        Screen.HelpScreen
         )
 
     // Column to store all the items
