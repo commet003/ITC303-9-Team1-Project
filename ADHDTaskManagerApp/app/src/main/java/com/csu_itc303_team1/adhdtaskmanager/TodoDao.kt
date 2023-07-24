@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
@@ -7,8 +8,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TodoDao {
 
-    @Query("SELECT * FROM Todo")
-    suspend fun getAllTodos(): List<Todo>
     @Insert
     suspend fun insertTodo(todo: Todo)
     @Delete
@@ -30,7 +29,7 @@ interface TodoDao {
     fun sortByDueTime(): Flow<List<Todo>>
 
     // Sort Todos by isCompleted
-    @Query("SELECT * FROM Todo WHERE isCompleted = 1")
+    @Query("SELECT * FROM Todo WHERE isCompleted = 1 ORDER BY completionDate ASC")
     fun sortByCompleted(): Flow<List<Todo>>
 
     // Sort Todos by not isCompleted
@@ -43,4 +42,6 @@ interface TodoDao {
     @Query("SELECT COUNT(*) FROM Todo WHERE isCompleted = 1")
     suspend fun getCountOfCompletedTodos(): Int
 
+    @Query("SELECT * FROM Todo WHERE isCompleted = 1")
+    fun getAllCompletedTodos(): Flow<List<Todo>>
 }

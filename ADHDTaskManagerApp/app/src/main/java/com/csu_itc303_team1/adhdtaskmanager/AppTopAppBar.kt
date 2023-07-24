@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.wrapContentSize
@@ -34,13 +35,23 @@ fun AppTopAppBar(scope: CoroutineScope, scaffoldState: ScaffoldState){
     // This is for the Bar at the top of the application. This will be present on every page.
     TopAppBar(
         title = { Text(text = "ADHD Task Manager", fontSize = 18.sp) }, // Label on the bar
-        // If the user is signed in, show the navigation icon
         navigationIcon = {
             IconButton(onClick = { scope.launch { scaffoldState.drawerState.open() } }) {
                 Icon(Icons.Filled.Menu, contentDescription = "Menu")
             }
 
         },
+        backgroundColor = MaterialTheme.colors.primary,         // Colours of the bar
+        contentColor = MaterialTheme.colors.onPrimary
+    )
+}
+
+// Top App Bar for the Sign In Page
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun SignInTopAppBar(){
+    TopAppBar(
+        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp) }, // Label on the bar
         backgroundColor = MaterialTheme.colors.primary,         // Colours of the bar
         contentColor = MaterialTheme.colors.onPrimary
     )

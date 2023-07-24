@@ -91,6 +91,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
     // Create a list of Screen objects
     val screens = listOf(
         Screen.TodoScreen,
+        Screen.CompletedScreen,
         Screen.RewardsScreen,
         Screen.LeaderboardScreen,
         Screen.SettingsScreen,

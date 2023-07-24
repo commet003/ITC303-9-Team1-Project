@@ -32,6 +32,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,7 +72,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        )/*.openHelperFactory(factory)*/.build()
+        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
     }
 
 
@@ -90,10 +92,6 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-
-
-
-
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
     //private lateinit var rewardViewModel: RewardViewModel
@@ -104,6 +102,13 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+
+    // Boolean value to check if the user is signed in or not
+    private val isSignedIn by lazy {
+        mutableStateOf(false)
+    }
+
+
 
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -121,6 +126,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
+
+        googleAuthUiClient.addAuthStateListener {
+            isSignedIn.value = googleAuthUiClient.getSignedIn()
+        }
+
 
         setContent {
             // Retrieve's Leaderboard data onCreate
@@ -151,13 +161,18 @@ class MainActivity : ComponentActivity() {
                         scaffoldState = scaffoldState,
                         // Creating the Top Bar
                         topBar = {
-                            AppTopAppBar(scope = scope, scaffoldState = scaffoldState)
-                                 },
+                            if (isSignedIn.value){
+                                AppTopAppBar(scope = scope, scaffoldState = scaffoldState)
+                            }else {
+                                SignInTopAppBar()
+                            }
+                        },
                         // Drawer content is what is inside the navigation drawer when clicking the
                         // menu icon. This case, A header and all the menu options in the drawer body
                         // If the user is signed in, show the drawer
+
                         drawerContent = {
-                            if (googleAuthUiClient.getSignedInUser() != null) {
+                            if (isSignedIn.value) {
                                 DrawerHeader()
                                 DrawerBody(
                                     context = applicationContext,
@@ -167,6 +182,7 @@ class MainActivity : ComponentActivity() {
                                     currentUser = googleAuthUiClient
                                 )
                             }
+                            else null
                         }
                     ) { // In this Section is contents of the actual screen. A padding value had to
                         // be added in the lambda form.
@@ -199,6 +215,9 @@ class MainActivity : ComponentActivity() {
                         // The content itself is the navController's current state, or Home Screen
                         // on Default
                         val state by viewModel.state.collectAsState()
+                        if (isSignedIn.value){
+                            state.userId = googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                        }
                         //val rewardState by rewardViewModel.collectAsState()
                         val todoEvent = viewModel::onEvent
                         val signInViewModel = viewModel<SignInViewModel>()
@@ -223,7 +242,6 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             startDestination = Screen.SignInScreen.route   // Screen that displays when app is first opened
                         ){
-
                             // Home screen/to-do screen
                             composable(
                                 route = Screen.TodoScreen.route
@@ -253,6 +271,13 @@ class MainActivity : ComponentActivity() {
                                 route = Screen.RewardsScreen.route
                             ) {
                                 RewardsScreen(rewardViewModel)
+                            }
+
+                            // Completed Task Screen
+                            composable(
+                                route = Screen.CompletedScreen.route
+                            ) {
+                                CompletedScreen(state, todoEvent)
                             }
 
                             // Sign In Screen
@@ -318,6 +343,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 

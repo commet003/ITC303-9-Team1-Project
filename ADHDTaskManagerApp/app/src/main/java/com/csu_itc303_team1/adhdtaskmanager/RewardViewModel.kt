@@ -46,10 +46,11 @@ class RewardViewModel(application: Application): ViewModel() {
         repo.insertReward(reward)
     }
 
-    fun findReward(name: String) {
+    fun findReward(name: String): LiveData<List<Reward>> {
         viewModelScope.launch {
             searchResults = repo.findReward(name)
         }
+        return searchResults
     }
 
     fun updateReward(reward: Reward) {
@@ -58,6 +59,10 @@ class RewardViewModel(application: Application): ViewModel() {
 
     fun deleteReward(reward: Reward) {
         repo.deleteReward(reward)
+    }
+
+    fun updateState(rewardName: String) {
+        findReward(rewardName)
     }
 
 }
