@@ -15,6 +15,10 @@ interface TodoDao {
     @Update
     suspend fun updateTodo(todo: Todo)
 
+    // Get todo by id
+    @Query("SELECT * FROM Todo WHERE id = :id")
+    fun getTodoById(id: Int): Flow<Todo>
+
 
     // Sort Todos by Priority
     @Query("SELECT * FROM Todo ORDER BY priority DESC")

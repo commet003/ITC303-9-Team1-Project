@@ -3,7 +3,10 @@ package com.csu_itc303_team1.adhdtaskmanager
 sealed interface TodoEvent {
 
     // Data class to update todo
-    data class updateTodo(val todo: Todo): TodoEvent
+    object updateTodo: TodoEvent
+
+    // Get individual todo
+    data class getTodoById(val id: Int): TodoEvent
 
     object saveTodo: TodoEvent
     data class setTitle(val title: String): TodoEvent

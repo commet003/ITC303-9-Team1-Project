@@ -8,7 +8,7 @@ val BlueGrottoDark = Color(4, 94, 165, 255)
 val BlueGreenDark = Color(117, 230, 218)
 val BabyBlueDark = Color(139, 217, 225)
 val BackgroundDark = Color(0xFF181818)
-val DiologBoxBackgroundDark = Color(0xFF2C2C2C)
+val DiologBoxBackgroundDark = Color(0xFF202020)
 
 
 // Light Theme Colors
@@ -16,4 +16,4 @@ val NavyBlueLight = Color(0xFF0A85B9)
 val BlueGrottoLight = Color(86, 208, 233)
 val BlueGreenLight = Color(190, 243, 238)
 val BabyBlueLight = Color(212, 241, 244)
-val DiologBoxBackgroundLight = Color(0xFFE5E5E5)
+val DiologBoxBackgroundLight = Color(0xFFBFECFF)

@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,44 +11,50 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
-import androidx.compose.material.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.EditTodoDialog
 
 
+@SuppressLint("RememberReturnType")
 @Composable
-fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rewardViewModel: RewardViewModel) {
+fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, index: Int, rewardViewModel: RewardViewModel) {
+
+    // Local variable to hold and remember the current todo
+    var currentTodo by remember { mutableStateOf(todo) }
 
     val searchResults by rewardViewModel.searchResults.observeAsState()
     rewardViewModel.findReward("Completed Task Reward")
 
-
-    //   Scaffold() {
-
-    if (todoState.showEditTodoDialog) {
+    // show the edit todo dialog if showEditTodoDialog is true
+    if (todoState.showEditTodoDialog){
         EditTodoDialog(
-            todo = todo,
-            state = todoState,
-            onEvent = onEvent,
+            todo,
+            todoState,
+            onEvent
         )
     }
+
 
     Card(
         modifier = Modifier
@@ -61,12 +69,12 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, top = 10.dp)
+                    .padding(start = 10.dp, top = 5.dp)
                     .height(25.dp),
                 verticalAlignment = CenterVertically,
             ) {
                 Text(
-                    text = todo.title,
+                    text = currentTodo.title,
                     color = MaterialTheme.colors.onPrimary,
                     fontSize = 22.sp,
                     // Line through if completed
@@ -76,7 +84,6 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                 IconButton(
                     onClick = {
                         onEvent(TodoEvent.showEditTodoDialog)
-
                     }
                 ) {
                     Icon(
@@ -88,7 +95,8 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
             }
             Row(
                 modifier = Modifier.height(60.dp),
-                verticalAlignment = CenterVertically
+                verticalAlignment = CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
                 Checkbox(
 
@@ -122,13 +130,14 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
 
                 Text(
                     color = MaterialTheme.colors.onPrimary,
-                    text = todo.description,
+                    text = currentTodo.description,
                     // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
             }
             Row(
-                modifier = Modifier.padding(start = 10.dp, top = 8.dp)
+                modifier = Modifier
+                    .padding(start = 10.dp, top = 8.dp)
                     .fillMaxHeight(),
                 verticalAlignment = CenterVertically
             ) {

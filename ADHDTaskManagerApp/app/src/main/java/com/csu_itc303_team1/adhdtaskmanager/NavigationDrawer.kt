@@ -198,7 +198,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
             if (currentUser.isUserAnonymous()) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "You are signed in anonymously, if you sign out you will lose all your data.",
+                        text = "You are signed in anonymously, if you sign out you will lose all of your data.",
                         fontSize = 14.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
                         color = Color(0xFFFC8B8B),

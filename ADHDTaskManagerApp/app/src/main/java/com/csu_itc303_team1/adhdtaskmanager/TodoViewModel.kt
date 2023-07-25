@@ -4,11 +4,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+@HiltViewModel
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
@@ -37,16 +39,48 @@ class TodoViewModel(
 
     fun onEvent(event: TodoEvent) {
         when (event) {
+            // Update Todo
             is TodoEvent.updateTodo -> {
+                val title = state.value.title
+                val description = state.value.description
+                val priority = state.value.priority
+                val dueDate = state.value.dueDate
+                val dueTime = state.value.dueTime
+                val userId = state.value.userId
+                val id = state.value.id
+
+                if (title.isBlank() || description.isBlank()) {
+                    return
+                }
+
+                val todo = Todo(
+                    id = id,
+                    title = title,
+                    description = description,
+                    priority = priority,
+                    dueDate = dueDate,
+                    dueTime = dueTime,
+                    userID = userId
+                )
+
                 viewModelScope.launch {
-                    todoDao.updateTodo(event.todo)
+                    todoDao.updateTodo(todo)
                 }
 
                 _state.update {
-                    it.copy(showEditTodoDialog = false)
+                    it.copy(
+                        title = "",
+                        description = "",
+                        priority = Priority.LOW,
+                        dueDate = "",
+                        dueTime = "",
+                        showDialog = false,
+                        showEditTodoDialog = false
+                    )
                 }
-
             }
+
+            // Delete Todo
 
             is TodoEvent.deleteTodo -> {
                 viewModelScope.launch {
@@ -190,6 +224,12 @@ class TodoViewModel(
             is TodoEvent.setUserId -> {
                 _state.update {
                     it.copy(userId = event.userId)
+                }
+            }
+
+            is TodoEvent.getTodoById -> {
+                viewModelScope.launch {
+                    todoDao.getTodoById(event.id)
                 }
             }
 

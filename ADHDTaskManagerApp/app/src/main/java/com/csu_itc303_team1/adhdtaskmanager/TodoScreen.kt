@@ -71,7 +71,7 @@ fun TodoScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(MaterialTheme.colors.surface)
+                            .background(MaterialTheme.colors.background)
                             .horizontalScroll(rememberScrollState()),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
@@ -88,7 +88,7 @@ fun TodoScreen(
                             }
                             DropdownMenu(
                                 expanded = expanded,
-                                modifier = Modifier.background(MaterialTheme.colors.surface),
+                                modifier = Modifier.background(MaterialTheme.colors.background),
                                 onDismissRequest = { expanded = false },
                             ){
                                 SortType.values().forEach {sortType ->
@@ -102,27 +102,27 @@ fun TodoScreen(
                                             if (sortType.name == "BY_DATE") {
                                                 Text(
                                                     text = "By Date",
-                                                    color = MaterialTheme.colors.onSurface
+                                                    color = MaterialTheme.colors.onBackground
                                                 )
                                             } else if (sortType.name == "BY_PRIORITY") {
                                                 Text(
                                                     text = "By Priority",
-                                                    color = MaterialTheme.colors.onSurface
+                                                    color = MaterialTheme.colors.onBackground
                                                 )
                                             } else if (sortType.name == "BY_TIME") {
                                                 Text(
                                                     text = "By Time",
-                                                    color = MaterialTheme.colors.onSurface
+                                                    color = MaterialTheme.colors.onBackground
                                                 )
                                             } else if (sortType.name == "BY_COMPLETED") {
                                                 Text(
                                                     text = "By Completed",
-                                                    color = MaterialTheme.colors.onSurface
+                                                    color = MaterialTheme.colors.onBackground
                                                 )
                                             } else if (sortType.name == "BY_NOT_COMPLETED") {
                                                 Text(
                                                     text = "By Not Completed",
-                                                    color = MaterialTheme.colors.onSurface
+                                                    color = MaterialTheme.colors.onBackground
                                                 )
                                             }
                                         }
@@ -132,10 +132,13 @@ fun TodoScreen(
                         }
                     }
                 }
-
+                item {
+                    Spacer(modifier = Modifier.height(5.dp))
+                }
                 items(state.todos){ todo ->
                     if (todo.userID == state.userId){
-                        TodoCard(todo = todo, todoState = state, onEvent = onEvent, rewardViewModel = rewardViewModel)
+
+                        TodoCard(todo = todo, todoState = state, onEvent = onEvent, index = state.todos.indexOf(todo),  rewardViewModel = rewardViewModel)
                     }
                 }
             }

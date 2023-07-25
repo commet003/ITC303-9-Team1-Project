@@ -1,6 +1,5 @@
 package com.csu_itc303_team1
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,7 +19,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun EditTodoDialog(
     todo: Todo,
@@ -28,12 +26,6 @@ fun EditTodoDialog(
     onEvent: (TodoEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    state.title = todo.title
-    state.description = todo.description
-    state.priority = todo.priority
-    state.dueDate = todo.dueDate
-    state.dueTime = todo.dueTime
-
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {onEvent(TodoEvent.hideDialog)},
@@ -43,21 +35,22 @@ fun EditTodoDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                    TextField(
+                        value = todo.title,
+                        onValueChange = {
+                            todo.title = it
+                            onEvent(TodoEvent.setTitle(it))
+                        },
+                        label = { Text("Enter Title of the task", color = MaterialTheme.colorScheme.onSurface) } // This line adds a hint to the TextField
+                    )
+
                 TextField(
-                    value = state.title,
-                    onValueChange = {
-                        todo.title = it
-                        onEvent(TodoEvent.setTitle(it))
-                    },
-                    label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
-                )
-                TextField(
-                    value = state.description,
+                    value = todo.description,
                     onValueChange = {
                         todo.description = it
                         onEvent(TodoEvent.setDescription(it))
                     },
-                    label = { Text("Provide a brief description") } // This line adds a hint to the TextField
+                    label = { Text("Provide a brief description", color = MaterialTheme.colorScheme.onSurface) } // This line adds a hint to the TextField
 
                 )
                 Row(
@@ -227,7 +220,7 @@ fun EditTodoDialog(
                     todo.priority = state.priority
                     todo.dueDate = state.dueDate
                     todo.dueTime = state.dueTime
-                    onEvent(TodoEvent.updateTodo(todo))
+                    onEvent(TodoEvent.updateTodo)
                 }
             ) {
                 Text(text = "Edit")
