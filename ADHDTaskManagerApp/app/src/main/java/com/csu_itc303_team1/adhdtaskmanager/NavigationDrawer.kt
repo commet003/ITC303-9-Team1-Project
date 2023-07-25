@@ -62,7 +62,11 @@ fun DrawerHeader(
         Column{
             Text(modifier = Modifier.padding(top = 64.dp, bottom = 64.dp), text = "Header", fontSize = 60.sp, color = MaterialTheme.colors.onPrimary)
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "Hello, $username!", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+            if(username == "" || username == null){
+                Text(text = "Hello, Guest!", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+            } else {
+                Text(text = "Hello, $username!", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+            }
 
         }
     }

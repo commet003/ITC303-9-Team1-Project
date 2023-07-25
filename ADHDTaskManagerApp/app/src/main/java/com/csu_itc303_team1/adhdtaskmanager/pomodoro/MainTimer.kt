@@ -24,11 +24,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
 import com.csu_itc303_team1.adhdtaskmanager.MainActivity
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.db.DBHelper
-import kotlinx.android.synthetic.main.activity_main_timer.*
 
 class MainTimer : AppCompatActivity() {
 
@@ -40,7 +38,7 @@ class MainTimer : AppCompatActivity() {
     //Receiver for receiving the background count down info to update the countdown
     private val br: BroadcastReceiver = object: BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            handleCountDown(intent)
+            //handleCountDown(intent)
         }
     }
 
@@ -54,15 +52,15 @@ class MainTimer : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 //        progress_bar.visibility =
-        progress_bar.setVisibility(View.INVISIBLE);
-        textView_completed.setText(completed.toString())
+        progressBar?.setVisibility(View.INVISIBLE);
+        //textView_completed.setText(completed.toString())
 //        progressBar = (ProgressBar()) findViewById(R.id.progress_bar);
 
-        createNotificationChannel()
+        //createNotificationChannel()
         //  wakelock keep the CPU for service to keep counting
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(
@@ -86,10 +84,10 @@ class MainTimer : AppCompatActivity() {
         timer.breakTimer = savedBreakTimer
         timer.loadWorkTimer()
 //        textView_countdown.text = timer.displayTime()
-        setTimerTextColor()
-        initState()
+        //setTimerTextColor()
+        //initState()
 
-        save_timer.setOnClickListener {
+        /*save_timer.setOnClickListener {
             val sharedPreferences = getSharedPreferences("timer_shared", Context.MODE_PRIVATE)
 
             //val sharedPreferences2 = getSharedPreferences("preferences", Context.MODE_PRIVATE)
@@ -519,6 +517,6 @@ class MainTimer : AppCompatActivity() {
         //restart timer if the timer is running
         if (timer.isCounting) {
             startTimer()
-        }
+        }*/
     }
 }
