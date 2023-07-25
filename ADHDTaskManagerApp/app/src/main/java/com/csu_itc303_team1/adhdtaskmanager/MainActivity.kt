@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+import java.util.EventListener
 
 
 @Suppress("UNCHECKED_CAST")
@@ -108,11 +110,9 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
-    override fun onStart() {
-        super.onStart()
+    private val username by lazy {
+        mutableStateOf(googleAuthUiClient.getSignedInUser()?.username)
     }
-
-
 
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -137,6 +137,9 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
+
+            val signInViewModel = viewModel<SignInViewModel>()
+            val signInState by signInViewModel.state.collectAsState()
             // Retrieve's Leaderboard data onCreate
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
             // Puts it into a readable format
@@ -177,7 +180,7 @@ class MainActivity : ComponentActivity() {
 
                         drawerContent = {
                             if (isSignedIn.value) {
-                                DrawerHeader()
+                                DrawerHeader(username.value ?: "Anonymous")
                                 DrawerBody(
                                     context = applicationContext,
                                     scope = scope,
@@ -224,8 +227,7 @@ class MainActivity : ComponentActivity() {
                         }
                         //val rewardState by rewardViewModel.collectAsState()
                         val todoEvent = viewModel::onEvent
-                        val signInViewModel = viewModel<SignInViewModel>()
-                        val signInState by signInViewModel.state.collectAsState()
+
 
                         val launcher = rememberLauncherForActivityResult(
                             contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -260,7 +262,11 @@ class MainActivity : ComponentActivity() {
                             composable(
                                 route = Screen.SettingsScreen.route
                             ) {
-                                SettingsScreen()
+                                SettingsScreen(
+                                    googleAuthUiClient,
+                                    context = applicationContext,
+                                    scope
+                                )
                             }
 
                             // Leaderboard Screen
@@ -332,6 +338,8 @@ class MainActivity : ComponentActivity() {
                                                 Toast.LENGTH_LONG
                                             ).show()
 
+                                            signInViewModel.userIsAnonymous()
+
                                             navController.navigate("todo_screen")
                                         }
                                     }
@@ -342,6 +350,12 @@ class MainActivity : ComponentActivity() {
                                 route = Screen.HelpScreen.route
                             ) {
                                 HelpScreen()
+                            }
+
+                            composable(
+                                route = Screen.CompletedScreen.route
+                            ){
+                                CompletedScreen(state, todoEvent)
                             }
                         }
                     }

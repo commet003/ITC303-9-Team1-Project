@@ -1,7 +1,10 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 import android.content.Context
+import android.graphics.fonts.FontStyle
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ScaffoldState
@@ -23,8 +28,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -36,18 +44,30 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+
 // The Header of the Navigation Menu
 @Composable
-fun DrawerHeader() {
+fun DrawerHeader(
+    username: String
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colors.primaryVariant),
-        contentAlignment = Alignment.Center
+            .background(color = MaterialTheme.colors.primaryVariant)
+            .padding(start = 10.dp, bottom = 20.dp),
+        contentAlignment = Alignment.CenterStart
     ){
-        Text(modifier = Modifier.padding(top = 64.dp, bottom = 64.dp), text = "Header", fontSize = 60.sp, color = MaterialTheme.colors.onPrimary)
+
+
+        Column{
+            Text(modifier = Modifier.padding(top = 64.dp, bottom = 64.dp), text = "Header", fontSize = 60.sp, color = MaterialTheme.colors.onPrimary)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text = "Hello, $username!", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+
+        }
     }
 }
+
 
 // Drawer Item for each Screen the Menu will point to will be in the form of a DrawerItem
 @Composable
@@ -84,6 +104,7 @@ fun DrawerItem(item: Screen, selected: Boolean, onItemClick: (Screen) -> Unit){
 }
 
 // This section is the main part of the Navigation Menu, the Drawer Body.
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController, currentUser: AuthUiClient) {
 
@@ -95,14 +116,14 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
         Screen.LeaderboardScreen,
         Screen.SettingsScreen,
         Screen.HelpScreen
-        )
+    )
 
     // Column to store all the items
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .background(color = MaterialTheme.colors.primaryVariant),
-        verticalArrangement = Arrangement.SpaceEvenly
+            .background(color = MaterialTheme.colors.primaryVariant)
+            .verticalScroll(rememberScrollState()),
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -152,23 +173,41 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
                     .height(45.dp)
                     .padding(start = 10.dp)
             ) {
-                // Menu Icon for the Drawer Item
-                Icon(
-                    imageVector = Icons.Filled.ExitToApp,
-                    contentDescription = "Sign Out",
-                    tint = MaterialTheme.colors.onPrimary,
-                    modifier = Modifier
-                        .background(color = MaterialTheme.colors.primaryVariant)
-                        .height(24.dp)
-                        .width(24.dp)
-                )
-                Spacer(modifier = Modifier.width(7.dp))
-                // Text for the Drawer Item
-                Text(
-                    text = "Sign Out",
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colors.onPrimary
-                )
+
+
+                Row(modifier = Modifier.fillMaxWidth()){
+                    Icon(
+                        imageVector = Icons.Filled.ExitToApp,
+                        contentDescription = "Sign Out",
+                        tint = MaterialTheme.colors.onPrimary,
+                        modifier = Modifier
+                            .background(color = MaterialTheme.colors.primaryVariant)
+                            .height(24.dp)
+                            .width(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(7.dp))
+                    // Text for the Drawer Item
+                    Text(
+                        text = "Sign Out",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colors.onPrimary
+                    )
+                }
+            }
+
+            if (currentUser.isUserAnonymous()) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "You are signed in anonymously, if you sign out you will lose all your data.",
+                        fontSize = 14.sp,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        color = Color(0xFFFC8B8B),
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                            .height(30.dp)
+                    )
+                }
             }
         }
     }

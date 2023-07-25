@@ -13,6 +13,9 @@ class SignInViewModel: ViewModel() {
     val state = _state.asStateFlow()
 
 
+    fun userIsAnonymous() {
+        _state.update { it.copy(userIsAnonymous = true) }
+    }
 
 
     fun onSignInResult(result: SignInResult) {

@@ -25,10 +25,9 @@ fun AddTodoDialog(
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
-        modifier = modifier
-            .border(1.dp, MaterialTheme.colors.primary),
+        modifier = Modifier.background(MaterialTheme.colors.surface),
         onDismissRequest = {onEvent(TodoEvent.hideDialog)},
-        title = {Text(text = "Add Todo")},
+        title = {Text(text = "Add Todo", modifier = Modifier.padding(bottom = 10.dp))},
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -60,7 +59,12 @@ fun AddTodoDialog(
                             selected = state.priority == Priority.LOW,
                             onClick = {
                                 onEvent(TodoEvent.setPriority(Priority.LOW))
-                            })
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colors.primaryVariant,
+                                unselectedColor = MaterialTheme.colors.primaryVariant
+                            )
+                        )
                         Text(text = Priority.LOW.name)
                     }
                     Column(
@@ -71,7 +75,12 @@ fun AddTodoDialog(
                             selected = state.priority == Priority.MEDIUM,
                             onClick = {
                                 onEvent(TodoEvent.setPriority(Priority.MEDIUM))
-                            })
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colors.primaryVariant,
+                                unselectedColor = MaterialTheme.colors.primaryVariant
+                            )
+                        )
                         Text(text = Priority.MEDIUM.name)
                     }
                     Column(
@@ -82,7 +91,12 @@ fun AddTodoDialog(
                             selected = state.priority == Priority.HIGH,
                             onClick = {
                                 onEvent(TodoEvent.setPriority(Priority.HIGH))
-                            })
+                            },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colors.primaryVariant,
+                                unselectedColor = MaterialTheme.colors.primaryVariant
+                            )
+                        )
                         Text(text = Priority.HIGH.name)
                     }
                 }

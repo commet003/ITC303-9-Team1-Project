@@ -3,6 +3,8 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -28,6 +30,7 @@ class AuthUiClient(
             listener(_isSignedIn)
         }
     }
+
 
     // Public getter fun for _isSignedIn
     fun getSignedIn(): Boolean {
@@ -128,4 +131,40 @@ class AuthUiClient(
             )
         }
     }
+
+    // Update anonymous users profile username
+    suspend fun updateUsername(username: String): SignInResult {
+        return try {
+            val user = auth.currentUser
+            user?.updateProfile(
+                com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                    .setDisplayName(username)
+                    .build()
+            )?.await()
+            SignInResult(
+                data = user?.run {
+                    UserData(
+                        userId = uid,
+                        username = displayName,
+                        profilePictureUrl = photoUrl?.toString()
+                    )
+                },
+                errorMessage = null
+            )
+        } catch(e: Exception) {
+            e.printStackTrace()
+            if(e is CancellationException) throw e
+            SignInResult(
+                data = null,
+                errorMessage = e.message
+            )
+        }
+    }
+
+    // Get is user anonymous
+    fun isUserAnonymous(): Boolean {
+        return auth.currentUser?.isAnonymous ?: false
+    }
+
 }
+
