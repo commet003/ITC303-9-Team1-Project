@@ -22,11 +22,11 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = NavyBlueLight,
-    primaryVariant = BlueGrottoLight,
+    primary = BlueGrottoLight,
+    primaryVariant = NavyBlueLight,
     secondary = BlueGreenLight,
     secondaryVariant = BabyBlueLight,
-    background = BackgroundLight,
+    background = BabyBlueLight,
     surface = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
@@ -43,14 +43,22 @@ fun ADHDTaskManagerTheme(
 
     val colors = if (darkTheme) {
         systemUiController.setStatusBarColor(
-            color = Color(0xFF0476D0),
+            color = MaterialTheme.colors.primaryVariant,
+            darkIcons = false
+        )
+        systemUiController.setNavigationBarColor(
+            color = BackgroundDark,
             darkIcons = false
         )
         DarkColorPalette
     } else {
         systemUiController.setStatusBarColor(
-            color = Color(0xFF56D0E9),
-            darkIcons = true
+            color = MaterialTheme.colors.primaryVariant,
+            darkIcons = false
+        )
+        systemUiController.setNavigationBarColor(
+            color = BabyBlueLight,
+            darkIcons = false
         )
         LightColorPalette
     }

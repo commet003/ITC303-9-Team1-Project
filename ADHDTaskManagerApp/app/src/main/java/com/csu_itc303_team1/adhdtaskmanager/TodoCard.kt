@@ -56,7 +56,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.secondary)
+                .background(MaterialTheme.colors.primaryVariant)
         ) {
             Row(
                 modifier = Modifier
@@ -67,7 +67,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
             ) {
                 Text(
                     text = todo.title,
-                    color = MaterialTheme.colors.onSecondary,
+                    color = MaterialTheme.colors.onPrimary,
                     fontSize = 22.sp,
                     // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
@@ -80,7 +80,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                     }
                 ) {
                     Icon(
-                        tint = MaterialTheme.colors.onSecondary,
+                        tint = MaterialTheme.colors.onPrimary,
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Todo"
                     )
@@ -112,16 +112,16 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                         }*/
                     },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colors.onSecondary,
-                        uncheckedColor = MaterialTheme.colors.onSecondary,
-                        checkmarkColor = MaterialTheme.colors.secondary,
-                        disabledColor = MaterialTheme.colors.onSecondary
+                        checkedColor = MaterialTheme.colors.onPrimary,
+                        uncheckedColor = MaterialTheme.colors.onPrimary,
+                        checkmarkColor = MaterialTheme.colors.primaryVariant,
+                        disabledColor = MaterialTheme.colors.primaryVariant
                     )
                 )
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    color = MaterialTheme.colors.onSecondary,
+                    color = MaterialTheme.colors.onPrimary,
                     text = todo.description,
                     // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
@@ -132,11 +132,11 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                     .fillMaxHeight(),
                 verticalAlignment = CenterVertically
             ) {
-                Text(text = todo.priority.name, color = MaterialTheme.colors.onSecondary)
+                Text(text = todo.priority.name, color = MaterialTheme.colors.onPrimary)
                 Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueDate, color = MaterialTheme.colors.onSecondary)
+                Text(text = todo.dueDate, color = MaterialTheme.colors.onPrimary)
                 Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueTime, color = MaterialTheme.colors.onSecondary)
+                Text(text = todo.dueTime, color = MaterialTheme.colors.onPrimary)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
@@ -144,7 +144,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, rew
                     }
                 ) {
                     Icon(
-                        tint = MaterialTheme.colors.onSecondary,
+                        tint = MaterialTheme.colors.onPrimary,
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Todo"
 

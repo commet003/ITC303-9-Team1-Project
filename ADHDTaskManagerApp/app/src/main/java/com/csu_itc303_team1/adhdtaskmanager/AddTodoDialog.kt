@@ -1,7 +1,9 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +25,8 @@ fun AddTodoDialog(
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier
+            .border(1.dp, MaterialTheme.colors.primary),
         onDismissRequest = {onEvent(TodoEvent.hideDialog)},
         title = {Text(text = "Add Todo")},
         text = {
@@ -123,10 +126,17 @@ fun AddTodoDialog(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        Button(onClick = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.primaryVariant,
+                                contentColor = MaterialTheme.colors.onPrimary
+                            ),
+                            onClick = {
                             dateDialogState.show()
                         }) {
-                            Text(text = "Date")
+                            Text(
+                                color = MaterialTheme.colors.onPrimary,
+                                text = "Date")
                         }
                         Text(text = formattedDate)
                     }
@@ -138,7 +148,11 @@ fun AddTodoDialog(
                         verticalArrangement = Arrangement.Top
 
                     ) {
-                        Button(onClick = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = MaterialTheme.colors.primaryVariant,
+                                contentColor = MaterialTheme.colors.onPrimary
+                            ),                            onClick = {
                             timeDialogState.show()
                         }) {
                             Text(text = "Time")
@@ -199,6 +213,11 @@ fun AddTodoDialog(
         },
         confirmButton = {
             Button(
+                modifier = Modifier.padding(bottom = 8.dp, end = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.primaryVariant,
+                    contentColor = MaterialTheme.colors.onPrimary
+                ),
                 onClick = {
                     onEvent(TodoEvent.saveTodo)
                 }
@@ -208,6 +227,11 @@ fun AddTodoDialog(
         },
         dismissButton = {
             Button(
+                modifier = Modifier.padding(bottom = 8.dp, end = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.primaryVariant,
+                    contentColor = MaterialTheme.colors.onPrimary
+                ),
                 onClick = {
                     onEvent(TodoEvent.hideDialog)
                 }

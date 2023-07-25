@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -11,12 +12,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
+import kotlin.math.exp
 
 @Composable
 fun TodoScreen(
@@ -31,19 +39,20 @@ fun TodoScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     // Set color of button
-                    backgroundColor = MaterialTheme.colors.primary,
+                    backgroundColor = MaterialTheme.colors.primaryVariant,
                     onClick = {
                         onEvent(TodoEvent.showDialog)
                     }) {
                     Icon(
                         tint = MaterialTheme.colors.onPrimary,
                         imageVector = Icons.Default.Add,
-                        modifier = Modifier.background(MaterialTheme.colors.primary),
+                        modifier = Modifier.background(MaterialTheme.colors.primaryVariant),
                         contentDescription = "Add Todo"
                     )
                 }
             }
         ) { paddingValues ->
+            var expanded by remember { mutableStateOf(false) }
 
             if (state.showDialog){
                 AddTodoDialog(
@@ -64,27 +73,63 @@ fun TodoScreen(
                             .fillMaxWidth()
                             .background(MaterialTheme.colors.surface)
                             .horizontalScroll(rememberScrollState()),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
                     ){
                         // TODO: This is where the task are filtered
                         // If you only want the completed task to show, then you can set
                         // sortType to SortType.BY_COMPLETED
-
-                        SortType.values().forEach {sortType ->
-                            Row (
-                                modifier = Modifier.clickable { onEvent(TodoEvent.sortBy(sortType)) },
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(
-                                    selected = state.sortType == sortType,
-                                    onClick = {
-                                        onEvent(TodoEvent.sortBy(sortType))
-                                    }
+                        Column {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(
+                                    imageVector = Icons.Filled.List,
+                                    contentDescription = "Filter"
                                 )
-                                Text(text = sortType.name, color = MaterialTheme.colors.onSurface)
+                            }
+                            DropdownMenu(
+                                expanded = expanded,
+                                modifier = Modifier.background(MaterialTheme.colors.surface),
+                                onDismissRequest = { expanded = false },
+                            ){
+                                SortType.values().forEach {sortType ->
+                                    Row (
+                                        modifier = Modifier.clickable { onEvent(TodoEvent.sortBy(sortType)) },
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+
+                                        DropdownMenuItem(
+                                            onClick = { onEvent(TodoEvent.sortBy(sortType)) }) {
+                                            if (sortType.name == "BY_DATE") {
+                                                Text(
+                                                    text = "By Date",
+                                                    color = MaterialTheme.colors.onSurface
+                                                )
+                                            } else if (sortType.name == "BY_PRIORITY") {
+                                                Text(
+                                                    text = "By Priority",
+                                                    color = MaterialTheme.colors.onSurface
+                                                )
+                                            } else if (sortType.name == "BY_TIME") {
+                                                Text(
+                                                    text = "By Time",
+                                                    color = MaterialTheme.colors.onSurface
+                                                )
+                                            } else if (sortType.name == "BY_COMPLETED") {
+                                                Text(
+                                                    text = "By Completed",
+                                                    color = MaterialTheme.colors.onSurface
+                                                )
+                                            } else if (sortType.name == "BY_NOT_COMPLETED") {
+                                                Text(
+                                                    text = "By Not Completed",
+                                                    color = MaterialTheme.colors.onSurface
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-
                     }
                 }
 
