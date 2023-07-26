@@ -15,6 +15,7 @@ configurations.all {
     }
 }
 
+
 android {
     namespace 'com.csu_itc303_team1.adhdtaskmanager'
     compileSdk 34
@@ -43,8 +44,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        // jvmTarget 17
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose true
@@ -91,12 +91,15 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.7.0'
 
+
+
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
     implementation 'androidx.security:security-crypto-ktx:1.1.0-alpha06'
     implementation 'com.google.firebase:firebase-functions-ktx:20.3.1'
+    implementation 'androidx.compose.material:material-icons-extended:1.4.3'
     //Room dependencies
     implementation("androidx.room:room-runtime:2.5.2")
     kapt("androidx.room:room-compiler:2.5.2")

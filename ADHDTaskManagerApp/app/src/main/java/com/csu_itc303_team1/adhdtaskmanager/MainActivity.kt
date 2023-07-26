@@ -61,6 +61,8 @@ import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 import java.util.EventListener
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 
 
 @Suppress("UNCHECKED_CAST")
@@ -255,18 +257,18 @@ class MainActivity : ComponentActivity() {
                                 TodoScreen(
                                     state = state,
                                     onEvent = todoEvent,
-                                    rewardViewModel = rewardViewModel)
+                                    rewardViewModel = rewardViewModel,
+                                    navigateToPomodoroTimer = { navController.navigate(Screen.PomodoroScreen.route) }  // Passing navigation function here
+                                )
                             }
 
-                            // Settings Screen
+                            // Other composables....
+
+                            // Add the Pomodoro Screen composable
                             composable(
-                                route = Screen.SettingsScreen.route
+                                route = Screen.PomodoroScreen.route
                             ) {
-                                SettingsScreen(
-                                    googleAuthUiClient,
-                                    context = applicationContext,
-                                    scope
-                                )
+                                PomodoroScreen(navigateBack = { navController.popBackStack() })
                             }
 
                             // Leaderboard Screen
