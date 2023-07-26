@@ -1,21 +1,25 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import com.csu_itc303_team1.adhdtaskmanager.components.DatePickerScreen
+import com.csu_itc303_team1.adhdtaskmanager.components.TimePickerScreen
 
 
 @Composable
@@ -25,7 +29,7 @@ fun AddTodoDialog(
     modifier: Modifier = Modifier
 ) {
     AlertDialog(
-        modifier = Modifier.background(MaterialTheme.colors.surface),
+        modifier = modifier,
         onDismissRequest = {onEvent(TodoEvent.hideDialog)},
         title = {Text(text = "Add Todo", modifier = Modifier.padding(bottom = 10.dp))},
         text = {
@@ -34,6 +38,7 @@ fun AddTodoDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextField(
+                    modifier = Modifier.focusTarget(),
                     value = state.title,
                     onValueChange = {
                         onEvent(TodoEvent.setTitle(it))
@@ -61,8 +66,8 @@ fun AddTodoDialog(
                                 onEvent(TodoEvent.setPriority(Priority.LOW))
                             },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colors.primaryVariant,
-                                unselectedColor = MaterialTheme.colors.primaryVariant
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         Text(text = Priority.LOW.name)
@@ -77,8 +82,8 @@ fun AddTodoDialog(
                                 onEvent(TodoEvent.setPriority(Priority.MEDIUM))
                             },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colors.primaryVariant,
-                                unselectedColor = MaterialTheme.colors.primaryVariant
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         Text(text = Priority.MEDIUM.name)
@@ -93,37 +98,16 @@ fun AddTodoDialog(
                                 onEvent(TodoEvent.setPriority(Priority.HIGH))
                             },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = MaterialTheme.colors.primaryVariant,
-                                unselectedColor = MaterialTheme.colors.primaryVariant
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                                unselectedColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         Text(text = Priority.HIGH.name)
                     }
                 }
-                // Date Picker && Time Picker
-                var pickedDate by remember {            // date variable stored to remember
-                    mutableStateOf(LocalDate.now())
-                }
-                var pickedTime by remember {            // time variable stored to remember
-                    mutableStateOf(LocalTime.NOON)
-                }
-                val formattedDate by remember {         // date variable formatted to string
-                    derivedStateOf {
-                        DateTimeFormatter
-                            .ofPattern("dd MMM yyyy")   // Format Selected
-                            .format(pickedDate)
-                    }
-                }
-                val formattedTime by remember {         // Time variable formatted to string
-                    derivedStateOf {
-                        DateTimeFormatter
-                            .ofPattern("hh:mm a")   // The Format Selected
-                            .format(pickedTime)
-                    }
-                }
-                // Date and Time Dialog States
-                val dateDialogState = rememberMaterialDialogState()
-                val timeDialogState = rememberMaterialDialogState()
+
+                val datePickerScreen = DatePickerScreen()
+                val timePickerScreen = TimePickerScreen()
 
                 // A New Row containing Two Columns. One for Date, and one for Time
                 Row(
@@ -142,17 +126,17 @@ fun AddTodoDialog(
                     ) {
                         Button(
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.primaryVariant,
-                                contentColor = MaterialTheme.colors.onPrimary
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                            dateDialogState.show()
+                                datePickerScreen
                         }) {
                             Text(
-                                color = MaterialTheme.colors.onPrimary,
+                                color = MaterialTheme.colorScheme.onPrimary,
                                 text = "Date")
                         }
-                        Text(text = formattedDate)
+
                     }
                     // On Button Click it opens the Time Dialog Screen,
                     // the text displays default or whatever is chosen
@@ -164,73 +148,24 @@ fun AddTodoDialog(
                     ) {
                         Button(
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.primaryVariant,
-                                contentColor = MaterialTheme.colors.onPrimary
-                            ),                            onClick = {
-                            timeDialogState.show()
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                            timePickerScreen
                         }) {
                             Text(text = "Time")
                         }
-                        Text(text = formattedTime)
                     }
                 }
-
-                // Inside the Date Dialog Screen, Ok and Cancel Buttons
-                MaterialDialog(
-                    dialogState = dateDialogState,
-                    buttons = {
-                        positiveButton(text = "Ok") {
-                        }
-                        negativeButton(text = "Cancel")
-                    }
-                ) {
-                    datepicker(
-                        // Date Settings, initial date, title and a constraint
-                        initialDate = LocalDate.now(),
-                        title = "Pick a date",
-                        allowedDateValidator = {
-                            it.isAfter(LocalDate.now())
-                        }
-                    ) {
-                        // What Happens when Date is picked.
-                        // Date Chosen becomes the date variable
-                        // the formatted date is then added to the TodoEvent
-                        pickedDate = it
-                        onEvent(TodoEvent.setDueDate(formattedDate))
-                    }
-
-                }
-                MaterialDialog(
-                    // Inside the Time Dialog Screen, Ok and Cancel Buttons
-                    dialogState = timeDialogState,
-                    buttons = {
-                        positiveButton(text = "Ok") {
-                        }
-                        negativeButton(text = "Cancel")
-                    }
-                ) {
-                    timepicker(
-                        // Time Settings: initial time and title
-                        initialTime = LocalTime.NOON,
-                        title = "Pick a Time"
-                    ) {
-                        // What Happens when Time is picked.
-                        // Date Chosen becomes the Time variable
-                        // the formatted Time is then added to the TodoEvent
-                        pickedTime = it
-                        onEvent(TodoEvent.setDueTime(formattedTime))
-                    }
-
-                }
-
             }
         },
         confirmButton = {
             Button(
                 modifier = Modifier.padding(bottom = 8.dp, end = 8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.primaryVariant,
-                    contentColor = MaterialTheme.colors.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
                     onEvent(TodoEvent.saveTodo)
@@ -243,8 +178,8 @@ fun AddTodoDialog(
             Button(
                 modifier = Modifier.padding(bottom = 8.dp, end = 8.dp),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.primaryVariant,
-                    contentColor = MaterialTheme.colors.onPrimary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
                     onEvent(TodoEvent.hideDialog)

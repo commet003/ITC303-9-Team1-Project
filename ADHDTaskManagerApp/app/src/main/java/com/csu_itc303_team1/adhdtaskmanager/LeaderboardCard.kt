@@ -1,9 +1,16 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+// Import CardElevation
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,8 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// not used at the moment
 
 @Composable
 fun LeaderboardCard(
@@ -29,7 +34,14 @@ fun LeaderboardCard(
                 bottom = 4.dp
             )
             .fillMaxWidth(),
-        elevation = 3.dp,
+       /* elevation = CardElevation(
+            defaultElevation = 8.dp,
+            pressedElevation = 16.dp,
+            focusedElevation = 8.dp,
+            hoveredElevation = 8.dp,
+            draggedElevation = 8.dp,
+            disabledElevation = 0.dp
+        ),*/
     ) {
         Row(
             modifier = Modifier

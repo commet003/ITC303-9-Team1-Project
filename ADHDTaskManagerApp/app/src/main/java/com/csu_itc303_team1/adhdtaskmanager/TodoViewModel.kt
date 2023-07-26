@@ -1,16 +1,12 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-@HiltViewModel
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
@@ -80,8 +76,19 @@ class TodoViewModel(
                 }
             }
 
-            // Delete Todo
+            // Toggle isClicked state of the todo
+            is TodoEvent.toggleIsClicked -> {
+                viewModelScope.launch {
+                    todoDao.updateTodo(
+                        event.todo.copy(
+                            isClicked = !event.todo.isClicked
+                        )
+                    )
+                }
+            }
 
+
+            // Delete Todo
             is TodoEvent.deleteTodo -> {
                 viewModelScope.launch {
                     todoDao.deleteTodo(event.todo)
@@ -215,7 +222,11 @@ class TodoViewModel(
                     todoDao.updateTodo(
                         event.todo.copy(
                             isCompleted = !event.todo.isCompleted,
-                            completionDate = LocalDateTime.now().toString()
+                            completionDate = if (event.todo.isCompleted) {
+                                ""
+                            } else {
+                                LocalDateTime.now().toString()
+                            }
                         )
                     )
                 }

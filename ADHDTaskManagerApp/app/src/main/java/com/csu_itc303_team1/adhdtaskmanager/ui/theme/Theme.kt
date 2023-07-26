@@ -1,18 +1,18 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val DarkColorPalette = darkColors(
+private val DarkColorPalette = darkColorScheme(
     primary = NavyBlueDark,
-    primaryVariant = BlueGrottoDark,
+    primaryContainer = BlueGrottoDark,
     secondary = BlueGreenDark,
-    secondaryVariant = BabyBlueDark,
+    secondaryContainer = BabyBlueDark,
     background = BackgroundDark,
     onBackground = Color.White,
     surface = DiologBoxBackgroundDark,
@@ -21,11 +21,11 @@ private val DarkColorPalette = darkColors(
     onSurface = Color.White
 )
 
-private val LightColorPalette = lightColors(
+private val LightColorPalette = lightColorScheme(
     primary = BlueGrottoLight,
-    primaryVariant = NavyBlueLight,
+    primaryContainer = NavyBlueLight,
     secondary = BlueGreenLight,
-    secondaryVariant = BabyBlueLight,
+    secondaryContainer = BabyBlueLight,
     background = BabyBlueLight,
     surface = DiologBoxBackgroundLight,
     onPrimary = Color.White,
@@ -43,7 +43,7 @@ fun ADHDTaskManagerTheme(
 
     val colors = if (darkTheme) {
         systemUiController.setStatusBarColor(
-            color = MaterialTheme.colors.primaryVariant,
+            color = MaterialTheme.colorScheme.primaryContainer,
             darkIcons = false
         )
         systemUiController.setNavigationBarColor(
@@ -53,7 +53,7 @@ fun ADHDTaskManagerTheme(
         DarkColorPalette
     } else {
         systemUiController.setStatusBarColor(
-            color = MaterialTheme.colors.primaryVariant,
+            color = MaterialTheme.colorScheme.primaryContainer,
             darkIcons = false
         )
         systemUiController.setNavigationBarColor(
@@ -64,7 +64,7 @@ fun ADHDTaskManagerTheme(
     }
 
     MaterialTheme(
-        colors = colors,
+        colorScheme = colors,
         typography = Typography,
         content = content
     )

@@ -13,6 +13,7 @@ data class Todo(
     var dueTime: String,
     val isCompleted: Boolean = false,
     var completionDate: String = "",
+    var isClicked: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val userID: String

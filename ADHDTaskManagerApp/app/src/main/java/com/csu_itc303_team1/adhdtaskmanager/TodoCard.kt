@@ -11,23 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Checkbox
-import androidx.compose.material.CheckboxDefaults
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
@@ -40,8 +30,6 @@ import com.csu_itc303_team1.EditTodoDialog
 @Composable
 fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, index: Int, rewardViewModel: RewardViewModel) {
 
-    // Local variable to hold and remember the current todo
-    var currentTodo by remember { mutableStateOf(todo) }
 
     val searchResults by rewardViewModel.searchResults.observeAsState()
     rewardViewModel.findReward("Completed Task Reward")
@@ -49,7 +37,6 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
     // show the edit todo dialog if showEditTodoDialog is true
     if (todoState.showEditTodoDialog){
         EditTodoDialog(
-            todo,
             todoState,
             onEvent
         )
@@ -64,7 +51,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.primaryVariant)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
             Row(
                 modifier = Modifier
@@ -74,8 +61,8 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                 verticalAlignment = CenterVertically,
             ) {
                 Text(
-                    text = currentTodo.title,
-                    color = MaterialTheme.colors.onPrimary,
+                    text = todo.title,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 22.sp,
                     // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
@@ -83,11 +70,12 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
+                        onEvent(TodoEvent.toggleIsClicked(todo))
                         onEvent(TodoEvent.showEditTodoDialog)
                     }
                 ) {
                     Icon(
-                        tint = MaterialTheme.colors.onPrimary,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Todo"
                     )
@@ -120,17 +108,16 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                         }*/
                     },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colors.onPrimary,
-                        uncheckedColor = MaterialTheme.colors.onPrimary,
-                        checkmarkColor = MaterialTheme.colors.primaryVariant,
-                        disabledColor = MaterialTheme.colors.primaryVariant
+                        checkedColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedColor = MaterialTheme.colorScheme.onPrimary,
+                        checkmarkColor = MaterialTheme.colorScheme.primary
                     )
                 )
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    color = MaterialTheme.colors.onPrimary,
-                    text = currentTodo.description,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    text = todo.description,
                     // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
@@ -141,11 +128,11 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                     .fillMaxHeight(),
                 verticalAlignment = CenterVertically
             ) {
-                Text(text = todo.priority.name, color = MaterialTheme.colors.onPrimary)
+                Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueDate, color = MaterialTheme.colors.onPrimary)
+                Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueTime, color = MaterialTheme.colors.onPrimary)
+                Text(text = todo.dueTime, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
@@ -153,7 +140,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                     }
                 ) {
                     Icon(
-                        tint = MaterialTheme.colors.onPrimary,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Todo"
 

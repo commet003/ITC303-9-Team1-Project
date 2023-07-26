@@ -10,117 +10,177 @@ import com.csu_itc303_team1.adhdtaskmanager.Priority
 import com.csu_itc303_team1.adhdtaskmanager.Todo
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
 import com.csu_itc303_team1.adhdtaskmanager.TodoState
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTodoDialog(
-    todo: Todo,
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var thisTodo: Todo? = null
+
+    for (todo in state.todos) {
+        if (todo.isClicked) {
+            thisTodo = todo
+        }
+    }
+    state.title = thisTodo?.title ?: ""
+    state.description = thisTodo?.description ?: ""
+    state.priority = thisTodo?.priority ?: Priority.LOW
+    state.dueDate = thisTodo?.dueDate ?: ""
+    state.dueTime = thisTodo?.dueTime ?: ""
+    state.userId = thisTodo?.userID ?: ""
+    state.id = thisTodo?.id ?: 0
+
     AlertDialog(
         modifier = modifier,
-        onDismissRequest = {onEvent(TodoEvent.hideDialog)},
-        title = {Text(text = "Edit Todo")},
+        onDismissRequest = { onEvent(TodoEvent.hideDialog) },
+        title = { Text(text = "Edit Todo") },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if (thisTodo != null) {
                     TextField(
-                        value = todo.title,
+                        value = thisTodo.title,
                         onValueChange = {
-                            todo.title = it
+                            thisTodo.title = it
                             onEvent(TodoEvent.setTitle(it))
                         },
-                        label = { Text("Enter Title of the task", color = MaterialTheme.colorScheme.onSurface) } // This line adds a hint to the TextField
+                        label = {
+                            Text(
+                                "Enter Title of the task",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } // This line adds a hint to the TextField
                     )
+                }
 
-                TextField(
-                    value = todo.description,
-                    onValueChange = {
-                        todo.description = it
-                        onEvent(TodoEvent.setDescription(it))
-                    },
-                    label = { Text("Provide a brief description", color = MaterialTheme.colorScheme.onSurface) } // This line adds a hint to the TextField
+                if (thisTodo != null) {
+                    TextField(
+                        value = thisTodo.description,
+                        onValueChange = {
+                            thisTodo.description = it
+                            onEvent(TodoEvent.setDescription(it))
+                        },
+                        label = {
+                            Text(
+                                "Provide a brief description",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } // This line adds a hint to the TextField
 
-                )
+                    )
+                }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp))
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                )
                 {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        RadioButton(
-                            selected = state.priority == Priority.LOW,
-                            onClick = {
-                                todo.priority = Priority.LOW
-                                onEvent(TodoEvent.setPriority(Priority.LOW))
-                            })
+
+                        if (thisTodo != null) {
+                            RadioButton(
+                                selected = thisTodo.priority == Priority.LOW,
+                                onClick = {
+                                    if (thisTodo != null) {
+                                        thisTodo.priority = Priority.LOW
+                                    }
+                                    onEvent(TodoEvent.setPriority(Priority.LOW))
+                                })
+                        }
+
                         Text(text = Priority.LOW.name)
                     }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        RadioButton(
-                            selected = state.priority == Priority.MEDIUM,
-                            onClick = {
-                                todo.priority = Priority.MEDIUM
-                                onEvent(TodoEvent.setPriority(Priority.MEDIUM))
-                            })
+                        if (thisTodo != null) {
+                            RadioButton(
+                                selected = thisTodo.priority == Priority.MEDIUM,
+                                onClick = {
+                                    if (thisTodo != null) {
+                                        thisTodo.priority = Priority.MEDIUM
+                                    }
+                                    onEvent(TodoEvent.setPriority(Priority.MEDIUM))
+                                })
+                        }
+
                         Text(text = Priority.MEDIUM.name)
                     }
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        RadioButton(
-                            selected = state.priority == Priority.HIGH,
-                            onClick = {
-                                todo.priority = Priority.HIGH
-                                onEvent(TodoEvent.setPriority(Priority.HIGH))
-                            })
+                        if (thisTodo != null) {
+                            RadioButton(
+                                selected = thisTodo.priority == Priority.HIGH,
+                                onClick = {
+                                    if (thisTodo != null) {
+                                        thisTodo.priority = Priority.HIGH
+                                    }
+                                    onEvent(TodoEvent.setPriority(Priority.HIGH))
+                                })
+                        }
+
                         Text(text = Priority.HIGH.name)
                     }
                 }
 
+                var displayDate by remember {
+                    mutableStateOf(state.dueDate)
+                }
+
+                var displayTime by remember {
+                    mutableStateOf(state.dueTime)
+                }
+
+
+                // Time and Date Converted from String to LocalTime and LocalDate
+                var convertedDate by remember {
+                    mutableStateOf(
+                        try {
+                            LocalDate.parse(thisTodo?.dueDate)
+                        } catch (e: DateTimeParseException) {
+                            LocalDate.now()
+                        }
+                    )
+                }
+
+                var convertedTime by remember {
+                    mutableStateOf(
+                        try {
+                            LocalTime.parse(thisTodo?.dueTime)
+                        } catch (e: DateTimeParseException) {
+                            LocalTime.NOON
+                        }
+                    )
+                }
+
 
                 // Date Picker && Time Picker
-                var pickedDate by remember { // date variable stored to remember
+                var editedPickedDate by remember { // date variable stored to remember
                     mutableStateOf(LocalDate.now())
                 }
 
-                var pickedTime by remember { // time variable stored to remember
+                var editedPickedTime by remember { // time variable stored to remember
                     mutableStateOf(LocalTime.NOON)
                 }
-                val formattedDate by remember { // date variable formatted to string
 
-                    derivedStateOf {
-                        DateTimeFormatter
-                            .ofPattern("dd MMM yyyy")   // Format Selected
-                            .format(pickedDate)
-                    }
-                }
-                val formattedTime by remember {         // Time variable formatted to string
-                    derivedStateOf {
-                        DateTimeFormatter
-                            .ofPattern("hh:mm a")   // The Format Selected
-                            .format(pickedTime)
-                    }
-                }
+
                 // Date and Time Dialog States
-                val dateDialogState = rememberMaterialDialogState()
-                val timeDialogState = rememberMaterialDialogState()
+                val dateDialogState = rememberDatePickerState()
+                val timeDialogState = rememberTimePickerState()
+
 
                 // A New Row containing Two Columns. One for Date, and one for Time
                 Row(
@@ -138,11 +198,13 @@ fun EditTodoDialog(
                         verticalArrangement = Arrangement.Top
                     ) {
                         Button(onClick = {
-                            dateDialogState.show()
+
                         }) {
                             Text(text = "Date")
                         }
-                        Text(text = formattedDate)
+                        if (thisTodo != null) {
+                            Text(text = displayDate)
+                        }
                     }
                     // On Button Click it opens the Time Dialog Screen,
                     // the text displays default or whatever is chosen
@@ -153,73 +215,24 @@ fun EditTodoDialog(
 
                     ) {
                         Button(onClick = {
-                            timeDialogState.show()
                         }) {
                             Text(text = "Time")
                         }
-                        Text(text = formattedTime)
+                        if (thisTodo != null) {
+                            Text(text = displayTime)
+                        }
                     }
                 }
-
-                // Inside the Date Dialog Screen, Ok and Cancel Buttons
-                MaterialDialog(
-                    dialogState = dateDialogState,
-                    buttons = {
-                        positiveButton(text = "Ok") {
-                        }
-                        negativeButton(text = "Cancel")
-                    }
-                ) {
-                    datepicker(
-                        // Date Settings, initial date, title and a constraint
-                        initialDate = LocalDate.now(),
-                        title = "Pick a date",
-                        allowedDateValidator = {
-                            it.isAfter(LocalDate.now())
-                        }
-                    ) {
-                        // What Happens when Date is picked.
-                        // Date Chosen becomes the date variable
-                        // the formatted date is then added to the TodoEvent
-                        pickedDate = it
-
-                        onEvent(TodoEvent.setDueDate(formattedDate))
-                    }
-
-                }
-                MaterialDialog(
-                    // Inside the Time Dialog Screen, Ok and Cancel Buttons
-                    dialogState = timeDialogState,
-                    buttons = {
-                        positiveButton(text = "Ok") {
-                        }
-                        negativeButton(text = "Cancel")
-                    }
-                ) {
-                    timepicker(
-                        // Time Settings: initial time and title
-                        initialTime = LocalTime.NOON,
-                        title = "Pick a Time"
-                    ) {
-                        // What Happens when Time is picked.
-                        // Date Chosen becomes the Time variable
-                        // the formatted Time is then added to the TodoEvent
-                        pickedTime = it
-                        onEvent(TodoEvent.setDueTime(formattedTime))
-                    }
-
-                }
-
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    todo.title = state.title
-                    todo.description = state.description
-                    todo.priority = state.priority
-                    todo.dueDate = state.dueDate
-                    todo.dueTime = state.dueTime
+                    if (thisTodo != null) {
+                        thisTodo.dueDate = state.dueDate
+                        thisTodo.dueTime = state.dueTime
+                    }
+                    onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
                     onEvent(TodoEvent.updateTodo)
                 }
             ) {
@@ -229,6 +242,7 @@ fun EditTodoDialog(
         dismissButton = {
             Button(
                 onClick = {
+                    onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
                     onEvent(TodoEvent.hideEditTodoDialog)
                 }
             ) {

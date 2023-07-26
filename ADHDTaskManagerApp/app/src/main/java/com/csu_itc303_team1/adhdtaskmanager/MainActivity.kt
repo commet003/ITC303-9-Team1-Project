@@ -19,22 +19,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.rememberDrawerState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +51,6 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
-import java.util.EventListener
 
 
 @Suppress("UNCHECKED_CAST")
@@ -153,10 +143,10 @@ class MainActivity : ComponentActivity() {
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.surface
+                    color = MaterialTheme.colorScheme.surface
                 ) {
                     // variables for remembering the state of the Coroutine Scope and Scaffold
-                    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+                    val drawerState = rememberDrawerState(DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
                     navController = rememberNavController()
 
@@ -165,32 +155,14 @@ class MainActivity : ComponentActivity() {
                             .padding(0.dp)
                             .fillMaxWidth()
                         ,
-                        scaffoldState = scaffoldState,
                         // Creating the Top Bar
                         topBar = {
                             if (isSignedIn.value){
-                                AppTopAppBar(scope = scope, scaffoldState = scaffoldState)
+                                AppTopAppBar(scope = scope, drawerState = drawerState)
                             }else {
                                 SignInTopAppBar()
                             }
                         },
-                        // Drawer content is what is inside the navigation drawer when clicking the
-                        // menu icon. This case, A header and all the menu options in the drawer body
-                        // If the user is signed in, show the drawer
-
-                        drawerContent = {
-                            if (isSignedIn.value) {
-                                DrawerHeader(username.value ?: "Anonymous")
-                                DrawerBody(
-                                    context = applicationContext,
-                                    scope = scope,
-                                    scaffoldState = scaffoldState,
-                                    navController = navController,
-                                    currentUser = googleAuthUiClient
-                                )
-                            }
-                            else null
-                        }
                     ) { // In this Section is contents of the actual screen. A padding value had to
                         // be added in the lambda form.
                             contentPadding ->

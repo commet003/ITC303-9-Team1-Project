@@ -1,14 +1,12 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 import android.content.Context
-import android.graphics.fonts.FontStyle
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,16 +18,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,16 +46,16 @@ fun DrawerHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colors.primaryVariant)
+            .background(color = MaterialTheme.colorScheme.primary)
             .padding(start = 10.dp, bottom = 20.dp),
         contentAlignment = Alignment.CenterStart
     ){
 
 
         Column{
-            Text(modifier = Modifier.padding(top = 64.dp, bottom = 64.dp), text = "Header", fontSize = 60.sp, color = MaterialTheme.colors.onPrimary)
+            Text(modifier = Modifier.padding(top = 64.dp, bottom = 64.dp), text = "Header", fontSize = 60.sp, color = MaterialTheme.colorScheme.onPrimary)
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "Hello, $username!", fontSize = 20.sp, color = MaterialTheme.colors.onPrimary)
+            Text(text = "Hello, $username!", fontSize = 20.sp, color = MaterialTheme.colorScheme.onPrimary)
 
         }
     }
@@ -80,14 +73,14 @@ fun DrawerItem(item: Screen, selected: Boolean, onItemClick: (Screen) -> Unit){
             .fillMaxWidth()
             .clickable { onItemClick(item) }
             .height(45.dp)
-            .background(MaterialTheme.colors.primaryVariant)
+            .background(MaterialTheme.colorScheme.primary)
             .padding(start = 10.dp)
     ) {
         // Menu Icon for the Drawer Item
         Image(
             painter = painterResource(id = item.icon),
             contentDescription = item.title,
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .height(24.dp)
@@ -98,7 +91,7 @@ fun DrawerItem(item: Screen, selected: Boolean, onItemClick: (Screen) -> Unit){
         Text(
             text = item.title,
             fontSize = 16.sp,
-            color = MaterialTheme.colors.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -106,7 +99,7 @@ fun DrawerItem(item: Screen, selected: Boolean, onItemClick: (Screen) -> Unit){
 // This section is the main part of the Navigation Menu, the Drawer Body.
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController, currentUser: AuthUiClient) {
+fun DrawerBody(context: Context, scope: CoroutineScope, drawerState: DrawerState, navController: NavController, currentUser: AuthUiClient) {
 
     // Create a list of Screen objects
     val screens = listOf(
@@ -122,7 +115,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
     Column(
         modifier = Modifier
             .fillMaxHeight()
-            .background(color = MaterialTheme.colors.primaryVariant)
+            .background(color = MaterialTheme.colorScheme.primary)
             .verticalScroll(rememberScrollState()),
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -146,7 +139,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
                 }
 
                 scope.launch {
-                    scaffoldState.drawerState.close()
+                    drawerState.close()
                 }
             })
         }
@@ -179,9 +172,9 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
                     Icon(
                         imageVector = Icons.Filled.ExitToApp,
                         contentDescription = "Sign Out",
-                        tint = MaterialTheme.colors.onPrimary,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier
-                            .background(color = MaterialTheme.colors.primaryVariant)
+                            .background(color = MaterialTheme.colorScheme.primary)
                             .height(24.dp)
                             .width(24.dp)
                     )
@@ -190,7 +183,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
                     Text(
                         text = "Sign Out",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colors.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
@@ -202,7 +195,7 @@ fun DrawerBody(context: Context, scope: CoroutineScope, scaffoldState: ScaffoldS
                         fontSize = 14.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
                         color = Color(0xFFFC8B8B),
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .padding(start = 10.dp, end = 10.dp, top = 10.dp)
                             .height(30.dp)

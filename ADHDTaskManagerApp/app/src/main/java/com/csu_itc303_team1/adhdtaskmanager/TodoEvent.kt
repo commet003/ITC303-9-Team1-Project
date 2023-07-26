@@ -8,6 +8,9 @@ sealed interface TodoEvent {
     // Get individual todo
     data class getTodoById(val id: Int): TodoEvent
 
+    // Toggle isClicked
+    data class toggleIsClicked(val todo: Todo): TodoEvent
+
     object saveTodo: TodoEvent
     data class setTitle(val title: String): TodoEvent
     data class setDescription(val description: String): TodoEvent

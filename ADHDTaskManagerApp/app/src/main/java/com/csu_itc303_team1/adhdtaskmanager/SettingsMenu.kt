@@ -7,18 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material3.ContentAlpha
 
 // Switch Row
 
@@ -64,14 +53,14 @@ fun SwitchRow(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 modifier = Modifier.alpha(contentAlpha)
             )
 
             Text(
                 text = desc,
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.alpha(contentAlpha)
             )
         }
@@ -83,7 +72,7 @@ fun SwitchRow(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EDropDownRow (){
     val context = LocalContext.current
@@ -99,13 +88,13 @@ fun EDropDownRow (){
 
         Text(
             text = "Example: Birth Month",
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyMedium,
             maxLines = 1
         )
 
         Text(
             text = "The Month on which you were born.",
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
 
         Box(
@@ -160,13 +149,13 @@ fun TextFieldEdittor () {
 
             Text(
                 text = "Example: Change Profile Name",
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1
             )
 
             Text(
                 text = "Change the Name on your profile",
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
 
@@ -176,12 +165,12 @@ fun TextFieldEdittor () {
         ) {
             Text(
                 text = "Current Profile Name:",
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
 
             Text(
                 text = profileName.value.text,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyMedium
             )
 
             TextField(
