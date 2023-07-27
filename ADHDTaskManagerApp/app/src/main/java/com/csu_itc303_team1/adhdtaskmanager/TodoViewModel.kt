@@ -95,6 +95,12 @@ class TodoViewModel(
                 }
             }
 
+            TodoEvent.showDialog -> {
+                _state.update {
+                    it.copy(showDialog = true)
+                }
+            }
+
             TodoEvent.hideDialog -> {
                 _state.update {
                     it.copy(showDialog = false)
@@ -167,12 +173,6 @@ class TodoViewModel(
             is TodoEvent.setTitle -> {
                 _state.update {
                     it.copy(title = event.title)
-                }
-            }
-
-            TodoEvent.showDialog -> {
-                _state.update {
-                    it.copy(showDialog = true)
                 }
             }
 

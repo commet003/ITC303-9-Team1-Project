@@ -21,15 +21,7 @@ fun AppTopAppBar(scope: CoroutineScope, drawerState: DrawerState){
             IconButton(onClick = { scope.launch {drawerState.open() } }) {
                 Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = MaterialTheme.colorScheme.onPrimary)
             }
-
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            scrolledContainerColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-        ),
     )
 }
 
@@ -49,3 +41,7 @@ fun SignInTopAppBar(){
         ),
     )
 }
+
+
+
+

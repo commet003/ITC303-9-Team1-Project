@@ -108,9 +108,7 @@ fun EditTodoDialog(
                             RadioButton(
                                 selected = thisTodo.priority == Priority.MEDIUM,
                                 onClick = {
-                                    if (thisTodo != null) {
-                                        thisTodo.priority = Priority.MEDIUM
-                                    }
+                                    thisTodo.priority = Priority.MEDIUM
                                     onEvent(TodoEvent.setPriority(Priority.MEDIUM))
                                 })
                         }
@@ -125,9 +123,7 @@ fun EditTodoDialog(
                             RadioButton(
                                 selected = thisTodo.priority == Priority.HIGH,
                                 onClick = {
-                                    if (thisTodo != null) {
-                                        thisTodo.priority = Priority.HIGH
-                                    }
+                                    thisTodo.priority = Priority.HIGH
                                     onEvent(TodoEvent.setPriority(Priority.HIGH))
                                 })
                         }
@@ -136,11 +132,11 @@ fun EditTodoDialog(
                     }
                 }
 
-                var displayDate by remember {
+                val displayDate by remember {
                     mutableStateOf(state.dueDate)
                 }
 
-                var displayTime by remember {
+                val displayTime by remember {
                     mutableStateOf(state.dueTime)
                 }
 

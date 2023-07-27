@@ -3,8 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -77,6 +75,8 @@ class AuthUiClient(
             )
         }
     }
+
+
 
     suspend fun signOut() {
         try {

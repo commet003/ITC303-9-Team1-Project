@@ -1,27 +1,47 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CalendarLocale
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerLayoutType
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.components.DatePickerScreen
-import com.csu_itc303_team1.adhdtaskmanager.components.TimePickerScreen
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneOffset
 
 
+@SuppressLint("RememberReturnType")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTodoDialog(
     state: TodoState,
@@ -37,6 +57,7 @@ fun AddTodoDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
                 TextField(
                     modifier = Modifier.focusTarget(),
                     value = state.title,
@@ -59,7 +80,7 @@ fun AddTodoDialog(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
-                        ) {
+                    ) {
                         RadioButton(
                             selected = state.priority == Priority.LOW,
                             onClick = {
@@ -106,23 +127,165 @@ fun AddTodoDialog(
                     }
                 }
 
-                val datePickerScreen = DatePickerScreen()
-                val timePickerScreen = TimePickerScreen()
+                // Date Picker && Time Picker
+                var pickedDate by remember {            // date variable stored to remember
+                    mutableStateOf(LocalDateTime.now())
+                }
+                var pickedTime by remember {            // time variable stored to remember
+                    mutableStateOf(LocalTime.NOON)
+                }
+
+                val dateFormatter: DatePickerFormatter = remember {
+                    object : DatePickerFormatter {
+                        override fun formatDate(
+                            dateMillis: Long?,
+                            locale: CalendarLocale,
+                            forContentDescription: Boolean
+                        ): String? {
+                            return dateMillis?.let {
+                                val date = LocalDateTime.ofEpochSecond(
+                                    it / 1000,
+                                    0,
+                                    ZoneOffset.UTC
+                                )
+                                date.toString()
+                            }
+                        }
+
+                        override fun formatMonthYear(
+                            monthMillis: Long?,
+                            locale: CalendarLocale
+                        ): String? {
+                            // Format month and year
+                            return monthMillis?.let {
+                                val date = LocalDateTime.ofEpochSecond(
+                                    it / 1000,
+                                    0,
+                                    ZoneOffset.UTC
+                                )
+                                date.toString()
+                            }
+                        }
+                    }
+                }
+
+                val datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = pickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                    yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
+                    initialDisplayMode = DisplayMode.Picker,
+                    initialDisplayedMonthMillis = null
+                )
+
+                val timePickerState = rememberTimePickerState(
+                    initialHour = LocalTime.now().hour,
+                    initialMinute = LocalTime.now().minute,
+                    is24Hour = false
+                )
+
+
+
+                if (state.showDateSelector) {
+                    DatePickerDialog(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.CenterHorizontally),
+                        onDismissRequest = { onEvent(TodoEvent.hideDateSelector) },
+                        confirmButton = {
+                            Button(onClick = {
+                                dateFormatter.formatDate(datePickerState.selectedDateMillis, CalendarLocale.getDefault())
+                                    ?.let { TodoEvent.setDueDate(it.dropLast(6)) }?.let { onEvent(it) }
+                                onEvent(TodoEvent.hideDateSelector)
+                            }) {
+                                Text(text = "Confirm")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+
+                                onClick = {
+                            onEvent(TodoEvent.hideDateSelector)
+                        }) {
+                            Text(text = "Cancel")
+                        }},
+                        shape = MaterialTheme.shapes.large,
+                        content = {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                DatePicker(
+                                    modifier = Modifier.padding(8.dp),
+                                    state = datePickerState,
+                                    showModeToggle = false,
+                                    title = null
+                                )
+                            }
+                        },
+                    )
+                }
+
+                if (state.showTimeSelector) {
+                    // Time Picker Dialog
+                    DatePickerDialog(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.CenterHorizontally),
+                        onDismissRequest = { onEvent(TodoEvent.hideTimeSelector) },
+                        confirmButton = {
+                            Button(onClick = {
+                                onEvent(TodoEvent.setDueTime(timePickerState.hour.toString() + ":" + timePickerState.minute.toString()))
+                                onEvent(TodoEvent.hideTimeSelector)
+                            }) {
+                                Text(text = "Confirm")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+
+                                onClick = {
+                                    onEvent(TodoEvent.hideTimeSelector)
+                                }) {
+                                Text(text = "Cancel")
+                            }},
+                        shape = MaterialTheme.shapes.large,
+                        content = {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                TimePicker(
+                                    state = timePickerState,
+                                    layoutType = TimePickerLayoutType.Vertical
+                                )
+                            }
+                        },
+                    )
+                }
+
+
+
 
                 // A New Row containing Two Columns. One for Date, and one for Time
                 Row(
-                    modifier = Modifier.padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-
-
-                ) {
+                    verticalAlignment = Alignment.CenterVertically
+                    ) {
                     // On Button Click it opens the date Dialog Screen,
                     // the text displays default or whatever is chosen
                     Column(
-                        modifier = Modifier.padding(4.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier.padding(10.dp)
                     ) {
                         Button(
                             colors = ButtonDefaults.buttonColors(
@@ -130,21 +293,20 @@ fun AddTodoDialog(
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                                datePickerScreen
-                        }) {
-                            Text(
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                text = "Date")
+                                onEvent(TodoEvent.showDateSelector)
+                            }
+                        )
+                        {
+                            Text(text = "Date")
                         }
-
+                        Text(text = state.dueDate)
                     }
                     // On Button Click it opens the Time Dialog Screen,
                     // the text displays default or whatever is chosen
                     Column(
-                        modifier = Modifier.padding(4.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier.padding(10.dp)
                     ) {
                         Button(
                             colors = ButtonDefaults.buttonColors(
@@ -152,10 +314,11 @@ fun AddTodoDialog(
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                            timePickerScreen
-                        }) {
+                                onEvent(TodoEvent.showTimeSelector)
+                            }) {
                             Text(text = "Time")
                         }
+                        Text(text = state.dueTime)
                     }
                 }
             }
