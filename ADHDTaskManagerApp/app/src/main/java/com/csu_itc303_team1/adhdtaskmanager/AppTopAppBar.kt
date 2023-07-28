@@ -10,21 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AppTopAppBar(scope: CoroutineScope, drawerState: DrawerState){
-
-    // This is for the Bar at the top of the application. This will be present on every page.
-    TopAppBar(
-        title = { Text(text = "ADHD Task Manager", fontSize = 18.sp, color = MaterialTheme.colorScheme.onPrimary) }, // Label on the bar
-        navigationIcon = {
-            IconButton(onClick = { scope.launch {drawerState.open() } }) {
-                Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = MaterialTheme.colorScheme.onPrimary)
-            }
-        },
-    )
-}
-
 // Top App Bar for the Sign In Page
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")

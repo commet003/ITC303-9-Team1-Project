@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DisplayMode
@@ -22,6 +23,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -191,7 +193,12 @@ fun AddTodoDialog(
                             .align(Alignment.CenterHorizontally),
                         onDismissRequest = { onEvent(TodoEvent.hideDateSelector) },
                         confirmButton = {
-                            Button(onClick = {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+                                onClick = {
                                 dateFormatter.formatDate(datePickerState.selectedDateMillis, CalendarLocale.getDefault())
                                     ?.let { TodoEvent.setDueDate(it.dropLast(6)) }?.let { onEvent(it) }
                                 onEvent(TodoEvent.hideDateSelector)
@@ -214,15 +221,40 @@ fun AddTodoDialog(
                         shape = MaterialTheme.shapes.large,
                         content = {
                             Column(
-                                modifier = Modifier.padding(8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Top
                             ) {
                                 DatePicker(
-                                    modifier = Modifier.padding(8.dp),
+                                    modifier = Modifier.padding(top = 16.dp),
                                     state = datePickerState,
                                     showModeToggle = false,
-                                    title = null
+                                    title = null,
+                                    colors = DatePickerDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                                        headlineContentColor = MaterialTheme.colorScheme.onSurface,
+                                        weekdayContentColor = MaterialTheme.colorScheme.onSurface,
+                                        subheadContentColor = MaterialTheme.colorScheme.onSurface,
+                                        navigationContentColor = MaterialTheme.colorScheme.onSurface,
+                                        yearContentColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledYearContentColor = MaterialTheme.colorScheme.secondary,
+                                        currentYearContentColor = MaterialTheme.colorScheme.onSurface,
+                                        selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        disabledSelectedYearContentColor = MaterialTheme.colorScheme.secondary,
+                                        selectedYearContainerColor = MaterialTheme.colorScheme.primary,
+                                        disabledSelectedYearContainerColor = MaterialTheme.colorScheme.secondary,
+                                        dayContentColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledDayContentColor = MaterialTheme.colorScheme.secondary,
+                                        selectedDayContentColor = MaterialTheme.colorScheme.surface,
+                                        disabledSelectedDayContentColor = MaterialTheme.colorScheme.secondary,
+                                        selectedDayContainerColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledSelectedDayContainerColor = MaterialTheme.colorScheme.secondary,
+                                        todayContentColor = MaterialTheme.colorScheme.onSurface,
+                                        todayDateBorderColor = MaterialTheme.colorScheme.onSurface,
+                                        dayInSelectionRangeContentColor = MaterialTheme.colorScheme.secondary,
+                                        dayInSelectionRangeContainerColor = MaterialTheme.colorScheme.secondary,
+                                        dividerColor = MaterialTheme.colorScheme.onSurface,
+                                    ),
                                 )
                             }
                         },
@@ -237,7 +269,12 @@ fun AddTodoDialog(
                             .align(Alignment.CenterHorizontally),
                         onDismissRequest = { onEvent(TodoEvent.hideTimeSelector) },
                         confirmButton = {
-                            Button(onClick = {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+                                onClick = {
                                 onEvent(TodoEvent.setDueTime(timePickerState.hour.toString() + ":" + timePickerState.minute.toString()))
                                 onEvent(TodoEvent.hideTimeSelector)
                             }) {
@@ -250,7 +287,6 @@ fun AddTodoDialog(
                                     containerColor = MaterialTheme.colorScheme.primary,
                                     contentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
-
                                 onClick = {
                                     onEvent(TodoEvent.hideTimeSelector)
                                 }) {
@@ -264,6 +300,22 @@ fun AddTodoDialog(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 TimePicker(
+                                    colors = TimePickerDefaults.colors(
+                                        clockDialColor = MaterialTheme.colorScheme.primary,
+                                        clockDialSelectedContentColor = MaterialTheme.colorScheme.primary,
+                                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        selectorColor = MaterialTheme.colorScheme.onPrimary,
+                                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                                        periodSelectorBorderColor = MaterialTheme.colorScheme.onPrimary,
+                                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.primary,
+                                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
+                                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.primary,
+                                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
+                                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
                                     state = timePickerState,
                                     layoutType = TimePickerLayoutType.Vertical
                                 )

@@ -60,6 +60,8 @@ import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
+import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -165,9 +167,17 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         if (isSignedIn.value) {
                             CenterAlignedTopAppBar(
+                                colors = TopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
                                 title = {
                                     Text(
                                         "ADHD Task Manager",
+                                        color = MaterialTheme.colorScheme.onPrimary,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -179,16 +189,18 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Menu,
-                                            contentDescription = "Localized description"
+                                            contentDescription = "Menu"
                                         )
                                     }
                                 },
                                 actions = {
                                     IconButton(onClick = { /* doSomething() */ }) {
                                         Icon(
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Person,
-                                            contentDescription = "Localized description"
+                                            contentDescription = "Profile"
                                         )
                                     }
                                 }
@@ -204,7 +216,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(contentPadding),
-                        color = MaterialTheme.colorScheme.surface
+                        color = MaterialTheme.colorScheme.background
                     ) {
 
 // icons to mimic drawer destinations
@@ -232,20 +244,33 @@ class MainActivity : ComponentActivity() {
                         ModalNavigationDrawer(
                             drawerState = drawerState,
                             drawerContent = {
-                                ModalDrawerSheet {
-                                    Spacer(Modifier.height(12.dp))
+                                ModalDrawerSheet(
+                                    drawerContainerColor = MaterialTheme.colorScheme.background,
+                                    drawerTonalElevation = 2.dp
+                                ) {
+                                    Spacer(Modifier.height(18.dp))
                                     screens.forEach { screen ->
                                         NavigationDrawerItem(
+                                            colors = NavigationDrawerItemDefaults.colors(
+                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                unselectedTextColor = MaterialTheme.colorScheme.primary
+                                            ),
                                             icon = {
                                                 Icon(
                                                     imageVector = screenIcons[screens.indexOf(screen)],
                                                     contentDescription = screen.title,
-                                                    tint = MaterialTheme.colorScheme.primary
                                                 )
                                             },
-                                            label = { Text(text = screen.title)},
-                                            selected = screen == selectedItem.value,
+                                            label = {
+                                                Text(text = screen.title)
+                                            },
+                                            selected = screen.route == selectedItem.value.route,
                                             onClick = {
+                                                selectedItem.value = screen
                                                 scope.launch {
                                                     drawerState.close()
                                                 }
@@ -256,13 +281,20 @@ class MainActivity : ComponentActivity() {
                                     }
                                     if (googleAuthUiClient.getSignedInUser() != null) {
                                         NavigationDrawerItem(
+                                            colors = NavigationDrawerItemDefaults.colors(
+                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                unselectedTextColor = MaterialTheme.colorScheme.primary
+                                            ),
                                             icon = {
                                                 Icon(
                                                     imageVector = Icons.Default.ExitToApp,
                                                     contentDescription = "Sign Out",
-                                                    tint = MaterialTheme.colorScheme.primary
                                                 ) },
-                                            label = { Text(text = "Sign Out") },
+                                            label = { Text(text = "Sign Out", color = MaterialTheme.colorScheme.primary) },
                                             selected = false,
                                             onClick = {
                                                 scope.launch {

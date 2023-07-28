@@ -1,7 +1,13 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csu_itc303_team1.adhdtaskmanager.Priority
+import com.csu_itc303_team1.adhdtaskmanager.SortType
+import com.csu_itc303_team1.adhdtaskmanager.Todo
+import com.csu_itc303_team1.adhdtaskmanager.TodoDao
+import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.TodoState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -104,6 +110,34 @@ class TodoViewModel(
             TodoEvent.hideDialog -> {
                 _state.update {
                     it.copy(showDialog = false)
+                }
+            }
+
+            // Show edit date
+            TodoEvent.showEditDateSelector -> {
+                _state.update {
+                    it.copy(showEditDateSelector = true)
+                }
+            }
+
+            // Hide edit date
+            TodoEvent.hideEditDateSelector -> {
+                _state.update {
+                    it.copy(showEditDateSelector = false)
+                }
+            }
+
+            // Show edit time
+            TodoEvent.showEditTimeSelector -> {
+                _state.update {
+                    it.copy(showEditTimeSelector = true)
+                }
+            }
+
+            // Hide edit time
+            TodoEvent.hideEditTimeSelector -> {
+                _state.update {
+                    it.copy(showEditTimeSelector = false)
                 }
             }
 

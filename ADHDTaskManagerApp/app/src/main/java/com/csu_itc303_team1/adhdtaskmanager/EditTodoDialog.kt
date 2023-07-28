@@ -1,4 +1,4 @@
-package com.csu_itc303_team1
+package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -6,12 +6,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.Priority
-import com.csu_itc303_team1.adhdtaskmanager.Todo
-import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.TodoState
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeParseException
 
 
@@ -91,9 +89,7 @@ fun EditTodoDialog(
                             RadioButton(
                                 selected = thisTodo.priority == Priority.LOW,
                                 onClick = {
-                                    if (thisTodo != null) {
-                                        thisTodo.priority = Priority.LOW
-                                    }
+                                    thisTodo.priority = Priority.LOW
                                     onEvent(TodoEvent.setPriority(Priority.LOW))
                                 })
                         }
@@ -133,11 +129,11 @@ fun EditTodoDialog(
                 }
 
                 val displayDate by remember {
-                    mutableStateOf(state.dueDate)
+                    mutableStateOf(thisTodo?.dueDate)
                 }
 
                 val displayTime by remember {
-                    mutableStateOf(state.dueTime)
+                    mutableStateOf(thisTodo?.dueTime)
                 }
 
 
@@ -164,18 +160,147 @@ fun EditTodoDialog(
 
 
                 // Date Picker && Time Picker
-                var editedPickedDate by remember { // date variable stored to remember
-                    mutableStateOf(LocalDate.now())
+                val editedPickedDate by remember { // date variable stored to remember
+                    mutableStateOf(LocalDateTime.now())
                 }
 
-                var editedPickedTime by remember { // time variable stored to remember
-                    mutableStateOf(LocalTime.NOON)
+                val dateFormatter: DatePickerFormatter = remember {
+                    object : DatePickerFormatter {
+                        override fun formatDate(
+                            dateMillis: Long?,
+                            locale: CalendarLocale,
+                            forContentDescription: Boolean
+                        ): String? {
+                            return dateMillis?.let {
+                                val date = LocalDateTime.ofEpochSecond(
+                                    it / 1000,
+                                    0,
+                                    ZoneOffset.UTC
+                                )
+                                date.toString()
+                            }
+                        }
+
+                        override fun formatMonthYear(
+                            monthMillis: Long?,
+                            locale: CalendarLocale
+                        ): String? {
+                            // Format month and year
+                            return monthMillis?.let {
+                                val date = LocalDateTime.ofEpochSecond(
+                                    it / 1000,
+                                    0,
+                                    ZoneOffset.UTC
+                                )
+                                date.toString()
+                            }
+                        }
+                    }
+                }
+
+                val editDatePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = editedPickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                    yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
+                    initialDisplayMode = DisplayMode.Picker,
+                    initialDisplayedMonthMillis = null,
+                )
+
+                val editTimePickerState = rememberTimePickerState(
+                    initialHour = LocalTime.now().hour,
+                    initialMinute = LocalTime.now().minute,
+                    is24Hour = false
+                )
+
+
+
+                if (state.showEditDateSelector) {
+                    DatePickerDialog(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.CenterHorizontally),
+                        onDismissRequest = { onEvent(TodoEvent.hideEditDateSelector) },
+                        confirmButton = {
+                            Button(onClick = {
+                                state.dueDate = dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""
+                                onEvent(TodoEvent.hideEditDateSelector)
+                            }) {
+                                Text(text = "Confirm")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+
+                                onClick = {
+                                    onEvent(TodoEvent.hideEditDateSelector)
+                                }) {
+                                Text(text = "Cancel")
+                            }},
+                        shape = MaterialTheme.shapes.large,
+                        content = {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                DatePicker(
+                                    modifier = Modifier.padding(8.dp),
+                                    state = editDatePickerState,
+                                    showModeToggle = false,
+                                    title = null
+                                )
+                            }
+                        },
+                    )
+                }
+
+                if (state.showEditTimeSelector) {
+                    // Time Picker Dialog
+                    DatePickerDialog(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.CenterHorizontally),
+                        onDismissRequest = { onEvent(TodoEvent.hideEditTimeSelector) },
+                        confirmButton = {
+                            Button(onClick = {
+                                state.dueTime = editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()
+                                onEvent(TodoEvent.hideEditTimeSelector)
+                            }) {
+                                Text(text = "Confirm")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+
+                                onClick = {
+                                    onEvent(TodoEvent.hideEditTimeSelector)
+                                }) {
+                                Text(text = "Cancel")
+                            }},
+                        shape = MaterialTheme.shapes.large,
+                        content = {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                TimePicker(
+                                    state = editTimePickerState,
+                                    layoutType = TimePickerLayoutType.Vertical,
+                                )
+                            }
+                        },
+                    )
                 }
 
 
-                // Date and Time Dialog States
-                val dateDialogState = rememberDatePickerState()
-                val timeDialogState = rememberTimePickerState()
 
 
                 // A New Row containing Two Columns. One for Date, and one for Time
@@ -194,12 +319,12 @@ fun EditTodoDialog(
                         verticalArrangement = Arrangement.Top
                     ) {
                         Button(onClick = {
-
+                            onEvent(TodoEvent.showEditDateSelector)
                         }) {
                             Text(text = "Date")
                         }
                         if (thisTodo != null) {
-                            Text(text = displayDate)
+                            Text(text = displayDate?:"")
                         }
                     }
                     // On Button Click it opens the Time Dialog Screen,
@@ -211,11 +336,12 @@ fun EditTodoDialog(
 
                     ) {
                         Button(onClick = {
+                            onEvent(TodoEvent.showEditTimeSelector)
                         }) {
                             Text(text = "Time")
                         }
                         if (thisTodo != null) {
-                            Text(text = displayTime)
+                            Text(text = displayTime?:"")
                         }
                     }
                 }

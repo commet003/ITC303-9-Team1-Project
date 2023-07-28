@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 
 import androidx.compose.foundation.background
@@ -13,13 +13,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.AddTodoDialog
+import com.csu_itc303_team1.adhdtaskmanager.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.SortType
+import com.csu_itc303_team1.adhdtaskmanager.TodoCard
+import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.TodoState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +49,7 @@ fun TodoScreen(
 
     Scaffold(
         floatingActionButton = {
-            LargeFloatingActionButton(
+            FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,
                 onClick = {
                     onEvent(TodoEvent.showDialog)
@@ -53,7 +58,8 @@ fun TodoScreen(
                 Icon(
                     tint = MaterialTheme.colorScheme.onPrimary,
                     imageVector = Icons.Default.Add,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+                        .height(24.dp).width(24.dp),
                     contentDescription = "Add Todo"
                 )
             }
@@ -87,6 +93,7 @@ fun TodoScreen(
                     ,
                     onClick = { }) {
                     Icon(
+                        tint = MaterialTheme.colorScheme.onBackground,
                         imageVector = Icons.Filled.List,
                         contentDescription = "Filter"
                     )
@@ -94,7 +101,7 @@ fun TodoScreen(
 
                 ExposedDropdownMenu(
                     modifier = Modifier
-                        .width(120.dp),
+                        .width(150.dp),
                     expanded = expanded,
                     onDismissRequest = { expanded = false }) {
                     SortType.values().forEach { sortType ->
@@ -132,12 +139,6 @@ fun TodoScreen(
                                 }
                             }
                         )
-                        if (sortType != SortType.values().last()){
-                            Divider(
-                                modifier = Modifier.height(2.dp).width(120.dp),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
                     }
                 }
 

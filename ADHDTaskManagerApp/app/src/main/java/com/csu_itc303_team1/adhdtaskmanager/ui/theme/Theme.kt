@@ -9,10 +9,10 @@ import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColorScheme(
-    primary = NavyBlueDark,
-    primaryContainer = BlueGrottoDark,
-    secondary = BlueGreenDark,
-    secondaryContainer = BabyBlueDark,
+    primary = NavyBlueLight,
+    primaryContainer = BlueGrottoLight,
+    secondary = BlueGreenLight,
+    secondaryContainer = BabyBlueLight,
     background = BackgroundDark,
     onBackground = Color.White,
     surface = DiologBoxBackgroundDark,
@@ -22,11 +22,11 @@ private val DarkColorPalette = darkColorScheme(
 )
 
 private val LightColorPalette = lightColorScheme(
-    primary = BlueGrottoLight,
-    primaryContainer = NavyBlueLight,
-    secondary = BlueGreenLight,
-    secondaryContainer = BabyBlueLight,
-    background = BabyBlueLight,
+    primary = NavyBlueDark,
+    primaryContainer = BlueGrottoDark,
+    secondary = BlueGreenDark,
+    secondaryContainer = BabyBlueDark,
+    background = BackgroundLight,
     surface = DiologBoxBackgroundLight,
     onPrimary = Color.White,
     onSecondary = Color.Black,
@@ -43,7 +43,7 @@ fun ADHDTaskManagerTheme(
 
     val colors = if (darkTheme) {
         systemUiController.setStatusBarColor(
-            color = MaterialTheme.colorScheme.primaryContainer,
+            color = NavyBlueLight,
             darkIcons = false
         )
         systemUiController.setNavigationBarColor(
@@ -53,11 +53,11 @@ fun ADHDTaskManagerTheme(
         DarkColorPalette
     } else {
         systemUiController.setStatusBarColor(
-            color = MaterialTheme.colorScheme.primaryContainer,
+            color = NavyBlueDark,
             darkIcons = false
         )
         systemUiController.setNavigationBarColor(
-            color = BabyBlueLight,
+            color = BackgroundLight,
             darkIcons = false
         )
         LightColorPalette
