@@ -76,6 +76,16 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
+    val passPhrase = "passPhrase"
+    val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
+    val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            TodoDatabase::class.java,
+            "todo.db"
+        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
+    }
+
 
 //    private val rewardDB by lazy {
 //        Room.databaseBuilder(
@@ -114,16 +124,6 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val passPhrase = "passPhrase"
-        val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
-        val db by lazy {
-            Room.databaseBuilder(
-                applicationContext,
-                TodoDatabase::class.java,
-                "todo.db"
-            )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
-        }
 
         val viewModel by viewModels<TodoViewModel>(
             factoryProducer = {
