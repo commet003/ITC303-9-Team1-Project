@@ -46,4 +46,10 @@ sealed interface TodoEvent {
     object hideEditTimeSelector: TodoEvent
     object ShowCompletedTasks: TodoEvent
 
+    // Reset Todos
+    object resetTodos: TodoEvent
+
+    // Reset State
+    object resetState: TodoEvent
+
 }

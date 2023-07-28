@@ -278,6 +278,31 @@ class TodoViewModel(
                 }
             }
 
+            // Reset State Todos to values from database
+            TodoEvent.resetTodos -> {
+                viewModelScope.launch {
+                    todoDao.getAllTodos().collect {
+                        state.value.todos = it
+                    }
+                }
+            }
+
+            // Reset State
+            TodoEvent.resetState -> {
+                _state.update {
+                    it.copy(
+                        title = "",
+                        description = "",
+                        priority = Priority.LOW,
+                        dueDate = "",
+                        dueTime = "",
+                        showDialog = false,
+                        showEditTodoDialog = false
+                    )
+                }
+            }
+
+
             else -> {}
         }
     }

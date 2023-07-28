@@ -95,7 +95,7 @@ dependencies {
 
     // Coil
     implementation("com.google.dagger:hilt-android:2.44")
-    implementation 'androidx.wear.compose:compose-material3:1.0.0-alpha07'
+    implementation 'androidx.wear.compose:compose-material3:1.0.0-alpha08'
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 
     // Accompanist
@@ -107,7 +107,7 @@ dependencies {
     implementation 'net.zetetic:android-database-sqlcipher:4.5.4@aar'
     implementation 'androidx.security:security-crypto-ktx:1.1.0-alpha06'
     implementation 'androidx.sqlite:sqlite-ktx:2.3.1'
-
+    implementation("androidx.sqlite:sqlite-framework:2.3.1")
 
 
     // ktx dependencies

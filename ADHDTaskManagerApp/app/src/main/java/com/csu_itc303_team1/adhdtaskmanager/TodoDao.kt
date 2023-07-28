@@ -1,12 +1,12 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface TodoDao {
+
 
     @Insert
     suspend fun insertTodo(todo: Todo)
@@ -19,6 +19,9 @@ interface TodoDao {
     @Query("SELECT * FROM Todo WHERE id = :id")
     fun getTodoById(id: Int): Flow<Todo>
 
+    // Get All Todos
+    @Query("SELECT * FROM Todo")
+    fun getAllTodos(): Flow<List<Todo>>
 
     // Sort Todos by Priority
     @Query("SELECT * FROM Todo ORDER BY priority DESC")

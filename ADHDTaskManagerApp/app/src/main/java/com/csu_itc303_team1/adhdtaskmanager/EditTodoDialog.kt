@@ -10,7 +10,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
-import java.time.format.DateTimeParseException
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,13 +26,13 @@ fun EditTodoDialog(
             thisTodo = todo
         }
     }
+
     state.title = thisTodo?.title ?: ""
     state.description = thisTodo?.description ?: ""
     state.priority = thisTodo?.priority ?: Priority.LOW
-    state.dueDate = thisTodo?.dueDate ?: ""
-    state.dueTime = thisTodo?.dueTime ?: ""
-    state.userId = thisTodo?.userID ?: ""
-    state.id = thisTodo?.id ?: 0
+    state.dueDate = (thisTodo?.dueDate ?: LocalDate.now()).toString()
+    state.dueTime = (thisTodo?.dueTime ?: LocalTime.now()).toString()
+
 
     AlertDialog(
         modifier = modifier,
@@ -44,9 +43,9 @@ fun EditTodoDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (thisTodo != null) {
+                thisTodo?.title?.let {
                     TextField(
-                        value = thisTodo.title,
+                        value = it,
                         onValueChange = {
                             thisTodo.title = it
                             onEvent(TodoEvent.setTitle(it))
@@ -60,6 +59,7 @@ fun EditTodoDialog(
                     )
                 }
 
+
                 if (thisTodo != null) {
                     TextField(
                         value = thisTodo.description,
@@ -72,10 +72,10 @@ fun EditTodoDialog(
                                 "Provide a brief description",
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
-                        } // This line adds a hint to the TextField
-
+                        }
                     )
                 }
+
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 )
@@ -109,6 +109,7 @@ fun EditTodoDialog(
                                 })
                         }
 
+
                         Text(text = Priority.MEDIUM.name)
                     }
                     Column(
@@ -124,40 +125,10 @@ fun EditTodoDialog(
                                 })
                         }
 
+
                         Text(text = Priority.HIGH.name)
                     }
                 }
-
-                val displayDate by remember {
-                    mutableStateOf(thisTodo?.dueDate)
-                }
-
-                val displayTime by remember {
-                    mutableStateOf(thisTodo?.dueTime)
-                }
-
-
-                // Time and Date Converted from String to LocalTime and LocalDate
-                var convertedDate by remember {
-                    mutableStateOf(
-                        try {
-                            LocalDate.parse(thisTodo?.dueDate)
-                        } catch (e: DateTimeParseException) {
-                            LocalDate.now()
-                        }
-                    )
-                }
-
-                var convertedTime by remember {
-                    mutableStateOf(
-                        try {
-                            LocalTime.parse(thisTodo?.dueTime)
-                        } catch (e: DateTimeParseException) {
-                            LocalTime.NOON
-                        }
-                    )
-                }
-
 
                 // Date Picker && Time Picker
                 val editedPickedDate by remember { // date variable stored to remember
@@ -198,11 +169,20 @@ fun EditTodoDialog(
                     }
                 }
 
+                val selectableDates: SelectableDates? = null
+
                 val editDatePickerState = rememberDatePickerState(
                     initialSelectedDateMillis = editedPickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
                     yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
                     initialDisplayMode = DisplayMode.Picker,
                     initialDisplayedMonthMillis = null,
+                    selectableDates = selectableDates.let {
+                        object : SelectableDates {
+                            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                                return utcTimeMillis >= LocalDate.now().toEpochDay()
+                            }
+                        }
+                    }
                 )
 
                 val editTimePickerState = rememberTimePickerState(
@@ -221,7 +201,10 @@ fun EditTodoDialog(
                         onDismissRequest = { onEvent(TodoEvent.hideEditDateSelector) },
                         confirmButton = {
                             Button(onClick = {
-                                state.dueDate = dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""
+                                onEvent(TodoEvent.setDueDate(dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""))
+                                if (thisTodo != null) {
+                                    thisTodo.dueDate = dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""
+                                }
                                 onEvent(TodoEvent.hideEditDateSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -266,7 +249,10 @@ fun EditTodoDialog(
                         onDismissRequest = { onEvent(TodoEvent.hideEditTimeSelector) },
                         confirmButton = {
                             Button(onClick = {
-                                state.dueTime = editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()
+                                onEvent(TodoEvent.setDueTime(editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()))
+                                if (thisTodo != null) {
+                                    thisTodo.dueTime = editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()
+                                }
                                 onEvent(TodoEvent.hideEditTimeSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -323,9 +309,8 @@ fun EditTodoDialog(
                         }) {
                             Text(text = "Date")
                         }
-                        if (thisTodo != null) {
-                            Text(text = displayDate?:"")
-                        }
+                        Text(text = state.dueDate)
+
                     }
                     // On Button Click it opens the Time Dialog Screen,
                     // the text displays default or whatever is chosen
@@ -340,9 +325,8 @@ fun EditTodoDialog(
                         }) {
                             Text(text = "Time")
                         }
-                        if (thisTodo != null) {
-                            Text(text = displayTime?:"")
-                        }
+                        Text(text = state.dueTime)
+
                     }
                 }
             }
@@ -350,12 +334,8 @@ fun EditTodoDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    if (thisTodo != null) {
-                        thisTodo.dueDate = state.dueDate
-                        thisTodo.dueTime = state.dueTime
-                    }
-                    onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
                     onEvent(TodoEvent.updateTodo)
+                    onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
                 }
             ) {
                 Text(text = "Edit")
@@ -365,7 +345,6 @@ fun EditTodoDialog(
             Button(
                 onClick = {
                     onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
-                    onEvent(TodoEvent.hideEditTodoDialog)
                 }
             ) {
                 Text(text = "Cancel")

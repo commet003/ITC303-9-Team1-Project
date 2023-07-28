@@ -67,6 +67,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -74,17 +75,6 @@ import net.sqlcipher.database.SupportFactory
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
-
-
-    private val passPhrase = "passPhrase"
-    private val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
-    private val db by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            TodoDatabase::class.java,
-            "todo.db"
-        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
-    }
 
 
 //    private val rewardDB by lazy {
@@ -124,6 +114,16 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val passPhrase = "passPhrase"
+        val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
+        val db by lazy {
+            Room.databaseBuilder(
+                applicationContext,
+                TodoDatabase::class.java,
+                "todo.db"
+            )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
+        }
 
         val viewModel by viewModels<TodoViewModel>(
             factoryProducer = {
@@ -347,11 +347,16 @@ class MainActivity : ComponentActivity() {
                                         android.Manifest.permission.POST_NOTIFICATIONS
                                     )
 
-                                    if (!notificationPermission.hasPermission) {
-                                        PermissionDialog(
+                                    if (!notificationPermission.hasPermission && isSignedIn.value) {
+                                        // Show the dialog after 20 seconds
+                                        LaunchedEffect(true) {
+                                            delay(20000)
+                                            notificationPermission.launchPermissionRequest()
+                                        }
+                                        /*PermissionDialog(
                                             onEvent = viewModel::onEvent,
                                             notificationPermission = notificationPermission
-                                        )
+                                        )*/
                                     }
 
 //                        val owner = LocalViewModelStoreOwner.current

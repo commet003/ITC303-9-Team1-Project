@@ -398,6 +398,7 @@ fun AddTodoDialog(
                 ),
                 onClick = {
                     onEvent(TodoEvent.hideDialog)
+                    onEvent(TodoEvent.resetState)
                 }
             ) {
                 Text(text = "Cancel")
