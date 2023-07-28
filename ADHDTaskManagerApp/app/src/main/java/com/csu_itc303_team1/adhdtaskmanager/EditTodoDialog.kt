@@ -43,11 +43,11 @@ fun EditTodoDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                thisTodo?.title?.let {
+
                     TextField(
-                        value = it,
+                        value = thisTodo?.title ?: "",
                         onValueChange = {
-                            thisTodo.title = it
+                            thisTodo?.title = it
                             onEvent(TodoEvent.setTitle(it))
                         },
                         label = {
@@ -57,14 +57,10 @@ fun EditTodoDialog(
                             )
                         } // This line adds a hint to the TextField
                     )
-                }
-
-
-                if (thisTodo != null) {
                     TextField(
-                        value = thisTodo.description,
+                        value = thisTodo?.description ?: "",
                         onValueChange = {
-                            thisTodo.description = it
+                            thisTodo?.description = it
                             onEvent(TodoEvent.setDescription(it))
                         },
                         label = {
@@ -74,7 +70,7 @@ fun EditTodoDialog(
                             )
                         }
                     )
-                }
+
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -85,14 +81,14 @@ fun EditTodoDialog(
                         verticalArrangement = Arrangement.Top
                     ) {
 
-                        if (thisTodo != null) {
                             RadioButton(
-                                selected = thisTodo.priority == Priority.LOW,
+                                selected = thisTodo?.priority == Priority.LOW,
                                 onClick = {
-                                    thisTodo.priority = Priority.LOW
+                                    thisTodo?.priority = Priority.LOW
                                     onEvent(TodoEvent.setPriority(Priority.LOW))
-                                })
-                        }
+                                }
+                            )
+
 
                         Text(text = Priority.LOW.name)
                     }
@@ -100,14 +96,13 @@ fun EditTodoDialog(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        if (thisTodo != null) {
                             RadioButton(
-                                selected = thisTodo.priority == Priority.MEDIUM,
+                                selected = thisTodo?.priority == Priority.MEDIUM,
                                 onClick = {
-                                    thisTodo.priority = Priority.MEDIUM
+                                    thisTodo?.priority = Priority.MEDIUM
                                     onEvent(TodoEvent.setPriority(Priority.MEDIUM))
                                 })
-                        }
+
 
 
                         Text(text = Priority.MEDIUM.name)
@@ -116,16 +111,13 @@ fun EditTodoDialog(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        if (thisTodo != null) {
                             RadioButton(
-                                selected = thisTodo.priority == Priority.HIGH,
+                                selected = thisTodo?.priority == Priority.HIGH,
                                 onClick = {
-                                    thisTodo.priority = Priority.HIGH
+                                    thisTodo?.priority = Priority.HIGH
                                     onEvent(TodoEvent.setPriority(Priority.HIGH))
-                                })
-                        }
-
-
+                                }
+                            )
                         Text(text = Priority.HIGH.name)
                     }
                 }
@@ -202,9 +194,7 @@ fun EditTodoDialog(
                         confirmButton = {
                             Button(onClick = {
                                 onEvent(TodoEvent.setDueDate(dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""))
-                                if (thisTodo != null) {
-                                    thisTodo.dueDate = dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""
-                                }
+                                thisTodo?.dueDate = dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""
                                 onEvent(TodoEvent.hideEditDateSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -250,9 +240,7 @@ fun EditTodoDialog(
                         confirmButton = {
                             Button(onClick = {
                                 onEvent(TodoEvent.setDueTime(editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()))
-                                if (thisTodo != null) {
-                                    thisTodo.dueTime = editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()
-                                }
+                                thisTodo?.dueTime = editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()
                                 onEvent(TodoEvent.hideEditTimeSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -344,7 +332,9 @@ fun EditTodoDialog(
         dismissButton = {
             Button(
                 onClick = {
-                    onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
+                    onEvent(TodoEvent.hideEditTodoDialog)
+                    onEvent(TodoEvent.resetState)
+                    onEvent(TodoEvent.resetTodos)
                 }
             ) {
                 Text(text = "Cancel")
