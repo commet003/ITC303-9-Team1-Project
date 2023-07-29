@@ -29,9 +29,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, index: Int, rewardViewModel: RewardViewModel) {
 
-
-    val searchResults by rewardViewModel.searchResults.observeAsState()
-    rewardViewModel.findReward("Completed Task Reward")
+    rewardViewModel.allRewards.observeAsState(listOf())
+    val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
     // show the edit todo dialog if showEditTodoDialog is true
     if (todoState.showEditTodoDialog){
@@ -91,20 +90,22 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                         onEvent(TodoEvent.toggleCompleted(todo))
 
                         // get the Completed Reward Entity and update the times achieved.
+                        // rewardViewModel.findReward("Completed Task Reward")
 
-                        //val completedReward = searchResults?.get(1)
 
-                        /*if (!todo.isCompleted) {
-                            if (completedReward != null) {
+                        if (search.isNotEmpty()) {
+                            val completedReward = search[0]
 
+                            if (!todo.isCompleted) {
                                 completedReward.timesAchieved =
                                     completedReward.timesAchieved + 1
-                            }
-                            if (completedReward != null) {
                                 rewardViewModel.updateReward(completedReward)
-                            }
 
-                        }*/
+                            }
+                        } else {
+                            println("Search Result on Todo Card is an empty list")
+                        }
+
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.onPrimary,

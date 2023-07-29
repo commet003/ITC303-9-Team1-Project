@@ -86,13 +86,6 @@ class MainActivity : ComponentActivity() {
         )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
     }
 
-
-//    private val rewardDB by lazy {
-//        Room.databaseBuilder(
-//            applicationContext,
-//            RewardDatabase::class.java, "reward_database.db"
-//        ).createFromAsset("reward.db").build()}
-
     private val rewardViewModel by viewModels<RewardViewModel>(
         factoryProducer = {
             object: ViewModelProvider.Factory{
@@ -105,7 +98,6 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
-    //private lateinit var rewardViewModel: RewardViewModel
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
@@ -147,8 +139,6 @@ class MainActivity : ComponentActivity() {
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
-            //initialRewards(rewardViewModel)
-            //rewardViewModel = ViewModelProvider(this) [RewardViewModel::class.java]
 
 
             ADHDTaskManagerTheme {
@@ -158,6 +148,7 @@ class MainActivity : ComponentActivity() {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
+                rewardViewModel.allRewards.observeAsState(listOf())
 
 
                 Scaffold(
@@ -358,18 +349,6 @@ class MainActivity : ComponentActivity() {
                                             notificationPermission = notificationPermission
                                         )*/
                                     }
-
-//                        val owner = LocalViewModelStoreOwner.current
-//
-//                        owner?.let{
-//                            val rewardViewModel: RewardViewModel = viewModel(
-//                                it,
-//                                "RewardViewModel",
-//                                RewardViewModelFactory(LocalContext.current.applicationContext as Application))
-//                            RewardSetup(rewardViewModel)
-//                            TodoRewardSetup(rewardViewModel)
-//                        }
-
 
                                     // The content itself is the navController's current state, or Home Screen
                                     // on Default
@@ -586,12 +565,5 @@ class MainActivity : ComponentActivity() {
             }
         }))
     }
-
-//    class RewardViewModelFactory(val application: Application):
-//            ViewModelProvider.Factory{
-//                override fun <T: ViewModel> create(modelClass: Class<T>): T {
-//                    return RewardViewModel(application) as T
-//                }
-//            }
 
 }
