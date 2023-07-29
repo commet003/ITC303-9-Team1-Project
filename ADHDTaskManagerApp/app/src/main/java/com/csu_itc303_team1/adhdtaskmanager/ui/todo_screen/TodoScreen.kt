@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.AddTodoDialog
+import com.csu_itc303_team1.adhdtaskmanager.EditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.SortType
 import com.csu_itc303_team1.adhdtaskmanager.TodoCard
@@ -73,6 +74,14 @@ fun TodoScreen(
                 onEvent = onEvent,
             )
         }
+
+        if (state.showEditTodoDialog){
+            EditTodoDialog(
+                state = state,
+                onEvent = onEvent,
+            )
+        }
+
         Column (
             verticalArrangement = Arrangement.SpaceAround
         ){

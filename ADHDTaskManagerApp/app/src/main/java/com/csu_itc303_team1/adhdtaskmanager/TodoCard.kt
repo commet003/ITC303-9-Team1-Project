@@ -33,12 +33,12 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
     // show the edit todo dialog if showEditTodoDialog is true
-    if (todoState.showEditTodoDialog){
+    /*if (todoState.showEditTodoDialog){
         EditTodoDialog(
             todoState,
             onEvent
         )
-    }
+    }*/
 
 
     Card(

@@ -51,10 +51,7 @@ fun EditTodoDialog(
                             onEvent(TodoEvent.setTitle(it))
                         },
                         label = {
-                            Text(
-                                "Enter Title of the task",
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            Text("Enter Title of the task")
                         } // This line adds a hint to the TextField
                     )
                     TextField(
@@ -64,10 +61,7 @@ fun EditTodoDialog(
                             onEvent(TodoEvent.setDescription(it))
                         },
                         label = {
-                            Text(
-                                "Provide a brief description",
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
+                            Text("Provide a brief description")
                         }
                     )
 
@@ -215,12 +209,11 @@ fun EditTodoDialog(
                         shape = MaterialTheme.shapes.large,
                         content = {
                             Column(
-                                modifier = Modifier.padding(8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Top
                             ) {
                                 DatePicker(
-                                    modifier = Modifier.padding(8.dp),
+                                    modifier = Modifier.padding(top = 16.dp),
                                     state = editDatePickerState,
                                     showModeToggle = false,
                                     title = null
@@ -239,8 +232,8 @@ fun EditTodoDialog(
                         onDismissRequest = { onEvent(TodoEvent.hideEditTimeSelector) },
                         confirmButton = {
                             Button(onClick = {
-                                onEvent(TodoEvent.setDueTime(editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()))
-                                thisTodo?.dueTime = editTimePickerState.hour.toString() + ":" + editTimePickerState.minute.toString()
+                                onEvent(TodoEvent.setDueTime(editTimePickerState.hour.toFloat().toString() + ":" + editTimePickerState.minute))
+                                thisTodo?.dueTime = editTimePickerState.hour.toFloat().toString() + ":" + editTimePickerState.minute.toFloat()
                                 onEvent(TodoEvent.hideEditTimeSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -324,6 +317,7 @@ fun EditTodoDialog(
                 onClick = {
                     onEvent(TodoEvent.updateTodo)
                     onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
+                    onEvent(TodoEvent.resetState)
                 }
             ) {
                 Text(text = "Edit")
@@ -332,7 +326,7 @@ fun EditTodoDialog(
         dismissButton = {
             Button(
                 onClick = {
-                    onEvent(TodoEvent.hideEditTodoDialog)
+                    thisTodo?.let { TodoEvent.toggleIsClicked(it) }?.let { onEvent(it) }
                     onEvent(TodoEvent.resetState)
                     onEvent(TodoEvent.resetTodos)
                 }

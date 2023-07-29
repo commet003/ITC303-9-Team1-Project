@@ -377,7 +377,7 @@ class MainActivity : ComponentActivity() {
                                     // NavHost for controlling the pages.
                                     NavHost(
                                         navController = navController,
-                                        startDestination = Screen.SignInScreen.route   // Screen that displays when app is first opened
+                                        startDestination = if (isSignedIn.value) Screen.TodoScreen.route else Screen.SignInScreen.route,
                                     ){
                                         // Home screen/to-do screen
                                         composable(
