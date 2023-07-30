@@ -1,8 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -32,7 +30,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -64,7 +60,6 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.delay
@@ -187,7 +182,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { /* doSomething() */ }) {
+                                    IconButton(onClick = {/*TODO*/}) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Person,
@@ -235,42 +230,46 @@ class MainActivity : ComponentActivity() {
                         ModalNavigationDrawer(
                             drawerState = drawerState,
                             drawerContent = {
-                                ModalDrawerSheet(
-                                    drawerContainerColor = MaterialTheme.colorScheme.background,
-                                    drawerTonalElevation = 2.dp
-                                ) {
-                                    Spacer(Modifier.height(18.dp))
-                                    screens.forEach { screen ->
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = screenIcons[screens.indexOf(screen)],
-                                                    contentDescription = screen.title,
+                                if (isSignedIn.value) {
+                                    ModalDrawerSheet(
+                                        drawerContainerColor = MaterialTheme.colorScheme.background,
+                                        drawerTonalElevation = 2.dp
+                                    ) {
+                                        Spacer(Modifier.height(18.dp))
+                                        screens.forEach { screen ->
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = screenIcons[screens.indexOf(
+                                                            screen
+                                                        )],
+                                                        contentDescription = screen.title,
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(text = screen.title)
+                                                },
+                                                selected = screen.route == selectedItem.value.route,
+                                                onClick = {
+                                                    selectedItem.value = screen
+                                                    scope.launch {
+                                                        drawerState.close()
+                                                    }
+                                                    navController.navigate(screen.route)
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
                                                 )
-                                            },
-                                            label = {
-                                                Text(text = screen.title)
-                                            },
-                                            selected = screen.route == selectedItem.value.route,
-                                            onClick = {
-                                                selectedItem.value = screen
-                                                scope.launch {
-                                                    drawerState.close()
-                                                }
-                                                navController.navigate(screen.route)
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-                                    }
-                                    if (googleAuthUiClient.getSignedInUser() != null) {
+                                            )
+                                        }
                                         NavigationDrawerItem(
                                             colors = NavigationDrawerItemDefaults.colors(
                                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -284,8 +283,14 @@ class MainActivity : ComponentActivity() {
                                                 Icon(
                                                     imageVector = Icons.Default.ExitToApp,
                                                     contentDescription = "Sign Out",
-                                                ) },
-                                            label = { Text(text = "Sign Out", color = MaterialTheme.colorScheme.primary) },
+                                                )
+                                            },
+                                            label = {
+                                                Text(
+                                                    text = "Sign Out",
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            },
                                             selected = false,
                                             onClick = {
                                                 scope.launch {
@@ -325,6 +330,8 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
+                                } else {
+                                    null
                                 }
                             },
                             content = {
@@ -337,6 +344,9 @@ class MainActivity : ComponentActivity() {
                                     val notificationPermission = rememberPermissionState(
                                         android.Manifest.permission.POST_NOTIFICATIONS
                                     )
+                                    val doNotDisturbPermission = rememberPermissionState(
+                                        android.Manifest.permission.WRITE_SETTINGS
+                                    )
 
                                     if (!notificationPermission.hasPermission && isSignedIn.value) {
                                         // Show the dialog after 20 seconds
@@ -344,10 +354,13 @@ class MainActivity : ComponentActivity() {
                                             delay(20000)
                                             notificationPermission.launchPermissionRequest()
                                         }
-                                        /*PermissionDialog(
-                                            onEvent = viewModel::onEvent,
-                                            notificationPermission = notificationPermission
-                                        )*/
+                                    }
+                                    if (!doNotDisturbPermission.hasPermission && isSignedIn.value) {
+                                        // Show the dialog after 20 seconds
+                                        LaunchedEffect(true) {
+                                            delay(10000)
+                                            doNotDisturbPermission.launchPermissionRequest()
+                                        }
                                     }
 
                                     // The content itself is the navController's current state, or Home Screen
@@ -501,60 +514,6 @@ class MainActivity : ComponentActivity() {
             }
             rewardViewModel.allRewards.observeAsState(listOf())
         }
-    }
-
-    //Shows the notification
-    // TODO - Make this show the notification when a task is due
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun showNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(this, "channel1")
-            .setContentTitle("Task Reminder")
-            .setContentText("You have a task due soon!")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
-        notificationManager.notify(1, notification)
-    }
-
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    @Composable
-    private fun PermissionDialog(
-        modifier: Modifier = Modifier,
-        notificationPermission: PermissionState,
-        onEvent: (TodoEvent) -> Unit
-    ){
-        AlertDialog(
-            modifier = modifier,
-            onDismissRequest = {onEvent(TodoEvent.hideDialog)},
-            title = {Text(text = "Notification Permission Required")},
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "This app requires notification permission to work")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        notificationPermission.launchPermissionRequest()
-                    }
-                ) {
-                    Text(text = "Give Permission")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        onEvent(TodoEvent.hideDialog)
-                    }
-                ) {
-                    Text(text = "Cancel")
-                }
-            }
-        )
     }
 
     // creates Arraylist of users from the firestore database

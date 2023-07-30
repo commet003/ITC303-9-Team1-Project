@@ -59,8 +59,10 @@ fun TodoScreen(
                 Icon(
                     tint = MaterialTheme.colorScheme.onPrimary,
                     imageVector = Icons.Default.Add,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-                        .height(24.dp).width(24.dp),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .height(24.dp)
+                        .width(24.dp),
                     contentDescription = "Add Todo"
                 )
             }
@@ -89,7 +91,8 @@ fun TodoScreen(
             // If you only want the completed task to show, then you can set
             // sortType to SortType.BY_COMPLETED
             ExposedDropdownMenuBox(
-                modifier = Modifier.padding(end = 10.dp)
+                modifier = Modifier
+                    .padding(end = 10.dp)
                     .align(Alignment.End),
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded}
