@@ -1,7 +1,11 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 
 class UsersRepo (
     // initializing the firestore database
@@ -29,5 +33,45 @@ class UsersRepo (
             }
             callback.onResponse(response)
         }
+    }
+
+    fun checkExists(email: String): Boolean {
+        val checkUser = rootRef.collection("users").document(email)
+        var userExist = false
+        checkUser.get()
+            .addOnSuccessListener { document ->
+                userExist = if (document != null) {
+                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                    true
+
+                } else {
+                    Log.d(TAG, "No Such Document")
+                    false
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with", exception)
+            }
+
+        return userExist
+    }
+
+    fun addToFirebaseDatabase(user: Users, id: String) {
+        rootRef.collection("users").document(id).set(user)
+            .addOnSuccessListener {id
+                Log.d(TAG, "DocumentSnapshot written with ID: ${id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+    }
+
+    fun retrieveFirebaseUser(user: AuthUiClient): Users {
+        var validUser: Users = Users()
+        val currentUser = rootRef.collection("users").document(user.getSignedInUser()?.username.toString())
+            currentUser.get().addOnSuccessListener { documentSnapshot ->
+                validUser = documentSnapshot.toObject<Users>()!!
+            }
+        return validUser
     }
 }

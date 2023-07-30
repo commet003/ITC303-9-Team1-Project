@@ -98,6 +98,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
+    private lateinit var userViewModel: UsersViewModel
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
@@ -137,6 +138,7 @@ class MainActivity : ComponentActivity() {
             val signInState by signInViewModel.state.collectAsState()
             // Retrieve's Leaderboard data onCreate
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
+            userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
 
@@ -355,6 +357,7 @@ class MainActivity : ComponentActivity() {
                                     val state by viewModel.state.collectAsState()
                                     if (isSignedIn.value){
                                         state.userId = googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                        // todo get signedin user into Users Repo
                                     }
                                     //val rewardState by rewardViewModel.collectAsState()
                                     val todoEvent = viewModel::onEvent
