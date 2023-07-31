@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 
 import android.annotation.SuppressLint
@@ -36,6 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.Priority
+import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.TodoState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

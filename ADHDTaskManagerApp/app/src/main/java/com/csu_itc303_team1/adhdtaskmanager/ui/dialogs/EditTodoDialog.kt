@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -6,6 +6,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.Priority
+import com.csu_itc303_team1.adhdtaskmanager.Todo
+import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.TodoState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -187,7 +191,14 @@ fun EditTodoDialog(
                         onDismissRequest = { onEvent(TodoEvent.hideEditDateSelector) },
                         confirmButton = {
                             Button(onClick = {
-                                onEvent(TodoEvent.setDueDate(dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""))
+                                onEvent(
+                                    TodoEvent.setDueDate(
+                                        dateFormatter.formatDate(
+                                            editDatePickerState.selectedDateMillis,
+                                            CalendarLocale.getDefault()
+                                        )?.dropLast(6) ?: ""
+                                    )
+                                )
                                 thisTodo?.dueDate = dateFormatter.formatDate(editDatePickerState.selectedDateMillis, CalendarLocale.getDefault())?.dropLast(6) ?: ""
                                 onEvent(TodoEvent.hideEditDateSelector)
                             }) {
@@ -232,7 +243,12 @@ fun EditTodoDialog(
                         onDismissRequest = { onEvent(TodoEvent.hideEditTimeSelector) },
                         confirmButton = {
                             Button(onClick = {
-                                onEvent(TodoEvent.setDueTime(editTimePickerState.hour.toFloat().toString() + ":" + editTimePickerState.minute))
+                                onEvent(
+                                    TodoEvent.setDueTime(
+                                        editTimePickerState.hour.toFloat()
+                                            .toString() + ":" + editTimePickerState.minute
+                                    )
+                                )
                                 thisTodo?.dueTime = editTimePickerState.hour.toFloat().toString() + ":" + editTimePickerState.minute.toFloat()
                                 onEvent(TodoEvent.hideEditTimeSelector)
                             }) {

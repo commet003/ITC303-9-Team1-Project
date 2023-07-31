@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager.utils.permissions
+package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
