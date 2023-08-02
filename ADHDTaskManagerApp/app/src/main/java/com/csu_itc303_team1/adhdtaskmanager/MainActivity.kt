@@ -270,7 +270,7 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                                         )
                                     }
-                                    if (googleAuthUiClient.getSignedInUser() != null) {
+                                    if (isSignedIn.value) {
                                         NavigationDrawerItem(
                                             colors = NavigationDrawerItemDefaults.colors(
                                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -431,7 +431,6 @@ class MainActivity : ComponentActivity() {
                                             LaunchedEffect(key1 = Unit) {
                                                 if(googleAuthUiClient.getSignedInUser() != null) {
                                                     navController.navigate("todo_screen")
-                                                    // Update top bar and drawer
                                                 }
                                             }
 
