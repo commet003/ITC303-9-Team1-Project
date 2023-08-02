@@ -18,7 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -35,7 +35,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
     var hours = remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
 
     Card(
@@ -130,14 +130,24 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
 
                 Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
-                if (todo.dueTime.slice(0.. 1).toInt() > 12 ){
-                    hours.value = todo.dueTime.slice(0.. 1).toInt() - 12
-                    Text(text = "${hours.value}:${todo.dueTime.slice(3.. 4)} PM", color = MaterialTheme.colorScheme.onPrimary)
-                } else if (todo.dueTime.slice(0.. 1).toInt() <= 12 ){
-                    Text(text = "${todo.dueTime} AM" , color = MaterialTheme.colorScheme.onPrimary)
+                if (todo.dueTime.isNotEmpty()) {
+                    if (todo.dueTime.slice(0..1).toInt() > 12) {
+                        hours.intValue = todo.dueTime.slice(0..1).toInt() - 12
+                        Text(
+                            text = "${hours.intValue}:${todo.dueTime.slice(3..4)} PM",
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
+                        Text(
+                            text = "${todo.dueTime} AM",
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(text = "")
+                    }
                 } else {
-                Text(text = "")
-            }
+                    Text(text = "")
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
