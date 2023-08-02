@@ -182,6 +182,14 @@ fun EditTodoDialog(
                 )
 
 
+                val amPMEdited = remember {
+                    mutableStateOf("")
+                }
+
+                val pmHoursEdited = remember {
+                    mutableStateOf(0)
+                }
+
 
                 if (state.showEditDateSelector) {
                     DatePickerDialog(
@@ -243,13 +251,17 @@ fun EditTodoDialog(
                         onDismissRequest = { onEvent(TodoEvent.hideEditTimeSelector) },
                         confirmButton = {
                             Button(onClick = {
-                                onEvent(
-                                    TodoEvent.setDueTime(
-                                        editTimePickerState.hour.toFloat()
-                                            .toString() + ":" + editTimePickerState.minute
+                               onEvent(
+                                        TodoEvent.setDueTime(
+                                            ("%02d".format(editTimePickerState.hour)
+                                                    + ":" + "%02d".format(editTimePickerState.minute))
+                                        )
                                     )
-                                )
-                                thisTodo?.dueTime = editTimePickerState.hour.toFloat().toString() + ":" + editTimePickerState.minute.toFloat()
+
+                                    thisTodo?.dueTime = ("%02d".format(editTimePickerState.hour)
+                                            + ":" + "%02d".format(editTimePickerState.minute))
+
+
                                 onEvent(TodoEvent.hideEditTimeSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -270,11 +282,29 @@ fun EditTodoDialog(
                         shape = MaterialTheme.shapes.large,
                         content = {
                             Column(
-                                modifier = Modifier.padding(8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 25.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 TimePicker(
+                                    colors = TimePickerDefaults.colors(
+                                        clockDialColor = MaterialTheme.colorScheme.background,
+                                        clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                        selectorColor = MaterialTheme.colorScheme.primary,
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        periodSelectorBorderColor = MaterialTheme.colorScheme.onPrimary,
+                                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground
+                                    ),
                                     state = editTimePickerState,
                                     layoutType = TimePickerLayoutType.Vertical,
                                 )
@@ -322,8 +352,16 @@ fun EditTodoDialog(
                         }) {
                             Text(text = "Time")
                         }
-                        Text(text = state.dueTime)
-
+                        if (editTimePickerState.hour > 12) {
+                            amPMEdited.value = "PM"
+                            pmHoursEdited.value = editTimePickerState.hour - 12
+                            Text(text = ("%02d".format(pmHoursEdited.value) + ":"+ "%02d".format(editTimePickerState.minute) + " ${amPMEdited.value}"))
+                        } else if (editTimePickerState.hour <= 12) {
+                            amPMEdited.value = "AM"
+                            Text(text = state.dueTime + " ${amPMEdited.value}")
+                        } else {
+                            Text(text = "")
+                        }
                     }
                 }
             }
@@ -331,7 +369,7 @@ fun EditTodoDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onEvent(TodoEvent.updateTodo)
+                    onEvent(TodoEvent.updateTodo(thisTodo!!))
                     onEvent(TodoEvent.toggleIsClicked(thisTodo!!))
                     onEvent(TodoEvent.resetState)
                 }

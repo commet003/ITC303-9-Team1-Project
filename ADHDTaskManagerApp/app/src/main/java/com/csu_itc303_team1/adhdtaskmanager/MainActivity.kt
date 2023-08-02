@@ -235,93 +235,107 @@ class MainActivity : ComponentActivity() {
                         ModalNavigationDrawer(
                             drawerState = drawerState,
                             drawerContent = {
-                                ModalDrawerSheet(
-                                    drawerContainerColor = MaterialTheme.colorScheme.background,
-                                    drawerTonalElevation = 2.dp
-                                ) {
-                                    Spacer(Modifier.height(18.dp))
-                                    screens.forEach { screen ->
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = screenIcons[screens.indexOf(screen)],
-                                                    contentDescription = screen.title,
-                                                )
-                                            },
-                                            label = {
-                                                Text(text = screen.title)
-                                            },
-                                            selected = screen.route == selectedItem.value.route,
-                                            onClick = {
-                                                selectedItem.value = screen
-                                                scope.launch {
-                                                    drawerState.close()
-                                                }
-                                                navController.navigate(screen.route)
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-                                    }
-                                    if (isSignedIn.value) {
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.ExitToApp,
-                                                    contentDescription = "Sign Out",
-                                                ) },
-                                            label = { Text(text = "Sign Out", color = MaterialTheme.colorScheme.primary) },
-                                            selected = false,
-                                            onClick = {
-                                                scope.launch {
-                                                    googleAuthUiClient.signOut()
-                                                    if (googleAuthUiClient.getSignedInUser() == null) {
-                                                        Toast
-                                                            .makeText(
-                                                                applicationContext,
-                                                                "Signed out",
-                                                                Toast.LENGTH_LONG
-                                                            )
-                                                            .show()
+                                if (isSignedIn.value) {
+                                    ModalDrawerSheet(
+                                        drawerContainerColor = MaterialTheme.colorScheme.background,
+                                        drawerTonalElevation = 2.dp
+                                    ) {
+                                        Spacer(Modifier.height(18.dp))
+                                        screens.forEach { screen ->
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = screenIcons[screens.indexOf(
+                                                            screen
+                                                        )],
+                                                        contentDescription = screen.title,
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(text = screen.title)
+                                                },
+                                                selected = screen.route == selectedItem.value.route,
+                                                onClick = {
+                                                    selectedItem.value = screen
+                                                    scope.launch {
+                                                        drawerState.close()
                                                     }
-                                                    navController.navigate(Screen.SignInScreen.route)
-                                                }
-
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-
-                                        if (googleAuthUiClient.isUserAnonymous()) {
-                                            Row(modifier = Modifier.fillMaxWidth()) {
-                                                Text(
-                                                    text = "You are signed in anonymously, if you sign out you will lose all of your data.",
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    color = Color(0xFFFC8B8B),
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    modifier = Modifier
-                                                        .padding(
-                                                            start = 10.dp,
-                                                            end = 10.dp,
-                                                            top = 10.dp
-                                                        )
-                                                        .height(30.dp)
+                                                    navController.navigate(screen.route)
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
                                                 )
+                                            )
+                                        }
+                                        if (isSignedIn.value) {
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.ExitToApp,
+                                                        contentDescription = "Sign Out",
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(
+                                                        text = "Sign Out",
+                                                        color = MaterialTheme.colorScheme.primary
+                                                    )
+                                                },
+                                                selected = false,
+                                                onClick = {
+                                                    scope.launch {
+                                                        googleAuthUiClient.signOut()
+                                                        if (googleAuthUiClient.getSignedInUser() == null) {
+                                                            Toast
+                                                                .makeText(
+                                                                    applicationContext,
+                                                                    "Signed out",
+                                                                    Toast.LENGTH_LONG
+                                                                )
+                                                                .show()
+                                                        }
+                                                        navController.navigate(Screen.SignInScreen.route)
+                                                    }
+
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
+                                                )
+                                            )
+
+                                            if (googleAuthUiClient.isUserAnonymous()) {
+                                                Row(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        text = "You are signed in anonymously, if you sign out you will lose all of your data.",
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Black,
+                                                        color = Color(0xFFFC8B8B),
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        modifier = Modifier
+                                                            .padding(
+                                                                start = 20.dp,
+                                                                end = 15.dp,
+                                                                top = 10.dp
+                                                            )
+                                                            .height(40.dp)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -492,9 +506,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         )
-
-
-
                     }
                 }
             }

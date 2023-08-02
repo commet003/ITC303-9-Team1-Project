@@ -3,9 +3,11 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -187,6 +189,14 @@ fun AddTodoDialog(
                     is24Hour = false
                 )
 
+                val amPM = remember {
+                    mutableStateOf("")
+                }
+
+                val pmHours = remember {
+                    mutableStateOf(0)
+                }
+
 
 
                 if (state.showDateSelector) {
@@ -223,41 +233,13 @@ fun AddTodoDialog(
                         }},
                         shape = MaterialTheme.shapes.large,
                         content = {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Top
+                            Box(
+                                contentAlignment = Alignment.Center,
                             ) {
                                 DatePicker(
-                                    modifier = Modifier.padding(top = 16.dp),
                                     state = datePickerState,
                                     showModeToggle = false,
-                                    title = null,
-                                    colors = DatePickerDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.surface,
-                                        titleContentColor = MaterialTheme.colorScheme.onSurface,
-                                        headlineContentColor = MaterialTheme.colorScheme.onSurface,
-                                        weekdayContentColor = MaterialTheme.colorScheme.onSurface,
-                                        subheadContentColor = MaterialTheme.colorScheme.onSurface,
-                                        navigationContentColor = MaterialTheme.colorScheme.onSurface,
-                                        yearContentColor = MaterialTheme.colorScheme.onSurface,
-                                        disabledYearContentColor = MaterialTheme.colorScheme.secondary,
-                                        currentYearContentColor = MaterialTheme.colorScheme.onSurface,
-                                        selectedYearContentColor = MaterialTheme.colorScheme.onPrimary,
-                                        disabledSelectedYearContentColor = MaterialTheme.colorScheme.secondary,
-                                        selectedYearContainerColor = MaterialTheme.colorScheme.primary,
-                                        disabledSelectedYearContainerColor = MaterialTheme.colorScheme.secondary,
-                                        dayContentColor = MaterialTheme.colorScheme.onSurface,
-                                        disabledDayContentColor = MaterialTheme.colorScheme.secondary,
-                                        selectedDayContentColor = MaterialTheme.colorScheme.surface,
-                                        disabledSelectedDayContentColor = MaterialTheme.colorScheme.secondary,
-                                        selectedDayContainerColor = MaterialTheme.colorScheme.onSurface,
-                                        disabledSelectedDayContainerColor = MaterialTheme.colorScheme.secondary,
-                                        todayContentColor = MaterialTheme.colorScheme.onSurface,
-                                        todayDateBorderColor = MaterialTheme.colorScheme.onSurface,
-                                        dayInSelectionRangeContentColor = MaterialTheme.colorScheme.secondary,
-                                        dayInSelectionRangeContainerColor = MaterialTheme.colorScheme.secondary,
-                                        dividerColor = MaterialTheme.colorScheme.onSurface,
-                                    ),
+                                    title = null
                                 )
                             }
                         },
@@ -268,8 +250,7 @@ fun AddTodoDialog(
                     // Time Picker Dialog
                     DatePickerDialog(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.CenterHorizontally),
+                            .fillMaxSize(),
                         onDismissRequest = { onEvent(TodoEvent.hideTimeSelector) },
                         confirmButton = {
                             Button(
@@ -278,7 +259,10 @@ fun AddTodoDialog(
                                     contentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 onClick = {
-                                onEvent(TodoEvent.setDueTime(timePickerState.hour.toString() + ":" + timePickerState.minute.toString()))
+                                    onEvent(TodoEvent.setDueTime(("%02d".format(timePickerState.hour)
+                                                + ":" + "%02d".format(timePickerState.minute))))
+
+
                                 onEvent(TodoEvent.hideTimeSelector)
                             }) {
                                 Text(text = "Confirm")
@@ -298,26 +282,28 @@ fun AddTodoDialog(
                         shape = MaterialTheme.shapes.large,
                         content = {
                             Column(
-                                modifier = Modifier.padding(8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 25.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 TimePicker(
                                     colors = TimePickerDefaults.colors(
-                                        clockDialColor = MaterialTheme.colorScheme.primary,
-                                        clockDialSelectedContentColor = MaterialTheme.colorScheme.primary,
-                                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                                        selectorColor = MaterialTheme.colorScheme.onPrimary,
-                                        containerColor = MaterialTheme.colorScheme.onPrimary,
+                                        clockDialColor = MaterialTheme.colorScheme.background,
+                                        clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                        selectorColor = MaterialTheme.colorScheme.primary,
+                                        containerColor = MaterialTheme.colorScheme.primary,
                                         periodSelectorBorderColor = MaterialTheme.colorScheme.onPrimary,
-                                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.primary,
-                                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
-                                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.primary,
-                                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
-                                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onPrimary
+                                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground
                                     ),
                                     state = timePickerState,
                                     layoutType = TimePickerLayoutType.Vertical
@@ -373,7 +359,16 @@ fun AddTodoDialog(
                             }) {
                             Text(text = "Time")
                         }
-                        Text(text = state.dueTime)
+                        if (timePickerState.hour > 12) {
+                            amPM.value = "PM"
+                            pmHours.value = timePickerState.hour - 12
+                            Text(text = ("%02d".format(pmHours.value) + ":"+ "%02d".format(timePickerState.minute) + " ${amPM.value}"))
+                        } else if (timePickerState.hour <= 12) {
+                            amPM.value = "AM"
+                            Text(text = state.dueTime + " ${amPM.value}")
+                        } else {
+                            Text(text = "")
+                        }
                     }
                 }
             }

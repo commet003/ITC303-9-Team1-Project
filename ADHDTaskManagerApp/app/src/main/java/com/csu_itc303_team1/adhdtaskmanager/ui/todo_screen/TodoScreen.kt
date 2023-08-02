@@ -93,9 +93,8 @@ fun TodoScreen(
             // If you only want the completed task to show, then you can set
             // sortType to SortType.BY_COMPLETED
             ExposedDropdownMenuBox(
-                modifier = Modifier
-                    .padding(end = 10.dp)
-                    .align(Alignment.End),
+                modifier = Modifier.align(Alignment.End)
+                    .padding(end = 10.dp),
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded}
             )
@@ -115,10 +114,8 @@ fun TodoScreen(
 
                 ExposedDropdownMenu(
                     modifier = Modifier
-                        .clip(MaterialTheme.shapes.medium)
                         .width(150.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.onPrimary)
-                        .background(MaterialTheme.colorScheme.primary),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     expanded = expanded,
                     onDismissRequest = { expanded = false }) {
                     SortType.values().forEach { sortType ->
@@ -132,27 +129,27 @@ fun TodoScreen(
                                 if (sortType.name == "BY_DATE") {
                                     Text(
                                         text = "By Date",
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_PRIORITY") {
                                     Text(
                                         text = "By Priority",
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_TIME") {
                                     Text(
                                         text = "By Time",
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_COMPLETED") {
                                     Text(
                                         text = "By Completed",
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_NOT_COMPLETED") {
                                     Text(
                                         text = "By Not Completed",
-                                        color = MaterialTheme.colorScheme.onPrimary
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }
                             }
