@@ -141,7 +141,7 @@ fun TextFieldEdittor () {
 
     val profileName = remember { mutableStateOf(TextFieldValue()) }
 
-    Row() {
+    Row {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)

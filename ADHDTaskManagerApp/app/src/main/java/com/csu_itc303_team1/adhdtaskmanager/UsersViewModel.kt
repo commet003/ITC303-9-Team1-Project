@@ -1,15 +1,17 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 
 class UsersViewModel(
-    private val repo: UsersRepo = UsersRepo(),
-    user: AuthUiClient
+    private val repo: UsersRepo = UsersRepo()
 ): ViewModel() {
 
-    var currentUser: Users = Users()
-    var userID: String = ""
+    private var currentUser by mutableStateOf(Users())
+    private var userID by mutableStateOf("")
 
     fun checkUserExists(id: String): Boolean {
         return repo.checkExists(id)
@@ -29,6 +31,10 @@ class UsersViewModel(
 
     fun addUserToFirebase(){
         repo.addToFirebaseDatabase(currentUser, userID)
+    }
+
+    fun getUserFromFirebase(user: AuthUiClient){
+        currentUser = repo.retrieveFirebaseUser(user)
     }
 
 }

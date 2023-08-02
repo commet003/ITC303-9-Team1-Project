@@ -272,7 +272,7 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                                         )
                                     }
-                                    if (googleAuthUiClient.getSignedInUser() != null) {
+                                    if (isSignedIn.value) {
                                         NavigationDrawerItem(
                                             colors = NavigationDrawerItemDefaults.colors(
                                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -449,6 +449,20 @@ class MainActivity : ComponentActivity() {
 
                                                     navController.navigate("todo_screen")
                                                     signInViewModel.resetState()
+                                                    val exist =
+                                                        googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                            userViewModel.checkUserExists(
+                                                                it1
+                                                            )
+                                                        }
+                                                    if (exist == true) {
+                                                        userViewModel.getUserFromFirebase(googleAuthUiClient)
+                                                    } else {
+                                                        userViewModel.convertToUserFromAuth(googleAuthUiClient)
+                                                        userViewModel.addUserToFirebase()
+
+                                                    }
+
                                                 }
                                             }
 
@@ -462,6 +476,7 @@ class MainActivity : ComponentActivity() {
                                                                 signInIntentSender ?: return@launch
                                                             ).build()
                                                         )
+
                                                     }
                                                 },
                                                 onAnonymousSignIn = {

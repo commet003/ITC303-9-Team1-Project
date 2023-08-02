@@ -67,11 +67,11 @@ class UsersRepo (
     }
 
     fun retrieveFirebaseUser(user: AuthUiClient): Users {
-        var validUser: Users = Users()
+        var validUser = Users()
         val currentUser = rootRef.collection("users").document(user.getSignedInUser()?.username.toString())
-            currentUser.get().addOnSuccessListener { documentSnapshot ->
-                validUser = documentSnapshot.toObject<Users>()!!
-            }
+        currentUser.get().addOnSuccessListener { documentSnapshot ->
+            validUser = documentSnapshot.toObject<Users>()!!
+        }
         return validUser
     }
 }
