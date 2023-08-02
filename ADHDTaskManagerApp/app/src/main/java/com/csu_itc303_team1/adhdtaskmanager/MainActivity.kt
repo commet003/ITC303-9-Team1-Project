@@ -353,15 +353,11 @@ class MainActivity : ComponentActivity() {
                                     )
 
                                     if (!notificationPermission.hasPermission && isSignedIn.value) {
-                                        // Show the dialog after 20 seconds
+                                        // Show the dialog after 10 seconds
                                         LaunchedEffect(true) {
-                                            delay(20000)
+                                            delay(10000)
                                             notificationPermission.launchPermissionRequest()
                                         }
-                                        /*PermissionDialog(
-                                            onEvent = viewModel::onEvent,
-                                            notificationPermission = notificationPermission
-                                        )*/
                                     }
 
                                     // The content itself is the navController's current state, or Home Screen

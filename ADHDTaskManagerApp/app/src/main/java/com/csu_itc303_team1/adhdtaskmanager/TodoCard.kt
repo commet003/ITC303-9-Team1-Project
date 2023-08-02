@@ -133,9 +133,11 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                 if (todo.dueTime.slice(0.. 1).toInt() > 12 ){
                     hours.value = todo.dueTime.slice(0.. 1).toInt() - 12
                     Text(text = "${hours.value}:${todo.dueTime.slice(3.. 4)} PM", color = MaterialTheme.colorScheme.onPrimary)
+                } else if (todo.dueTime.slice(0.. 1).toInt() <= 12 ){
+                    Text(text = "${todo.dueTime} AM" , color = MaterialTheme.colorScheme.onPrimary)
                 } else {
-                    Text(text = todo.dueTime, color = MaterialTheme.colorScheme.onPrimary)
-                }
+                Text(text = "")
+            }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {
