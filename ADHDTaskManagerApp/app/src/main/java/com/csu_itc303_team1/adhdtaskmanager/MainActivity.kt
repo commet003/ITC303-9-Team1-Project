@@ -3,8 +3,10 @@ package com.csu_itc303_team1.adhdtaskmanager
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -63,11 +65,10 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.getPermissions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -76,7 +77,7 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    val passPhrase = "passPhrase"
+    private val passPhrase = "passPhrase"
     val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
     val db by lazy {
         Room.databaseBuilder(
@@ -143,6 +144,7 @@ class MainActivity : ComponentActivity() {
 
             ADHDTaskManagerTheme {
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
+                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -187,7 +189,22 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { /* doSomething() */ }) {
+                                    IconButton(onClick = {
+                                        if (notificationManager.isNotificationPolicyAccessGranted){
+                                            if (notificationManager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_ALL) {
+                                                notificationManager.setInterruptionFilter(
+                                                    NotificationManager.INTERRUPTION_FILTER_NONE
+                                                )
+                                            } else if (notificationManager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_NONE) {
+                                                notificationManager.setInterruptionFilter(
+                                                    NotificationManager.INTERRUPTION_FILTER_ALL
+                                                )
+                                            }
+                                        }else {
+                                            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                                            startActivity(intent)
+                                        }
+                                    }) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Person,
@@ -235,266 +252,273 @@ class MainActivity : ComponentActivity() {
                         ModalNavigationDrawer(
                             drawerState = drawerState,
                             drawerContent = {
-                                ModalDrawerSheet(
-                                    drawerContainerColor = MaterialTheme.colorScheme.background,
-                                    drawerTonalElevation = 2.dp
-                                ) {
-                                    Spacer(Modifier.height(18.dp))
-                                    screens.forEach { screen ->
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = screenIcons[screens.indexOf(screen)],
-                                                    contentDescription = screen.title,
-                                                )
-                                            },
-                                            label = {
-                                                Text(text = screen.title)
-                                            },
-                                            selected = screen.route == selectedItem.value.route,
-                                            onClick = {
-                                                selectedItem.value = screen
-                                                scope.launch {
-                                                    drawerState.close()
-                                                }
-                                                navController.navigate(screen.route)
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-                                    }
-                                    if (isSignedIn.value) {
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.ExitToApp,
-                                                    contentDescription = "Sign Out",
-                                                ) },
-                                            label = { Text(text = "Sign Out", color = MaterialTheme.colorScheme.primary) },
-                                            selected = false,
-                                            onClick = {
-                                                scope.launch {
-                                                    googleAuthUiClient.signOut()
-                                                    if (googleAuthUiClient.getSignedInUser() == null) {
-                                                        Toast
-                                                            .makeText(
-                                                                applicationContext,
-                                                                "Signed out",
-                                                                Toast.LENGTH_LONG
-                                                            )
-                                                            .show()
-                                                    }
-                                                    navController.navigate(Screen.SignInScreen.route)
-                                                }
-
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-
-                                        if (googleAuthUiClient.isUserAnonymous()) {
-                                            Row(modifier = Modifier.fillMaxWidth()) {
-                                                Text(
-                                                    text = "You are signed in anonymously, if you sign out you will lose all of your data.",
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    color = Color(0xFFFC8B8B),
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    modifier = Modifier
-                                                        .padding(
-                                                            start = 10.dp,
-                                                            end = 10.dp,
-                                                            top = 10.dp
-                                                        )
-                                                        .height(30.dp)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            content = {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    horizontalAlignment = Alignment.Start,
-                                    verticalArrangement = Arrangement.Top
-                                ) {
-                                    val notificationPermission = rememberPermissionState(
-                                        android.Manifest.permission.POST_NOTIFICATIONS
-                                    )
-
-                                    if (!notificationPermission.hasPermission && isSignedIn.value) {
-                                        // Show the dialog after 20 seconds
-                                        LaunchedEffect(true) {
-                                            delay(20000)
-                                            notificationPermission.launchPermissionRequest()
-                                        }
-                                        /*PermissionDialog(
-                                            onEvent = viewModel::onEvent,
-                                            notificationPermission = notificationPermission
-                                        )*/
-                                    }
-
-                                    // The content itself is the navController's current state, or Home Screen
-                                    // on Default
-                                    val state by viewModel.state.collectAsState()
-                                    if (isSignedIn.value){
-                                        state.userId = googleAuthUiClient.getSignedInUser()?.userId ?: ""
-                                    }
-                                    //val rewardState by rewardViewModel.collectAsState()
-                                    val todoEvent = viewModel::onEvent
-
-
-                                    val launcher = rememberLauncherForActivityResult(
-                                        contract = ActivityResultContracts.StartIntentSenderForResult(),
-                                        onResult = { result ->
-                                            if(result.resultCode == RESULT_OK) {
-                                                lifecycleScope.launch {
-                                                    val signInResult = googleAuthUiClient.signInWithIntent(
-                                                        intent = result.data ?: return@launch
+                                if (isSignedIn.value) {
+                                    ModalDrawerSheet(
+                                        drawerContainerColor = MaterialTheme.colorScheme.background,
+                                        drawerTonalElevation = 2.dp
+                                    ) {
+                                        Spacer(Modifier.height(18.dp))
+                                        screens.forEach { screen ->
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = screenIcons[screens.indexOf(
+                                                            screen
+                                                        )],
+                                                        contentDescription = screen.title,
                                                     )
-                                                    signInViewModel.onSignInResult(signInResult)
-                                                }
-                                            }
-                                        }
-                                    )
-
-                                    // NavHost for controlling the pages.
-                                    NavHost(
-                                        navController = navController,
-                                        startDestination = if (isSignedIn.value) Screen.TodoScreen.route else Screen.SignInScreen.route,
-                                    ){
-                                        // Home screen/to-do screen
-                                        composable(
-                                            route = Screen.TodoScreen.route
-                                        ) {
-                                            TodoScreen(
-                                                state = state,
-                                                onEvent = todoEvent,
-                                                rewardViewModel = rewardViewModel
-                                            )
-                                        }
-
-                                        // Settings Screen
-                                        composable(
-                                            route = Screen.SettingsScreen.route
-                                        ) {
-                                            SettingsScreen(
-                                                googleAuthUiClient,
-                                                context = applicationContext,
-                                                scope
-                                            )
-                                        }
-
-                                        // Leaderboard Screen
-                                        composable(
-                                            route = Screen.LeaderboardScreen.route
-                                        ) {
-                                            LeaderboardScreen()
-                                        }
-
-                                        // Rewards Screen
-                                        composable(
-                                            route = Screen.RewardsScreen.route
-                                        ) {
-                                            RewardsScreen(rewardViewModel)
-                                        }
-
-                                        // Completed Task Screen
-                                        composable(
-                                            route = Screen.CompletedScreen.route
-                                        ) {
-                                            CompletedScreen(state, todoEvent)
-                                        }
-
-                                        // Sign In Screen
-                                        composable(
-                                            route = Screen.SignInScreen.route
-                                        ) {
-
-
-                                            LaunchedEffect(key1 = Unit) {
-                                                if(googleAuthUiClient.getSignedInUser() != null) {
-                                                    navController.navigate("todo_screen")
-                                                }
-                                            }
-
-
-                                            LaunchedEffect(key1 = signInState.isSignInSuccessful) {
-                                                if(signInState.isSignInSuccessful) {
-                                                    Toast.makeText(
-                                                        applicationContext,
-                                                        "Sign in successful",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-
-                                                    navController.navigate("todo_screen")
-                                                    signInViewModel.resetState()
-                                                }
-                                            }
-
-                                            SignInScreen(
-                                                state = signInState,
-                                                onSignInClick = {
-                                                    lifecycleScope.launch {
-                                                        val signInIntentSender = googleAuthUiClient.signIn()
-                                                        launcher.launch(
-                                                            IntentSenderRequest.Builder(
-                                                                signInIntentSender ?: return@launch
-                                                            ).build()
-                                                        )
-                                                    }
                                                 },
-                                                onAnonymousSignIn = {
-                                                    lifecycleScope.launch {
-                                                        googleAuthUiClient.signInAnonymously()
-                                                        Toast.makeText(
-                                                            applicationContext,
-                                                            "Signed in anonymously",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-
-                                                        signInViewModel.userIsAnonymous()
-
-                                                        navController.navigate("todo_screen")
+                                                label = {
+                                                    Text(text = screen.title)
+                                                },
+                                                selected = screen.route == selectedItem.value.route,
+                                                onClick = {
+                                                    selectedItem.value = screen
+                                                    scope.launch {
+                                                        drawerState.close()
                                                     }
-                                                }
+                                                    navController.navigate(screen.route)
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
+                                                )
                                             )
                                         }
+                                        if (isSignedIn.value) {
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.ExitToApp,
+                                                        contentDescription = "Sign Out",
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(
+                                                        text = "Sign Out",
+                                                        color = MaterialTheme.colorScheme.primary
+                                                    )
+                                                },
+                                                selected = false,
+                                                onClick = {
+                                                    scope.launch {
+                                                        googleAuthUiClient.signOut()
+                                                        if (googleAuthUiClient.getSignedInUser() == null) {
+                                                            Toast
+                                                                .makeText(
+                                                                    applicationContext,
+                                                                    "Signed out",
+                                                                    Toast.LENGTH_LONG
+                                                                )
+                                                                .show()
+                                                        }
+                                                        navController.navigate(Screen.SignInScreen.route)
+                                                    }
 
-                                        composable(
-                                            route = Screen.HelpScreen.route
-                                        ) {
-                                            HelpScreen()
-                                        }
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
+                                                )
+                                            )
 
-                                        composable(
-                                            route = Screen.CompletedScreen.route
-                                        ){
-                                            CompletedScreen(state, todoEvent)
+                                            if (googleAuthUiClient.isUserAnonymous()) {
+                                                Row(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        text = "You are signed in anonymously, if you sign out you will lose all of your data.",
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Black,
+                                                        color = Color(0xFFFC8B8B),
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        modifier = Modifier
+                                                            .padding(
+                                                                start = 20.dp,
+                                                                end = 15.dp,
+                                                                top = 10.dp
+                                                            )
+                                                            .height(40.dp)
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
-                        )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.Start,
+                                verticalArrangement = Arrangement.Top
+                            ) {
 
 
+                                if (isSignedIn.value) {
+                                    // Show the dialog after 10 seconds
+                                    LaunchedEffect(true) {
+                                        getPermissions(applicationContext)
+                                    }
+                                }
 
+
+                                // The content itself is the navController's current state, or Home Screen
+                                // on Default
+                                val state by viewModel.state.collectAsState()
+                                if (isSignedIn.value) {
+                                    state.userId =
+                                        googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                }
+                                //val rewardState by rewardViewModel.collectAsState()
+                                val todoEvent = viewModel::onEvent
+
+
+                                val launcher = rememberLauncherForActivityResult(
+                                    contract = ActivityResultContracts.StartIntentSenderForResult(),
+                                    onResult = { result ->
+                                        if (result.resultCode == RESULT_OK) {
+                                            lifecycleScope.launch {
+                                                val signInResult =
+                                                    googleAuthUiClient.signInWithIntent(
+                                                        intent = result.data ?: return@launch
+                                                    )
+                                                signInViewModel.onSignInResult(signInResult)
+                                            }
+                                        }
+                                    }
+                                )
+
+                                // NavHost for controlling the pages.
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = if (isSignedIn.value) Screen.TodoScreen.route else Screen.SignInScreen.route,
+                                ) {
+                                    // Home screen/to-do screen
+                                    composable(
+                                        route = Screen.TodoScreen.route
+                                    ) {
+                                        TodoScreen(
+                                            state = state,
+                                            onEvent = todoEvent,
+                                            rewardViewModel = rewardViewModel
+                                        )
+                                    }
+
+                                    // Settings Screen
+                                    composable(
+                                        route = Screen.SettingsScreen.route
+                                    ) {
+                                        SettingsScreen(
+                                            googleAuthUiClient,
+                                            context = applicationContext,
+                                            scope
+                                        )
+                                    }
+
+                                    // Leaderboard Screen
+                                    composable(
+                                        route = Screen.LeaderboardScreen.route
+                                    ) {
+                                        LeaderboardScreen()
+                                    }
+
+                                    // Rewards Screen
+                                    composable(
+                                        route = Screen.RewardsScreen.route
+                                    ) {
+                                        RewardsScreen(rewardViewModel)
+                                    }
+
+                                    // Completed Task Screen
+                                    composable(
+                                        route = Screen.CompletedScreen.route
+                                    ) {
+                                        CompletedScreen(state, todoEvent)
+                                    }
+
+                                    // Sign In Screen
+                                    composable(
+                                        route = Screen.SignInScreen.route
+                                    ) {
+
+
+                                        LaunchedEffect(key1 = Unit) {
+                                            if (googleAuthUiClient.getSignedInUser() != null) {
+                                                navController.navigate("todo_screen")
+                                            }
+                                        }
+
+
+                                        LaunchedEffect(key1 = signInState.isSignInSuccessful) {
+                                            if (signInState.isSignInSuccessful) {
+                                                Toast.makeText(
+                                                    applicationContext,
+                                                    "Sign in successful",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+
+                                                navController.navigate("todo_screen")
+                                                signInViewModel.resetState()
+                                            }
+                                        }
+
+                                        SignInScreen(
+                                            state = signInState,
+                                            onSignInClick = {
+                                                lifecycleScope.launch {
+                                                    val signInIntentSender =
+                                                        googleAuthUiClient.signIn()
+                                                    launcher.launch(
+                                                        IntentSenderRequest.Builder(
+                                                            signInIntentSender ?: return@launch
+                                                        ).build()
+                                                    )
+                                                }
+                                            },
+                                            onAnonymousSignIn = {
+                                                lifecycleScope.launch {
+                                                    googleAuthUiClient.signInAnonymously()
+                                                    Toast.makeText(
+                                                        applicationContext,
+                                                        "Signed in anonymously",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+
+                                                    signInViewModel.userIsAnonymous()
+
+                                                    navController.navigate("todo_screen")
+                                                }
+                                            }
+                                        )
+                                    }
+
+                                    composable(
+                                        route = Screen.HelpScreen.route
+                                    ) {
+                                        HelpScreen()
+                                    }
+
+                                    composable(
+                                        route = Screen.CompletedScreen.route
+                                    ) {
+                                        CompletedScreen(state, todoEvent)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -503,7 +527,7 @@ class MainActivity : ComponentActivity() {
     }
 
     //Shows the notification
-    // TODO - Make this show the notification when a task is due
+// TODO - Make this show the notification when a task is due
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun showNotification() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

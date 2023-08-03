@@ -18,6 +18,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
@@ -32,14 +34,9 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
     rewardViewModel.allRewards.observeAsState(listOf())
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
-    // show the edit todo dialog if showEditTodoDialog is true
-    /*if (todoState.showEditTodoDialog){
-        EditTodoDialog(
-            todoState,
-            onEvent
-        )
-    }*/
-
+    var hours = remember {
+        mutableIntStateOf(0)
+    }
 
     Card(
         modifier = Modifier
@@ -130,9 +127,27 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
             ) {
                 Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
+
                 Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueTime, color = MaterialTheme.colorScheme.onPrimary)
+                if (todo.dueTime.isNotEmpty()) {
+                    if (todo.dueTime.slice(0..1).toInt() > 12) {
+                        hours.intValue = todo.dueTime.slice(0..1).toInt() - 12
+                        Text(
+                            text = "${hours.intValue}:${todo.dueTime.slice(3..4)} PM",
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
+                        Text(
+                            text = "${todo.dueTime} AM",
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(text = "")
+                    }
+                } else {
+                    Text(text = "")
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
                     onClick = {

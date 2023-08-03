@@ -43,41 +43,16 @@ class TodoViewModel(
         when (event) {
             // Update Todo
             is TodoEvent.updateTodo -> {
-                val title = state.value.title
-                val description = state.value.description
-                val priority = state.value.priority
-                val dueDate = state.value.dueDate
-                val dueTime = state.value.dueTime
-                val userId = state.value.userId
-                val id = state.value.id
-
-                if (title.isBlank() || description.isBlank()) {
-                    return
-                }
-
-                val todo = Todo(
-                    id = id,
-                    title = title,
-                    description = description,
-                    priority = priority,
-                    dueDate = dueDate,
-                    dueTime = dueTime,
-                    userID = userId
-                )
-
                 viewModelScope.launch {
-                    todoDao.updateTodo(todo)
-                }
-
-                _state.update {
-                    it.copy(
-                        title = "",
-                        description = "",
-                        priority = Priority.LOW,
-                        dueDate = "",
-                        dueTime = "",
-                        showDialog = false,
-                        showEditTodoDialog = false
+                    todoDao.updateTodo(
+                        event.todo.copy(
+                            title = state.value.title,
+                            description = state.value.description,
+                            priority = state.value.priority,
+                            dueDate = state.value.dueDate,
+                            dueTime = state.value.dueTime,
+                            userID = state.value.userId
+                        )
                     )
                 }
             }
