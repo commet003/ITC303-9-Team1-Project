@@ -19,7 +19,9 @@ fun CompletedScreen(state: TodoState, event: (TodoEvent) -> Unit) {
     ) {
         items(state.todos, {it.id}) { todo ->
             println(todo.title)
-            CompletedTaskCard(todo)
+            if (todo.userID == state.userId){
+                CompletedTaskCard(todo)
+            }
         }
     }
 }

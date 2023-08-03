@@ -2,7 +2,6 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -93,7 +92,8 @@ fun TodoScreen(
             // If you only want the completed task to show, then you can set
             // sortType to SortType.BY_COMPLETED
             ExposedDropdownMenuBox(
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
                     .padding(end = 10.dp),
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded}
