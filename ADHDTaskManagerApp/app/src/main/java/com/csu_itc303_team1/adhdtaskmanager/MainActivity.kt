@@ -3,10 +3,8 @@ package com.csu_itc303_team1.adhdtaskmanager
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -65,10 +63,13 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.getPermissions
+import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -113,7 +114,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
+        InternalCoroutinesApi::class
+    )
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,7 +147,6 @@ class MainActivity : ComponentActivity() {
 
             ADHDTaskManagerTheme {
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
-                val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -190,20 +192,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 actions = {
                                     IconButton(onClick = {
-                                        if (notificationManager.isNotificationPolicyAccessGranted){
-                                            if (notificationManager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_ALL) {
-                                                notificationManager.setInterruptionFilter(
-                                                    NotificationManager.INTERRUPTION_FILTER_NONE
-                                                )
-                                            } else if (notificationManager.currentInterruptionFilter == NotificationManager.INTERRUPTION_FILTER_NONE) {
-                                                notificationManager.setInterruptionFilter(
-                                                    NotificationManager.INTERRUPTION_FILTER_ALL
-                                                )
-                                            }
-                                        }else {
-                                            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-                                            startActivity(intent)
-                                        }
+                                        toggleDoNotDisturb(applicationContext, this@MainActivity)
                                     }) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
@@ -366,11 +355,17 @@ class MainActivity : ComponentActivity() {
                                 verticalArrangement = Arrangement.Top
                             ) {
 
+                                val postNotificationPermission = rememberPermissionState(
+                                    android.Manifest.permission.POST_NOTIFICATIONS
+                                    )
 
-                                if (isSignedIn.value) {
+                                if (postNotificationPermission.hasPermission && isSignedIn.value) {
                                     // Show the dialog after 10 seconds
                                     LaunchedEffect(true) {
-                                        getPermissions(applicationContext)
+                                        delay(10000)
+                                        if (!postNotificationPermission.hasPermission) {
+                                            postNotificationPermission.launchPermissionRequest()
+                                        }
                                     }
                                 }
 
