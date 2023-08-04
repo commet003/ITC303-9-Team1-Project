@@ -5,6 +5,9 @@ import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -123,13 +126,14 @@ fun PomodoroTimerScreen(
         }
     }
 
+    Row {
+        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold)
+    }
+
     Box(
         modifier = modifier.onSizeChanged { size = it },
         contentAlignment = Alignment.Center
     ){
-        Row {
-            Text(text = "Pomodoro Timer", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        }
         Canvas(modifier = modifier) {
             drawArc(
                 color = inactiveBarColor,
@@ -183,7 +187,8 @@ fun PomodoroTimerScreen(
                 } else isTimerRunning = !isTimerRunning
             },
             modifier = Modifier
-                .align(Alignment.BottomCenter),
+                .align(Alignment.BottomEnd)
+                .padding(top = 120.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.primary
@@ -201,11 +206,33 @@ fun PomodoroTimerScreen(
                 text = if (!isTimerRunning && currentTime <= 0L){
                     "Start"
                 } else if (isTimerRunning && currentTime >= 0L) {
-                    "Stop"
+                    "Pause"
                 } else {
-                    "Restart"
+                    "Resume"
                 }
             )
         }
+        Button(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(top = 120.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Red,
+                contentColor = Color.White
+            ),
+            onClick = {
+            isTimerRunning = false
+            currentTime = workTime
+            isWorkTime = true
+            isBreakTime = false
+            timerRoundsCount = 4
+                seconds = 0
+                if (!isDoNotDisturbEnabled(context)){
+                    toggleDoNotDisturb(context, activity)
+                }
+        }) {
+            Text(text = "Stop")
+        }
     }
+    Spacer(modifier = Modifier.height(16.dp))
 }

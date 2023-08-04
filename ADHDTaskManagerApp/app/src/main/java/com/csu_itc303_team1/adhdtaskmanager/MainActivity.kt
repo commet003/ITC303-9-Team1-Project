@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -525,11 +524,12 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.PomodoroTimerScreen.route
                                     ) {
-                                        Box(
+                                        Column(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .background(MaterialTheme.colorScheme.background),
-                                            contentAlignment = Alignment.Center
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.SpaceAround
                                         ){
                                             PomodoroTimerScreen(
                                                 workTime = 1500L * 1000L,
