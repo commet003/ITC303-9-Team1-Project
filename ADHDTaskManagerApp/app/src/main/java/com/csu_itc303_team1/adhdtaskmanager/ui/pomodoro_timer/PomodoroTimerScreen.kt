@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
 
+
 @Composable
 fun PomodoroTimerScreen(
     workTime: Long,
@@ -57,20 +59,21 @@ fun PomodoroTimerScreen(
         mutableFloatStateOf(initialValue)
     }
     var currentTime by remember {
-        mutableLongStateOf(workTime)
+        mutableLongStateOf(0L)
     }
-    var workTimerTimes by remember {
-        mutableIntStateOf(0)
+
+    var timerRoundsCount by remember {
+        mutableIntStateOf(4)
     }
 
     var isTimerRunning by remember {
         mutableStateOf(false)
     }
     var isWorkTime by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
     var isBreakTime by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     var seconds by remember {
@@ -81,22 +84,41 @@ fun PomodoroTimerScreen(
         if (currentTime > 0 && isTimerRunning) {
             delay(1000)
             currentTime -= 1000
-            progress = currentTime.toFloat() / workTime.toFloat()
+            if (isWorkTime){
+                progress = currentTime.toFloat() / workTime.toFloat()
+            } else if (isBreakTime){
+                progress = currentTime.toFloat() / breakTime.toFloat()
+            }
             if (seconds == 0){
                 seconds = 59
             }
             else{
                 seconds -= 1
             }
-        } else if (currentTime == 0L){
-            isTimerRunning = false
+        } else if (currentTime == 0L && isTimerRunning) {
+            if (isWorkTime) {
+                timerRoundsCount -= 1
+                isWorkTime = false
+                isBreakTime = true
+                currentTime = breakTime
+            } else if (isBreakTime) {
+                isWorkTime = true
+                isBreakTime = false
+                currentTime = workTime
+            } else if (timerRoundsCount == 0) {
+                isTimerRunning = false
+                timerRoundsCount = 4
+                currentTime = workTime
+                isWorkTime = true
+                isBreakTime = false
+            }
         }
     }
 
-    LaunchedEffect(key1 = isTimerRunning){
-        if (isTimerRunning && isDoNotDisturbEnabled(context)) {
+    LaunchedEffect(key1 = isTimerRunning, key2 = isBreakTime){
+        if (isTimerRunning && isDoNotDisturbEnabled(context) && !isBreakTime) {
             toggleDoNotDisturb(context, activity)
-        } else if (!isTimerRunning && !isDoNotDisturbEnabled(context)) {
+        } else if (!isTimerRunning && !isDoNotDisturbEnabled(context) && isBreakTime) {
             toggleDoNotDisturb(context, activity)
         }
     }
@@ -105,6 +127,9 @@ fun PomodoroTimerScreen(
         modifier = modifier.onSizeChanged { size = it },
         contentAlignment = Alignment.Center
     ){
+        Row {
+            Text(text = "Pomodoro Timer", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        }
         Canvas(modifier = modifier) {
             drawArc(
                 color = inactiveBarColor,
@@ -140,7 +165,7 @@ fun PomodoroTimerScreen(
             )
         }
         Text(
-            text = ((currentTime / 1000L) / 60).toString() + ":" + "%02d".format(seconds),
+            text = "%02d".format((currentTime / 1000L) / 60) + ":" + "%02d".format(seconds),
             fontSize = 44.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
@@ -153,8 +178,6 @@ fun PomodoroTimerScreen(
                     } else {
                         breakTime
                     }
-                    isWorkTime = !isWorkTime
-                    isBreakTime = !isBreakTime
                     isTimerRunning = true
 
                 } else isTimerRunning = !isTimerRunning
