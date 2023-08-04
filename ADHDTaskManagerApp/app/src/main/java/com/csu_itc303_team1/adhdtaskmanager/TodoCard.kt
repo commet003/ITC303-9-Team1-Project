@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 
 
 @SuppressLint("RememberReturnType")

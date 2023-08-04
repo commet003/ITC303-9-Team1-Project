@@ -1,4 +1,8 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.utils.states
+
+import com.csu_itc303_team1.adhdtaskmanager.Priority
+import com.csu_itc303_team1.adhdtaskmanager.SortType
+import com.csu_itc303_team1.adhdtaskmanager.Todo
 
 data class TodoState(
     var todos: List<Todo> = emptyList(),

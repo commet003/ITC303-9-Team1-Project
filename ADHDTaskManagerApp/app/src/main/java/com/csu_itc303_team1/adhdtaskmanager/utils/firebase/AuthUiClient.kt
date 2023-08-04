@@ -3,7 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import com.csu_itc303_team1.adhdtaskmanager.R
+import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
@@ -102,7 +102,7 @@ class AuthUiClient(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(context.getString(R.string.web_client_id))
+                    .setServerClientId(BuildConfig.WEB_CLIENT_ID)
                     .build()
             )
             .build()

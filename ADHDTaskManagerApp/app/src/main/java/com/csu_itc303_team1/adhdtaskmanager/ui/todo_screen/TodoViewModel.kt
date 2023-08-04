@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.Priority
 import com.csu_itc303_team1.adhdtaskmanager.SortType
 import com.csu_itc303_team1.adhdtaskmanager.Todo
-import com.csu_itc303_team1.adhdtaskmanager.TodoDao
+import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

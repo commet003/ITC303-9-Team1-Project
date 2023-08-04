@@ -27,3 +27,9 @@ fun toggleDoNotDisturb(
         }
     }
 }
+
+// check if do not disturb is enabled
+fun isDoNotDisturbEnabled(context: Context): Boolean {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    return notificationManager.currentInterruptionFilter != NotificationManager.INTERRUPTION_FILTER_NONE
+}

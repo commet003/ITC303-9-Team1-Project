@@ -26,6 +26,7 @@ android {
 
     defaultConfig {
         buildConfigField("String", "TODO_DATABASE_PASSPHRASE", apikeyProperties['TODO_DATABASE_PASSPHRASE'])
+        buildConfigField("String", "WEB_CLIENT_ID", apikeyProperties['WEB_CLIENT_ID'])
 
         applicationId "com.csu_itc303_team1.adhdtaskmanager"
         minSdk 28

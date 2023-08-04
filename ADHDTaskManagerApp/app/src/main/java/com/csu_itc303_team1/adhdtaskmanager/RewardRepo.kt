@@ -3,12 +3,9 @@ package com.csu_itc303_team1.adhdtaskmanager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
-import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
+import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.RewardDao
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RewardRepo(private val rewardDao: RewardDao) {

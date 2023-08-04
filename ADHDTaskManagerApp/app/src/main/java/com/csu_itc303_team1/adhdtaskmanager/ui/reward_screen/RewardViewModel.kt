@@ -1,29 +1,14 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen
 
 import android.app.Application
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.csu_itc303_team1.adhdtaskmanager.RewardRepo
 import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
-import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDao
-import com.csu_itc303_team1.adhdtaskmanager.database.local.RewardDatabase
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 class RewardViewModel(application: Application): ViewModel() {

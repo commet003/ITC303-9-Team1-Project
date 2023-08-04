@@ -14,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DisplayMode
@@ -40,7 +39,7 @@ import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.Priority
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

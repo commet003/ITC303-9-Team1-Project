@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.Priority
 import com.csu_itc303_team1.adhdtaskmanager.Todo
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

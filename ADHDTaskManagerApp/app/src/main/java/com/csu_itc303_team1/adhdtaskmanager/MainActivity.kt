@@ -13,7 +13,9 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.ExitToApp
@@ -29,6 +32,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -57,12 +61,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -78,8 +86,7 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    private val passPhrase = BuildConfig.TODO_DATABASE_PASSPHRASE
-    private val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
+    private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -223,7 +230,8 @@ class MainActivity : ComponentActivity() {
                             Icons.Default.Star,
                             Icons.Default.List,
                             Icons.Default.Settings,
-                            Icons.Default.Info
+                            Icons.Default.Info,
+                            Icons.Filled.PlayArrow
                         )
 
                         // Create a list of Screen objects
@@ -233,7 +241,8 @@ class MainActivity : ComponentActivity() {
                             Screen.RewardsScreen,
                             Screen.LeaderboardScreen,
                             Screen.SettingsScreen,
-                            Screen.HelpScreen
+                            Screen.HelpScreen,
+                            Screen.PomodoroTimerScreen
                         )
 
                         val selectedItem = remember { mutableStateOf(screens[0]) }
@@ -354,6 +363,7 @@ class MainActivity : ComponentActivity() {
                                 horizontalAlignment = Alignment.Start,
                                 verticalArrangement = Arrangement.Top
                             ) {
+
 
                                 val postNotificationPermission = rememberPermissionState(
                                     android.Manifest.permission.POST_NOTIFICATIONS
@@ -510,6 +520,28 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.CompletedScreen.route
                                     ) {
                                         CompletedScreen(state, todoEvent)
+                                    }
+
+                                    composable(
+                                        route = Screen.PomodoroTimerScreen.route
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(MaterialTheme.colorScheme.background),
+                                            contentAlignment = Alignment.Center
+                                        ){
+                                            PomodoroTimerScreen(
+                                                workTime = 1500L * 1000L,
+                                                breakTime = 300L * 1000L,
+                                                handleColor = MaterialTheme.colorScheme.primary,
+                                                inactiveBarColor = MaterialTheme.colorScheme.onPrimary,
+                                                activeBarColor = MaterialTheme.colorScheme.primary,
+                                                context = applicationContext,
+                                                activity = this@MainActivity,
+                                                modifier = Modifier.size(300.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
