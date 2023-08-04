@@ -78,14 +78,14 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    private val passPhrase = "passPhrase"
-    val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
-    val db by lazy {
+    private val passPhrase = BuildConfig.TODO_DATABASE_PASSPHRASE
+    private val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
+    private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
+        ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
     private val rewardViewModel by viewModels<RewardViewModel>(
