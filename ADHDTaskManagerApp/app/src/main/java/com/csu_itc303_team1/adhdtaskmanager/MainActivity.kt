@@ -540,7 +540,7 @@ class MainActivity : ComponentActivity() {
                                                 initialWorkTime = 1500L * 1000L,
                                                 initialBreakTime = 300L * 1000L,
                                                 handleColor = MaterialTheme.colorScheme.primary,
-                                                inactiveBarColor = MaterialTheme.colorScheme.onPrimary,
+                                                inactiveBarColor = MaterialTheme.colorScheme.surface,
                                                 activeBarColor = MaterialTheme.colorScheme.primary,
                                                 context = applicationContext,
                                                 activity = this@MainActivity,
