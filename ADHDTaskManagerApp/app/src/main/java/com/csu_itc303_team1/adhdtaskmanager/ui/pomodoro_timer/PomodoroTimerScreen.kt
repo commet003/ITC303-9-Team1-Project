@@ -40,12 +40,20 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
 import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
+import androidx.compose.material.TextField
+import androidx.compose.ui.text.input.KeyboardType
+
+
+
+
+
+
 
 
 @Composable
 fun PomodoroTimerScreen(
-    workTime: Long,
-    breakTime: Long,
+    initialWorkTime: Long,
+    initialBreakTime: Long,
     handleColor: Color,
     inactiveBarColor: Color,
     activeBarColor: Color,
@@ -54,49 +62,61 @@ fun PomodoroTimerScreen(
     strokeWidth: Dp = 5.dp,
     context: Context,
     activity: Activity
-){
-    var size by remember {
-        mutableStateOf(IntSize.Zero)
+) {
+    var size by remember { mutableStateOf(IntSize.Zero) }
+    var progress by remember { mutableFloatStateOf(initialValue) }
+    var currentTime by remember { mutableLongStateOf(0L) }
+    var timerRoundsCount by remember { mutableIntStateOf(4) }
+    var isTimerRunning by remember { mutableStateOf(false) }
+    var isWorkTime by remember { mutableStateOf(false) }
+    var isBreakTime by remember { mutableStateOf(true) }
+    var seconds by remember { mutableIntStateOf(0) }
+    var workTime by remember { mutableStateOf(initialWorkTime) }
+    var breakTime by remember { mutableStateOf(initialBreakTime) }
+    var workTimeInput by remember { mutableStateOf("") }
+    var breakTimeInput by remember { mutableStateOf("") }
+
+    TextField(
+        value = workTimeInput,
+        onValueChange = {
+            if(it.all { char -> char.isDigit() }) {
+                workTimeInput = it
+            }
+        },
+        modifier = Modifier.padding(all = 16.dp),
+        label = { Text("Enter work time in minutes", color = Color(0, 50, 140)) } // Navy blue text
+    )
+
+    TextField(
+        value = breakTimeInput,
+        onValueChange = {
+            if(it.all { char -> char.isDigit() }) {
+                breakTimeInput = it
+            }
+        },
+        modifier = Modifier.padding(all = 16.dp),
+        label = { Text("Enter break time in minutes", color = Color(0, 50, 140)) } // Navy blue text
+    )
+
+    if (workTimeInput.isNotEmpty()) {
+        workTime = workTimeInput.toLong() * 60000 // convert minutes to milliseconds
     }
-    var progress by remember {
-        mutableFloatStateOf(initialValue)
-    }
-    var currentTime by remember {
-        mutableLongStateOf(0L)
+    if (breakTimeInput.isNotEmpty()) {
+        breakTime = breakTimeInput.toLong() * 60000 // convert minutes to milliseconds
     }
 
-    var timerRoundsCount by remember {
-        mutableIntStateOf(4)
-    }
-
-    var isTimerRunning by remember {
-        mutableStateOf(false)
-    }
-    var isWorkTime by remember {
-        mutableStateOf(false)
-    }
-    var isBreakTime by remember {
-        mutableStateOf(true)
-    }
-
-    var seconds by remember {
-        mutableIntStateOf(0)
-    }
-
-
-    LaunchedEffect(key1 = isTimerRunning, key2 = currentTime){
+    LaunchedEffect(key1 = isTimerRunning, key2 = currentTime) {
         if (currentTime > 0 && isTimerRunning) {
             delay(1000)
             currentTime -= 1000
-            if (isWorkTime){
+            if (isWorkTime) {
                 progress = currentTime.toFloat() / workTime.toFloat()
-            } else if (isBreakTime){
+            } else if (isBreakTime) {
                 progress = currentTime.toFloat() / breakTime.toFloat()
             }
-            if (seconds == 0){
+            if (seconds == 0) {
                 seconds = 59
-            }
-            else{
+            } else {
                 seconds -= 1
             }
         } else if (currentTime == 0L && isTimerRunning) {
@@ -119,7 +139,7 @@ fun PomodoroTimerScreen(
         }
     }
 
-    LaunchedEffect(key1 = isTimerRunning, key2 = isBreakTime){
+    LaunchedEffect(key1 = isTimerRunning, key2 = isBreakTime) {
         if (isTimerRunning && isDoNotDisturbEnabled(context) && !isBreakTime) {
             toggleDoNotDisturb(context, activity)
         } else if (!isTimerRunning && !isDoNotDisturbEnabled(context) && isBreakTime) {
@@ -128,8 +148,13 @@ fun PomodoroTimerScreen(
     }
 
     Row {
-        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = Color(0, 50, 140)) // Navy blue text
     }
+
+
+
+
+
 
     Box(
         modifier = modifier.onSizeChanged { size = it },
