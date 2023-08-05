@@ -128,7 +128,7 @@ fun PomodoroTimerScreen(
     }
 
     Row {
-        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Pomodoro Timer", color = MaterialTheme.colorScheme.onBackground, fontSize = 34.sp, fontWeight = FontWeight.Bold)
     }
 
     Box(
@@ -194,12 +194,12 @@ fun PomodoroTimerScreen(
                 containerColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.error
+                    MaterialTheme.colorScheme.secondary
                 },
                 contentColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.onPrimary
                 } else {
-                    MaterialTheme.colorScheme.background
+                    MaterialTheme.colorScheme.onSecondary
                 }
             )
         ) {
@@ -210,7 +210,8 @@ fun PomodoroTimerScreen(
                     "Pause"
                 } else {
                     "Resume"
-                }
+                },
+                fontWeight = FontWeight.Bold
             )
         }
         Button(
@@ -232,7 +233,7 @@ fun PomodoroTimerScreen(
                     toggleDoNotDisturb(context, activity)
                 }
         }) {
-            Text(text = "Stop")
+            Text(text = "Stop", color = Color.White, fontWeight = FontWeight.Bold)
         }
     }
     Spacer(modifier = Modifier.height(16.dp))
