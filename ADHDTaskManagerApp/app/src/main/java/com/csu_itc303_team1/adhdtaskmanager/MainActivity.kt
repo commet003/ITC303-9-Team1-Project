@@ -1,8 +1,10 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationManager
-import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -24,18 +26,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,14 +37,18 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -70,13 +68,9 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
-import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -152,6 +146,32 @@ class MainActivity : ComponentActivity() {
 
 
             ADHDTaskManagerTheme {
+
+                /**
+                 * This is where the Pomodoro Timer Notification is created
+                 */
+
+                val context = LocalContext.current
+                var hasNotificationPermission by remember {
+                    mutableStateOf(ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED)
+                }
+
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { isGranted ->
+                        hasNotificationPermission = isGranted
+                    }
+                )
+
+                LaunchedEffect(key1 = hasNotificationPermission) {
+                    if (!hasNotificationPermission) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
@@ -198,7 +218,10 @@ class MainActivity : ComponentActivity() {
                                 },
                                 actions = {
                                     IconButton(onClick = {
-                                        toggleDoNotDisturb(applicationContext, this@MainActivity)
+                                        if (hasNotificationPermission){
+                                            showFocusNotification()
+                                            showBreakNotification()
+                                        }
                                     }) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
@@ -224,13 +247,13 @@ class MainActivity : ComponentActivity() {
 
 // icons to mimic drawer destinations
                         val screenIcons = listOf(
-                            Icons.Default.Home,
-                            Icons.Default.Done,
-                            Icons.Default.Star,
-                            Icons.Default.List,
-                            Icons.Default.Settings,
-                            Icons.Default.Info,
-                            Icons.Filled.PlayArrow
+                            R.drawable.ic_home,
+                            R.drawable.ic_complete,
+                            R.drawable.ic_rewards,
+                            R.drawable.ic_leaderboard,
+                            R.drawable.ic_settings,
+                            R.drawable.ic_help,
+                            R.drawable.ic_pomodoro_timer
                         )
 
                         // Create a list of Screen objects
@@ -267,9 +290,7 @@ class MainActivity : ComponentActivity() {
                                                 ),
                                                 icon = {
                                                     Icon(
-                                                        imageVector = screenIcons[screens.indexOf(
-                                                            screen
-                                                        )],
+                                                        painter = painterResource(id = screenIcons[screens.indexOf(screen)]),
                                                         contentDescription = screen.title,
                                                     )
                                                 },
@@ -362,22 +383,6 @@ class MainActivity : ComponentActivity() {
                                 horizontalAlignment = Alignment.Start,
                                 verticalArrangement = Arrangement.Top
                             ) {
-
-
-                                val postNotificationPermission = rememberPermissionState(
-                                    android.Manifest.permission.POST_NOTIFICATIONS
-                                    )
-
-                                if (postNotificationPermission.hasPermission && isSignedIn.value) {
-                                    // Show the dialog after 10 seconds
-                                    LaunchedEffect(true) {
-                                        delay(10000)
-                                        if (!postNotificationPermission.hasPermission) {
-                                            postNotificationPermission.launchPermissionRequest()
-                                        }
-                                    }
-                                }
-
 
                                 // The content itself is the navController's current state, or Home Screen
                                 // on Default
@@ -553,58 +558,30 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //Shows the notification
-// TODO - Make this show the notification when a task is due
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun showNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(this, "channel1")
-            .setContentTitle("Task Reminder")
-            .setContentText("You have a task due soon!")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+    fun showFocusNotification() {
+        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            "PomodoroTimer"
+        )
+            .setContentTitle("Pomodoro Timer")
+            .setContentText("It's time to focus!")
+            .setSmallIcon(R.drawable.ic_complete)
             .build()
         notificationManager.notify(1, notification)
     }
 
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    @Composable
-    private fun PermissionDialog(
-        modifier: Modifier = Modifier,
-        notificationPermission: PermissionState,
-        onEvent: (TodoEvent) -> Unit
-    ){
-        AlertDialog(
-            modifier = modifier,
-            onDismissRequest = {onEvent(TodoEvent.hideDialog)},
-            title = {Text(text = "Notification Permission Required")},
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "This app requires notification permission to work")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        notificationPermission.launchPermissionRequest()
-                    }
-                ) {
-                    Text(text = "Give Permission")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        onEvent(TodoEvent.hideDialog)
-                    }
-                ) {
-                    Text(text = "Cancel")
-                }
-            }
+    fun showBreakNotification() {
+        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            "PomodoroTimer"
         )
+            .setContentTitle("Pomodoro Timer")
+            .setContentText("It's time for a break!")
+            .setSmallIcon(R.drawable.ic_complete)
+            .build()
+        notificationManager.notify(2, notification)
     }
 
     // creates Arraylist of users from the firestore database

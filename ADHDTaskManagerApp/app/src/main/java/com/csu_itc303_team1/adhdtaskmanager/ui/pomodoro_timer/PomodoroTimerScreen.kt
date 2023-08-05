@@ -83,6 +83,7 @@ fun PomodoroTimerScreen(
         mutableIntStateOf(0)
     }
 
+
     LaunchedEffect(key1 = isTimerRunning, key2 = currentTime){
         if (currentTime > 0 && isTimerRunning) {
             delay(1000)

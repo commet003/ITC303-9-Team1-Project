@@ -125,6 +125,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                 modifier = Modifier
                     .padding(start = 10.dp, top = 8.dp)
                     .fillMaxHeight(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = CenterVertically
             ) {
                 Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onPrimary)
@@ -150,7 +151,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                 } else {
                     Text(text = "")
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
                 IconButton(
                     onClick = {
                         onEvent(TodoEvent.deleteTodo(todo))
