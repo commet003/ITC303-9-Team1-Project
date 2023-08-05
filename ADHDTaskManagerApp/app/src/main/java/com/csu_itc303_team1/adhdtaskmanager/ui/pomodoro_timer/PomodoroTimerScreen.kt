@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -128,7 +129,8 @@ fun PomodoroTimerScreen(
     }
 
     Row {
-        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold,
+            color = Color.Green)
     }
 
     Box(
