@@ -16,11 +16,18 @@ configurations.all {
     }
 }
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     namespace 'com.csu_itc303_team1.adhdtaskmanager'
     compileSdk 34
 
     defaultConfig {
+        buildConfigField("String", "TODO_DATABASE_PASSPHRASE", apikeyProperties['TODO_DATABASE_PASSPHRASE'])
+        buildConfigField("String", "WEB_CLIENT_ID", apikeyProperties['WEB_CLIENT_ID'])
+
         applicationId "com.csu_itc303_team1.adhdtaskmanager"
         minSdk 28
         targetSdk 34
@@ -68,12 +75,14 @@ kotlin {
 }
 
 dependencies {
-
+    
     // Compose
     implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation("androidx.transition:transition-ktx:1.4.1")
+    implementation("androidx.compose.material:material:1.4.1")
+    implementation("androidx.compose.material3:material3:1.0.1")
 
     // Material 3
     implementation("androidx.compose.material3:material3:1.2.0-alpha04")
@@ -138,6 +147,7 @@ dependencies {
     debugImplementation "androidx.compose.compiler:compiler:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    implementation "androidx.compose.ui:ui:$compose_version"
 
 
     // Test
@@ -148,9 +158,9 @@ dependencies {
 
 
     // Navigation
-    implementation "androidx.navigation:navigation-compose:2.7.0-beta02"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.0-beta02'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.0-beta02'
+    implementation "androidx.navigation:navigation-compose:2.7.0-rc01"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.0-rc01'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.0-rc01'
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"

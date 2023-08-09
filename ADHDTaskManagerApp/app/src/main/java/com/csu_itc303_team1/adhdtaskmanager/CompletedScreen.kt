@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 
 
 @Composable
@@ -19,7 +20,9 @@ fun CompletedScreen(state: TodoState, event: (TodoEvent) -> Unit) {
     ) {
         items(state.todos, {it.id}) { todo ->
             println(todo.title)
-            CompletedTaskCard(todo)
+            if (todo.userID == state.userId){
+                CompletedTaskCard(todo)
+            }
         }
     }
 }

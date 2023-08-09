@@ -1,8 +1,10 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationManager
-import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -13,6 +15,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,18 +24,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,14 +37,18 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -57,17 +58,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -76,14 +79,13 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    val passPhrase = "passPhrase"
-    val factory = SupportFactory(SQLiteDatabase.getBytes(passPhrase.toCharArray()))
-    val db by lazy {
+    private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
+    private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
+        ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
     private val rewardViewModel by viewModels<RewardViewModel>(
@@ -113,7 +115,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
+        InternalCoroutinesApi::class
+    )
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,6 +148,32 @@ class MainActivity : ComponentActivity() {
 
 
             ADHDTaskManagerTheme {
+
+                /**
+                 * This is where the Pomodoro Timer Notification is created
+                 */
+
+                val context = LocalContext.current
+                var hasNotificationPermission by remember {
+                    mutableStateOf(ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED)
+                }
+
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { isGranted ->
+                        hasNotificationPermission = isGranted
+                    }
+                )
+
+                LaunchedEffect(key1 = hasNotificationPermission) {
+                    if (!hasNotificationPermission) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
@@ -189,7 +219,12 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { /* doSomething() */ }) {
+                                    IconButton(onClick = {
+                                        if (hasNotificationPermission){
+                                            showFocusNotification()
+                                            showBreakNotification()
+                                        }
+                                    }) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Person,
@@ -214,12 +249,13 @@ class MainActivity : ComponentActivity() {
 
 // icons to mimic drawer destinations
                         val screenIcons = listOf(
-                            Icons.Default.Home,
-                            Icons.Default.Done,
-                            Icons.Default.Star,
-                            Icons.Default.List,
-                            Icons.Default.Settings,
-                            Icons.Default.Info
+                            R.drawable.ic_home,
+                            R.drawable.ic_complete,
+                            R.drawable.ic_rewards,
+                            R.drawable.ic_leaderboard,
+                            R.drawable.ic_settings,
+                            R.drawable.ic_help,
+                            R.drawable.ic_pomodoro_timer
                         )
 
                         // Create a list of Screen objects
@@ -229,7 +265,8 @@ class MainActivity : ComponentActivity() {
                             Screen.RewardsScreen,
                             Screen.LeaderboardScreen,
                             Screen.SettingsScreen,
-                            Screen.HelpScreen
+                            Screen.HelpScreen,
+                            Screen.PomodoroTimerScreen
                         )
 
                         val selectedItem = remember { mutableStateOf(screens[0]) }
@@ -237,285 +274,301 @@ class MainActivity : ComponentActivity() {
                         ModalNavigationDrawer(
                             drawerState = drawerState,
                             drawerContent = {
-                                ModalDrawerSheet(
-                                    drawerContainerColor = MaterialTheme.colorScheme.background,
-                                    drawerTonalElevation = 2.dp
-                                ) {
-                                    Spacer(Modifier.height(18.dp))
-                                    screens.forEach { screen ->
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = screenIcons[screens.indexOf(screen)],
-                                                    contentDescription = screen.title,
-                                                )
-                                            },
-                                            label = {
-                                                Text(text = screen.title)
-                                            },
-                                            selected = screen.route == selectedItem.value.route,
-                                            onClick = {
-                                                selectedItem.value = screen
-                                                scope.launch {
-                                                    drawerState.close()
-                                                }
-                                                navController.navigate(screen.route)
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-                                    }
-                                    if (isSignedIn.value) {
-                                        NavigationDrawerItem(
-                                            colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                unselectedTextColor = MaterialTheme.colorScheme.primary
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.ExitToApp,
-                                                    contentDescription = "Sign Out",
-                                                ) },
-                                            label = { Text(text = "Sign Out", color = MaterialTheme.colorScheme.primary) },
-                                            selected = false,
-                                            onClick = {
-                                                scope.launch {
-                                                    googleAuthUiClient.signOut()
-                                                    if (googleAuthUiClient.getSignedInUser() == null) {
-                                                        Toast
-                                                            .makeText(
-                                                                applicationContext,
-                                                                "Signed out",
-                                                                Toast.LENGTH_LONG
-                                                            )
-                                                            .show()
-                                                    }
-                                                    navController.navigate(Screen.SignInScreen.route)
-                                                }
-
-                                            },
-                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                                        )
-
-                                        if (googleAuthUiClient.isUserAnonymous()) {
-                                            Row(modifier = Modifier.fillMaxWidth()) {
-                                                Text(
-                                                    text = "You are signed in anonymously, if you sign out you will lose all of your data.",
-                                                    fontSize = 14.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    color = Color(0xFFFC8B8B),
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    modifier = Modifier
-                                                        .padding(
-                                                            start = 10.dp,
-                                                            end = 10.dp,
-                                                            top = 10.dp
-                                                        )
-                                                        .height(30.dp)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            content = {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    horizontalAlignment = Alignment.Start,
-                                    verticalArrangement = Arrangement.Top
-                                ) {
-                                    val notificationPermission = rememberPermissionState(
-                                        android.Manifest.permission.POST_NOTIFICATIONS
-                                    )
-
-                                    if (!notificationPermission.hasPermission && isSignedIn.value) {
-                                        // Show the dialog after 20 seconds
-                                        LaunchedEffect(true) {
-                                            delay(20000)
-                                            notificationPermission.launchPermissionRequest()
-                                        }
-                                        /*PermissionDialog(
-                                            onEvent = viewModel::onEvent,
-                                            notificationPermission = notificationPermission
-                                        )*/
-                                    }
-
-                                    // The content itself is the navController's current state, or Home Screen
-                                    // on Default
-                                    val state by viewModel.state.collectAsState()
-                                    if (isSignedIn.value){
-                                        state.userId = googleAuthUiClient.getSignedInUser()?.userId ?: ""
-                                        // todo get signedin user into Users Repo
-                                    }
-                                    //val rewardState by rewardViewModel.collectAsState()
-                                    val todoEvent = viewModel::onEvent
-
-
-                                    val launcher = rememberLauncherForActivityResult(
-                                        contract = ActivityResultContracts.StartIntentSenderForResult(),
-                                        onResult = { result ->
-                                            if(result.resultCode == RESULT_OK) {
-                                                lifecycleScope.launch {
-                                                    val signInResult = googleAuthUiClient.signInWithIntent(
-                                                        intent = result.data ?: return@launch
+                                if (isSignedIn.value) {
+                                    ModalDrawerSheet(
+                                        drawerContainerColor = MaterialTheme.colorScheme.background,
+                                        drawerTonalElevation = 2.dp
+                                    ) {
+                                        Spacer(Modifier.height(18.dp))
+                                        screens.forEach { screen ->
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        painter = painterResource(id = screenIcons[screens.indexOf(screen)]),
+                                                        contentDescription = screen.title,
                                                     )
-                                                    signInViewModel.onSignInResult(signInResult)
-                                                }
-                                            }
-                                        }
-                                    )
-
-                                    // NavHost for controlling the pages.
-                                    NavHost(
-                                        navController = navController,
-                                        startDestination = if (isSignedIn.value) Screen.TodoScreen.route else Screen.SignInScreen.route,
-                                    ){
-                                        // Home screen/to-do screen
-                                        composable(
-                                            route = Screen.TodoScreen.route
-                                        ) {
-                                            TodoScreen(
-                                                state = state,
-                                                onEvent = todoEvent,
-                                                rewardViewModel = rewardViewModel,
-                                                usersViewModel = userViewModel
-                                            )
-                                        }
-
-                                        // Settings Screen
-                                        composable(
-                                            route = Screen.SettingsScreen.route
-                                        ) {
-                                            SettingsScreen(
-                                                googleAuthUiClient,
-                                                context = applicationContext,
-                                                scope
-                                            )
-                                        }
-
-                                        // Leaderboard Screen
-                                        composable(
-                                            route = Screen.LeaderboardScreen.route
-                                        ) {
-                                            LeaderboardScreen()
-                                        }
-
-                                        // Rewards Screen
-                                        composable(
-                                            route = Screen.RewardsScreen.route
-                                        ) {
-                                            RewardsScreen(rewardViewModel, userViewModel)
-                                        }
-
-                                        // Completed Task Screen
-                                        composable(
-                                            route = Screen.CompletedScreen.route
-                                        ) {
-                                            CompletedScreen(state, todoEvent)
-                                        }
-
-                                        // Sign In Screen
-                                        composable(
-                                            route = Screen.SignInScreen.route
-                                        ) {
-
-
-                                            LaunchedEffect(key1 = Unit) {
-                                                if(googleAuthUiClient.getSignedInUser() != null) {
-                                                    navController.navigate("todo_screen")
-                                                    userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
-                                                    println("launched effect 1. user exists, I have run the code")
-                                                    // Update top bar and drawer
-                                                }
-                                            }
-
-
-                                            LaunchedEffect(key1 = signInState.isSignInSuccessful) {
-                                                if(signInState.isSignInSuccessful) {
-                                                    Toast.makeText(
-                                                        applicationContext,
-                                                        "Sign in successful",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-
-                                                    navController.navigate("todo_screen")
-                                                    signInViewModel.resetState()
-                                                    val exist =
-                                                        googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                            userViewModel.checkUserExists(
-                                                                it1
-                                                            )
-                                                        }
-                                                    if (exist == false) {
-                                                        userViewModel.convertToUserFromAuth(
-                                                            googleAuthUiClient
-                                                        )
-                                                        userViewModel.addUserToFirebase()
-                                                        println("I'm trying to add another user again.")
-                                                    }
-                                                }
-                                            }
-
-                                            SignInScreen(
-                                                state = signInState,
-                                                onSignInClick = {
-                                                    lifecycleScope.launch {
-                                                        val signInIntentSender = googleAuthUiClient.signIn()
-                                                        launcher.launch(
-                                                            IntentSenderRequest.Builder(
-                                                                signInIntentSender ?: return@launch
-                                                            ).build()
-                                                        )
-
-                                                    }
                                                 },
-                                                onAnonymousSignIn = {
-                                                    lifecycleScope.launch {
-                                                        googleAuthUiClient.signInAnonymously()
-                                                        Toast.makeText(
-                                                            applicationContext,
-                                                            "Signed in anonymously",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
-
-                                                        signInViewModel.userIsAnonymous()
-
-                                                        navController.navigate("todo_screen")
+                                                label = {
+                                                    Text(text = screen.title)
+                                                },
+                                                selected = screen.route == selectedItem.value.route,
+                                                onClick = {
+                                                    selectedItem.value = screen
+                                                    scope.launch {
+                                                        drawerState.close()
                                                     }
-                                                }
+                                                    navController.navigate(screen.route)
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
+                                                )
                                             )
                                         }
+                                        if (isSignedIn.value) {
+                                            NavigationDrawerItem(
+                                                colors = NavigationDrawerItemDefaults.colors(
+                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                ),
+                                                icon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.ExitToApp,
+                                                        contentDescription = "Sign Out",
+                                                    )
+                                                },
+                                                label = {
+                                                    Text(
+                                                        text = "Sign Out",
+                                                        color = MaterialTheme.colorScheme.primary
+                                                    )
+                                                },
+                                                selected = false,
+                                                onClick = {
+                                                    scope.launch {
+                                                        googleAuthUiClient.signOut()
+                                                        if (googleAuthUiClient.getSignedInUser() == null) {
+                                                            Toast
+                                                                .makeText(
+                                                                    applicationContext,
+                                                                    "Signed out",
+                                                                    Toast.LENGTH_LONG
+                                                                )
+                                                                .show()
+                                                        }
+                                                        navController.navigate(Screen.SignInScreen.route)
+                                                    }
 
-                                        composable(
-                                            route = Screen.HelpScreen.route
-                                        ) {
-                                            HelpScreen()
-                                        }
+                                                },
+                                                modifier = Modifier.padding(
+                                                    NavigationDrawerItemDefaults.ItemPadding
+                                                )
+                                            )
 
-                                        composable(
-                                            route = Screen.CompletedScreen.route
-                                        ){
-                                            CompletedScreen(state, todoEvent)
+                                            if (googleAuthUiClient.isUserAnonymous()) {
+                                                Row(modifier = Modifier.fillMaxWidth()) {
+                                                    Text(
+                                                        text = "You are signed in anonymously, if you sign out you will lose all of your data.",
+                                                        fontSize = 14.sp,
+                                                        fontWeight = FontWeight.Black,
+                                                        color = Color(0xFFFC8B8B),
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        modifier = Modifier
+                                                            .padding(
+                                                                start = 20.dp,
+                                                                end = 15.dp,
+                                                                top = 10.dp
+                                                            )
+                                                            .height(40.dp)
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
-                        )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.Start,
+                                verticalArrangement = Arrangement.Top
+                            ) {
+
+                                // The content itself is the navController's current state, or Home Screen
+                                // on Default
+                                val state by viewModel.state.collectAsState()
+                                if (isSignedIn.value) {
+                                    state.userId =
+                                        googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                }
+                                //val rewardState by rewardViewModel.collectAsState()
+                                val todoEvent = viewModel::onEvent
 
 
+                                val launcher = rememberLauncherForActivityResult(
+                                    contract = ActivityResultContracts.StartIntentSenderForResult(),
+                                    onResult = { result ->
+                                        if (result.resultCode == RESULT_OK) {
+                                            lifecycleScope.launch {
+                                                val signInResult =
+                                                    googleAuthUiClient.signInWithIntent(
+                                                        intent = result.data ?: return@launch
+                                                    )
+                                                signInViewModel.onSignInResult(signInResult)
+                                            }
+                                        }
+                                    }
+                                )
 
+                                // NavHost for controlling the pages.
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = if (isSignedIn.value) Screen.TodoScreen.route else Screen.SignInScreen.route,
+                                ) {
+                                    // Home screen/to-do screen
+                                    composable(
+                                        route = Screen.TodoScreen.route
+                                    ) {
+                                        TodoScreen(
+                                            state = state,
+                                            onEvent = todoEvent,
+                                            rewardViewModel = rewardViewModel,
+                                            usersViewModel = userViewModel
+                                        )
+                                    }
+
+                                    // Settings Screen
+                                    composable(
+                                        route = Screen.SettingsScreen.route
+                                    ) {
+                                        SettingsScreen(
+                                            googleAuthUiClient,
+                                            context = applicationContext,
+                                            scope
+                                        )
+                                    }
+
+                                    // Leaderboard Screen
+                                    composable(
+                                        route = Screen.LeaderboardScreen.route
+                                    ) {
+                                        LeaderboardScreen()
+                                    }
+
+                                    // Rewards Screen
+                                    composable(
+                                        route = Screen.RewardsScreen.route
+                                    ) {
+                                        RewardsScreen(rewardViewModel, userViewModel)
+                                    }
+
+                                    // Completed Task Screen
+                                    composable(
+                                        route = Screen.CompletedScreen.route
+                                    ) {
+                                        CompletedScreen(state, todoEvent)
+                                    }
+
+                                    // Sign In Screen
+                                    composable(
+                                        route = Screen.SignInScreen.route
+                                    ) {
+
+
+                                        LaunchedEffect(key1 = Unit) {
+                                            if (googleAuthUiClient.getSignedInUser() != null) {
+                                                navController.navigate("todo_screen")
+                                                userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
+                                                println("launched effect 1. user exists, I have run the code")
+                                            }
+                                        }
+
+
+                                        LaunchedEffect(key1 = signInState.isSignInSuccessful) {
+                                            if (signInState.isSignInSuccessful) {
+                                                Toast.makeText(
+                                                    applicationContext,
+                                                    "Sign in successful",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+
+                                                navController.navigate("todo_screen")
+                                                signInViewModel.resetState()
+                                                val exist =
+                                                    googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                        userViewModel.checkUserExists(
+                                                            it1
+                                                        )
+                                                    }
+                                                if (exist == false) {
+                                                    userViewModel.convertToUserFromAuth(
+                                                        googleAuthUiClient
+                                                    )
+                                                    userViewModel.addUserToFirebase()
+                                                    println("I'm trying to add another user again.")
+                                                }
+                                            }
+                                        }
+
+                                        SignInScreen(
+                                            state = signInState,
+                                            onSignInClick = {
+                                                lifecycleScope.launch {
+                                                    val signInIntentSender =
+                                                        googleAuthUiClient.signIn()
+                                                    launcher.launch(
+                                                        IntentSenderRequest.Builder(
+                                                            signInIntentSender ?: return@launch
+                                                        ).build()
+                                                    )
+                                                }
+                                            },
+                                            onAnonymousSignIn = {
+                                                lifecycleScope.launch {
+                                                    googleAuthUiClient.signInAnonymously()
+                                                    Toast.makeText(
+                                                        applicationContext,
+                                                        "Signed in anonymously",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+
+                                                    signInViewModel.userIsAnonymous()
+
+                                                    navController.navigate("todo_screen")
+                                                }
+                                            }
+                                        )
+                                    }
+
+                                    composable(
+                                        route = Screen.HelpScreen.route
+                                    ) {
+                                        HelpScreen()
+                                    }
+
+                                    composable(
+                                        route = Screen.CompletedScreen.route
+                                    ) {
+                                        CompletedScreen(state, todoEvent)
+                                    }
+
+                                    composable(
+                                        route = Screen.PomodoroTimerScreen.route
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .background(MaterialTheme.colorScheme.background),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.SpaceAround
+                                        ){
+                                            PomodoroTimerScreen(
+                                                initialWorkTime = 1500L * 1000L,
+                                                initialBreakTime = 300L * 1000L,
+                                                handleColor = MaterialTheme.colorScheme.primary,
+                                                inactiveBarColor = MaterialTheme.colorScheme.surface,
+                                                activeBarColor = MaterialTheme.colorScheme.primary,
+                                                context = applicationContext,
+                                                activity = this@MainActivity,
+                                                modifier = Modifier.size(300.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -523,58 +576,30 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //Shows the notification
-    // TODO - Make this show the notification when a task is due
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun showNotification() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(this, "channel1")
-            .setContentTitle("Task Reminder")
-            .setContentText("You have a task due soon!")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+    fun showFocusNotification() {
+        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            "PomodoroTimer"
+        )
+            .setContentTitle("Pomodoro Timer")
+            .setContentText("It's time to focus!")
+            .setSmallIcon(R.drawable.ic_complete)
             .build()
         notificationManager.notify(1, notification)
     }
 
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    @Composable
-    private fun PermissionDialog(
-        modifier: Modifier = Modifier,
-        notificationPermission: PermissionState,
-        onEvent: (TodoEvent) -> Unit
-    ){
-        AlertDialog(
-            modifier = modifier,
-            onDismissRequest = {onEvent(TodoEvent.hideDialog)},
-            title = {Text(text = "Notification Permission Required")},
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "This app requires notification permission to work")
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        notificationPermission.launchPermissionRequest()
-                    }
-                ) {
-                    Text(text = "Give Permission")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        onEvent(TodoEvent.hideDialog)
-                    }
-                ) {
-                    Text(text = "Cancel")
-                }
-            }
+    fun showBreakNotification() {
+        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            "PomodoroTimer"
         )
+            .setContentTitle("Pomodoro Timer")
+            .setContentText("It's time for a break!")
+            .setSmallIcon(R.drawable.ic_complete)
+            .build()
+        notificationManager.notify(2, notification)
     }
 
     // creates Arraylist of users from the firestore database

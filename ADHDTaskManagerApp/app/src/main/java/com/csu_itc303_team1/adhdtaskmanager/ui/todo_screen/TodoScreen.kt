@@ -30,15 +30,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.AddTodoDialog
-import com.csu_itc303_team1.adhdtaskmanager.EditTodoDialog
-import com.csu_itc303_team1.adhdtaskmanager.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.SortType
 import com.csu_itc303_team1.adhdtaskmanager.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddTodoDialog
+import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.EditTodoDialog
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +63,10 @@ fun TodoScreen(
                 Icon(
                     tint = MaterialTheme.colorScheme.onPrimary,
                     imageVector = Icons.Default.Add,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-                        .height(24.dp).width(24.dp),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary)
+                        .height(24.dp)
+                        .width(24.dp),
                     contentDescription = "Add Todo"
                 )
             }
@@ -91,8 +95,9 @@ fun TodoScreen(
             // If you only want the completed task to show, then you can set
             // sortType to SortType.BY_COMPLETED
             ExposedDropdownMenuBox(
-                modifier = Modifier.padding(end = 10.dp)
-                    .align(Alignment.End),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 10.dp),
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded}
             )
@@ -112,11 +117,13 @@ fun TodoScreen(
 
                 ExposedDropdownMenu(
                     modifier = Modifier
-                        .width(150.dp),
+                        .width(150.dp)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     expanded = expanded,
                     onDismissRequest = { expanded = false }) {
                     SortType.values().forEach { sortType ->
                         DropdownMenuItem(
+                            modifier = Modifier.clip(MaterialTheme.shapes.medium),
                             onClick = {
                                 expanded = false
                                 onEvent(TodoEvent.sortBy(sortType))
@@ -125,27 +132,27 @@ fun TodoScreen(
                                 if (sortType.name == "BY_DATE") {
                                     Text(
                                         text = "By Date",
-                                        color = MaterialTheme.colorScheme.onBackground
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_PRIORITY") {
                                     Text(
                                         text = "By Priority",
-                                        color = MaterialTheme.colorScheme.onBackground
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_TIME") {
                                     Text(
                                         text = "By Time",
-                                        color = MaterialTheme.colorScheme.onBackground
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_COMPLETED") {
                                     Text(
                                         text = "By Completed",
-                                        color = MaterialTheme.colorScheme.onBackground
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 } else if (sortType.name == "BY_NOT_COMPLETED") {
                                     Text(
                                         text = "By Not Completed",
-                                        color = MaterialTheme.colorScheme.onBackground
+                                        color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }
                             }

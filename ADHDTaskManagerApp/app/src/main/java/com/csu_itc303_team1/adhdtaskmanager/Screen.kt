@@ -16,4 +16,7 @@ sealed class Screen(val route: String, var icon: Int, val title: String) {
 
     // Help Screen
     object HelpScreen: Screen("help_screen", R.drawable.ic_help,"Help")
+
+    // Pomodoro Timer Screen
+    object PomodoroTimerScreen: Screen("pomodoro_timer_screen", R.drawable.ic_pomodoro_timer, "Pomodoro Timer")
 }

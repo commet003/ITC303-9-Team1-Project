@@ -1,9 +1,11 @@
-package com.csu_itc303_team1.adhdtaskmanager.database.local
+package com.csu_itc303_team1.adhdtaskmanager.utils.local_database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
+import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.RewardDao
 
 @Database(
     entities = [Reward::class],

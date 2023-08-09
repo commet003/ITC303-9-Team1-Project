@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.Priority
 import com.csu_itc303_team1.adhdtaskmanager.SortType
 import com.csu_itc303_team1.adhdtaskmanager.Todo
-import com.csu_itc303_team1.adhdtaskmanager.TodoDao
+import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -43,41 +43,16 @@ class TodoViewModel(
         when (event) {
             // Update Todo
             is TodoEvent.updateTodo -> {
-                val title = state.value.title
-                val description = state.value.description
-                val priority = state.value.priority
-                val dueDate = state.value.dueDate
-                val dueTime = state.value.dueTime
-                val userId = state.value.userId
-                val id = state.value.id
-
-                if (title.isBlank() || description.isBlank()) {
-                    return
-                }
-
-                val todo = Todo(
-                    id = id,
-                    title = title,
-                    description = description,
-                    priority = priority,
-                    dueDate = dueDate,
-                    dueTime = dueTime,
-                    userID = userId
-                )
-
                 viewModelScope.launch {
-                    todoDao.updateTodo(todo)
-                }
-
-                _state.update {
-                    it.copy(
-                        title = "",
-                        description = "",
-                        priority = Priority.LOW,
-                        dueDate = "",
-                        dueTime = "",
-                        showDialog = false,
-                        showEditTodoDialog = false
+                    todoDao.updateTodo(
+                        event.todo.copy(
+                            title = state.value.title,
+                            description = state.value.description,
+                            priority = state.value.priority,
+                            dueDate = state.value.dueDate,
+                            dueTime = state.value.dueTime,
+                            userID = state.value.userId
+                        )
                     )
                 }
             }
