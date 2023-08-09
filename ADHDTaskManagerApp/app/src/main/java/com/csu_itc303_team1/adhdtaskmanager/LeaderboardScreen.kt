@@ -35,7 +35,7 @@ fun LeaderboardScreen() {
 //            LeaderboardItem(user = element, rank = sortedList.indexOf(element) + 1)
 //        }
 //    }
-    Row() {
+    Row {
         Spacer(modifier = Modifier.width(5.dp))
 
         Text(

@@ -100,6 +100,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
+    private lateinit var userViewModel: UsersViewModel
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
@@ -141,6 +142,7 @@ class MainActivity : ComponentActivity() {
             val signInState by signInViewModel.state.collectAsState()
             // Retrieve's Leaderboard data onCreate
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
+            userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
 
@@ -422,7 +424,8 @@ class MainActivity : ComponentActivity() {
                                         TodoScreen(
                                             state = state,
                                             onEvent = todoEvent,
-                                            rewardViewModel = rewardViewModel
+                                            rewardViewModel = rewardViewModel,
+                                            usersViewModel = userViewModel
                                         )
                                     }
 
@@ -448,7 +451,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel)
+                                        RewardsScreen(rewardViewModel, userViewModel)
                                     }
 
                                     // Completed Task Screen
@@ -467,6 +470,8 @@ class MainActivity : ComponentActivity() {
                                         LaunchedEffect(key1 = Unit) {
                                             if (googleAuthUiClient.getSignedInUser() != null) {
                                                 navController.navigate("todo_screen")
+                                                userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
+                                                println("launched effect 1. user exists, I have run the code")
                                             }
                                         }
 
@@ -481,6 +486,19 @@ class MainActivity : ComponentActivity() {
 
                                                 navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
+                                                val exist =
+                                                    googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                        userViewModel.checkUserExists(
+                                                            it1
+                                                        )
+                                                    }
+                                                if (exist == false) {
+                                                    userViewModel.convertToUserFromAuth(
+                                                        googleAuthUiClient
+                                                    )
+                                                    userViewModel.addUserToFirebase()
+                                                    println("I'm trying to add another user again.")
+                                                }
                                             }
                                         }
 

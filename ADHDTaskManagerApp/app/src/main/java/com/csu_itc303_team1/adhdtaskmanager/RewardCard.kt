@@ -31,7 +31,7 @@ fun RewardCard(reward: Reward){
         Row(
             modifier = Modifier.padding(15.dp)
         ){
-            Column(){
+            Column {
                 Text(
                     text = reward.title,
                     fontSize = 24.sp
@@ -42,7 +42,7 @@ fun RewardCard(reward: Reward){
                 )
             }
 
-            Column(){
+            Column {
                 Text(
                     text = "Total Points",
                     fontSize = 20.sp

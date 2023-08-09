@@ -36,16 +36,19 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.SortType
 import com.csu_itc303_team1.adhdtaskmanager.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.EditTodoDialog
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
-    rewardViewModel: RewardViewModel
+    rewardViewModel: RewardViewModel,
+    usersViewModel: UsersViewModel
 ) {
     rewardViewModel.allRewards.observeAsState(listOf())
 
@@ -174,7 +177,8 @@ fun TodoScreen(
                             todoState = state,
                             onEvent = onEvent,
                             index = state.todos.indexOf(todo),
-                            rewardViewModel = rewardViewModel
+                            rewardViewModel = rewardViewModel,
+                            usersViewModel = usersViewModel
                         )
                     }
                 }
