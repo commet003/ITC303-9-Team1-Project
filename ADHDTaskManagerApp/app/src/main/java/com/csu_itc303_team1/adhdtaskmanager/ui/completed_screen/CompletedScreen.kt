@@ -6,24 +6,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CompletedTaskCard
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 
 
 @Composable
-fun CompletedScreen(state: TodoState, event: (TodoEvent) -> Unit) {
-
-    event(TodoEvent.sortBy(SortType.BY_COMPLETED))
+fun CompletedScreen(state: TodoState) {
 
     LazyColumn(
         modifier = Modifier,
         contentPadding = PaddingValues(0.dp, 20.dp, 0.dp)
     ) {
         items(state.todos, {it.id}) { todo ->
-            println(todo.title)
-            if (todo.userID == state.userId){
+            if (todo.userID == state.userId && todo.isCompleted){
                 CompletedTaskCard(todo)
             }
         }

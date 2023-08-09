@@ -58,7 +58,7 @@ fun ADHDTaskManagerTheme(
         )
         systemUiController.setNavigationBarColor(
             color = BackgroundLight,
-            darkIcons = false
+            darkIcons = true
         )
         LightColorPalette
     }

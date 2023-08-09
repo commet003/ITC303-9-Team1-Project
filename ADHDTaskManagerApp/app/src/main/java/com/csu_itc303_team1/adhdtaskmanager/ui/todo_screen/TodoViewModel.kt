@@ -2,12 +2,12 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
-import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,15 +18,14 @@ class TodoViewModel(
 ): ViewModel() {
 
     private val _state = MutableStateFlow(TodoState())
-    private val _sortType = MutableStateFlow(SortType.BY_DATE)
+    private val _sortType = MutableStateFlow(SortType.BY_DATE_TIME)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _todos = _sortType
         .flatMapLatest { sortType ->
             when (sortType) {
-                SortType.BY_DATE -> todoDao.sortByDueDate()
+                SortType.BY_DATE_TIME -> todoDao.sortByDueDateAndTime()
                 SortType.BY_PRIORITY -> todoDao.sortByPriority()
-                SortType.BY_TIME -> todoDao.sortByDueTime()
                 SortType.BY_COMPLETED -> todoDao.sortByCompleted()
                 SortType.BY_NOT_COMPLETED -> todoDao.sortByNotCompleted()
             }

@@ -32,14 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.EditTodoDialog
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,31 +129,31 @@ fun TodoScreen(
                                 onEvent(TodoEvent.sortBy(sortType))
                             },
                             text = {
-                                if (sortType.name == "BY_DATE") {
-                                    Text(
-                                        text = "By Date",
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else if (sortType.name == "BY_PRIORITY") {
-                                    Text(
-                                        text = "By Priority",
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else if (sortType.name == "BY_TIME") {
-                                    Text(
-                                        text = "By Time",
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else if (sortType.name == "BY_COMPLETED") {
-                                    Text(
-                                        text = "By Completed",
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else if (sortType.name == "BY_NOT_COMPLETED") {
-                                    Text(
-                                        text = "By Not Completed",
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
+                                when (sortType.name) {
+                                    "BY_PRIORITY" -> {
+                                        Text(
+                                            text = "By Priority",
+                                            color = MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
+                                    "BY_DATE_TIME" -> {
+                                        Text(
+                                            text = "By Date",
+                                            color = MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
+                                    "BY_COMPLETED" -> {
+                                        Text(
+                                            text = "By Completed",
+                                            color = MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
+                                    "BY_NOT_COMPLETED" -> {
+                                        Text(
+                                            text = "By Not Completed",
+                                            color = MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
                                 }
                             }
                         )

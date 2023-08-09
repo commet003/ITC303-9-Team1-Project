@@ -185,6 +185,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
@@ -192,6 +193,7 @@ class MainActivity : ComponentActivity() {
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
                 rewardViewModel.allRewards.observeAsState(listOf())
+
 
 
                 Scaffold(
@@ -281,9 +283,14 @@ class MainActivity : ComponentActivity() {
                         )
 
                         val selectedItem = remember { mutableStateOf(screens[0]) }
+                        LaunchedEffect(key1 = !isSignedIn.value){
+                            drawerState.close()
+                            selectedItem.value = screens[0]
+                        }
 
                         ModalNavigationDrawer(
                             drawerState = drawerState,
+                            gesturesEnabled = isSignedIn.value,
                             drawerContent = {
                                 if (isSignedIn.value) {
                                     ModalDrawerSheet(
@@ -469,7 +476,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.CompletedScreen.route
                                     ) {
-                                        CompletedScreen(state, todoEvent)
+                                        CompletedScreen(state)
                                     }
 
                                     // Sign In Screen
@@ -547,12 +554,6 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.HelpScreen.route
                                     ) {
                                         HelpScreen()
-                                    }
-
-                                    composable(
-                                        route = Screen.CompletedScreen.route
-                                    ) {
-                                        CompletedScreen(state, todoEvent)
                                     }
 
                                     composable(
