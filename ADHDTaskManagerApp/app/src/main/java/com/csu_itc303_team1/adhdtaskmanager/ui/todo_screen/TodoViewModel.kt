@@ -2,11 +2,11 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.csu_itc303_team1.adhdtaskmanager.Priority
-import com.csu_itc303_team1.adhdtaskmanager.SortType
-import com.csu_itc303_team1.adhdtaskmanager.Todo
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
-import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*

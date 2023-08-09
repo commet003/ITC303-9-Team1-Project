@@ -33,10 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.SortType
-import com.csu_itc303_team1.adhdtaskmanager.TodoCard
-import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.EditTodoDialog

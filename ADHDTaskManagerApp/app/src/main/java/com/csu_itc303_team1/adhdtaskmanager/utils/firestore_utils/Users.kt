@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils
 
 data class Response(
     var users: List<Users>? = null,

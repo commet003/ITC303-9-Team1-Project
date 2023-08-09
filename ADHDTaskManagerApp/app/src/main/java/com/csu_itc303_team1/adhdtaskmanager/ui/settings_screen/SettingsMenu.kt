@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

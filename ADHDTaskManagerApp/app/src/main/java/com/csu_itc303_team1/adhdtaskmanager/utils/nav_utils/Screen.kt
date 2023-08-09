@@ -1,4 +1,6 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils
+
+import com.csu_itc303_team1.adhdtaskmanager.R
 
 /**
  * When a New Screen is added for the Navigation Drawer Menu. A new Screen Object will
@@ -10,7 +12,7 @@ sealed class Screen(val route: String, var icon: Int, val title: String) {
     object SettingsScreen: Screen("settings_screen", R.drawable.ic_settings,"Settings")
     object LeaderboardScreen: Screen("leaderboard_screen", R.drawable.ic_leaderboard,"Leaderboard")
     object RewardsScreen: Screen("reward_screen", R.drawable.ic_rewards,"Rewards")
-    object CompletedScreen: Screen("completed_screen",R.drawable.ic_complete,"Completed Tasks")
+    object CompletedScreen: Screen("completed_screen", R.drawable.ic_complete,"Completed Tasks")
     // Sign In Screen
     object SignInScreen: Screen("sign_in_screen", R.drawable.ic_sign_in,"Sign In")
 

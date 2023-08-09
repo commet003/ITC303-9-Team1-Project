@@ -5,8 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.csu_itc303_team1.adhdtaskmanager.RewardRepo
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
 import kotlinx.coroutines.launch
 

@@ -6,9 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.Priority
-import com.csu_itc303_team1.adhdtaskmanager.Todo
-import com.csu_itc303_team1.adhdtaskmanager.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import java.time.LocalDate
 import java.time.LocalDateTime

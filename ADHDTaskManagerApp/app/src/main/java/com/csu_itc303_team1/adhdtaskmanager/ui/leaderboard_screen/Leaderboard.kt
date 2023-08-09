@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 
 fun usersList(response: Response) {
 

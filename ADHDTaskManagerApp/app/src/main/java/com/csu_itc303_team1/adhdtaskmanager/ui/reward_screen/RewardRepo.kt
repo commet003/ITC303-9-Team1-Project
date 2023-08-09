@@ -1,8 +1,8 @@
-package com.csu_itc303_team1.adhdtaskmanager
+package com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.RewardDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

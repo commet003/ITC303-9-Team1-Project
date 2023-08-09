@@ -40,14 +40,6 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
 import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
-import androidx.compose.material.TextField
-import androidx.compose.ui.text.input.KeyboardType
-
-
-
-
-
-
 
 
 @Composable
@@ -71,12 +63,12 @@ fun PomodoroTimerScreen(
     var isWorkTime by remember { mutableStateOf(false) }
     var isBreakTime by remember { mutableStateOf(true) }
     var seconds by remember { mutableIntStateOf(0) }
-    var workTime by remember { mutableStateOf(initialWorkTime) }
-    var breakTime by remember { mutableStateOf(initialBreakTime) }
-    var workTimeInput by remember { mutableStateOf("") }
-    var breakTimeInput by remember { mutableStateOf("") }
+    var workTime by remember { mutableLongStateOf(initialWorkTime) }
+    var breakTime by remember { mutableLongStateOf(initialBreakTime) }
+    //var workTimeInput by remember { mutableStateOf("") }
+    //var breakTimeInput by remember { mutableStateOf("") }
 
-    TextField(
+    /*TextField(
         value = workTimeInput,
         onValueChange = {
             if(it.all { char -> char.isDigit() }) {
@@ -103,7 +95,7 @@ fun PomodoroTimerScreen(
     }
     if (breakTimeInput.isNotEmpty()) {
         breakTime = breakTimeInput.toLong() * 60000 // convert minutes to milliseconds
-    }
+    }*/
 
     LaunchedEffect(key1 = isTimerRunning, key2 = currentTime) {
         if (currentTime > 0 && isTimerRunning) {
@@ -148,11 +140,8 @@ fun PomodoroTimerScreen(
     }
 
     Row {
-        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = Color(0, 50, 140)) // Navy blue text
+        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
     }
-
-
-
 
 
 
@@ -170,7 +159,11 @@ fun PomodoroTimerScreen(
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
             drawArc(
-                color = activeBarColor,
+                color = if(isWorkTime){
+                    activeBarColor
+                }else {
+                      Color.Green
+                      },
                 startAngle = -215f,
                 sweepAngle = 250f * progress,
                 useCenter = false,
@@ -189,7 +182,11 @@ fun PomodoroTimerScreen(
                     Offset(center.x + aSide, center.y + bSide)
                 ),
                 pointMode = PointMode.Points,
-                color = handleColor,
+                color = if(isWorkTime){
+                    handleColor
+                }else {
+                    Color.Green
+                },
                 strokeWidth = (strokeWidth * 3f).toPx(),
                 cap = StrokeCap.Round
             )
@@ -219,7 +216,7 @@ fun PomodoroTimerScreen(
                 containerColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.error
+                    MaterialTheme.colorScheme.primaryContainer
                 },
                 contentColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.onPrimary
@@ -235,7 +232,8 @@ fun PomodoroTimerScreen(
                     "Pause"
                 } else {
                     "Resume"
-                }
+                },
+                fontWeight = FontWeight.Bold
             )
         }
         Button(
@@ -243,7 +241,7 @@ fun PomodoroTimerScreen(
                 .align(Alignment.BottomStart)
                 .padding(top = 120.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red,
+                containerColor = MaterialTheme.colorScheme.error,
                 contentColor = Color.White
             ),
             onClick = {
@@ -257,7 +255,10 @@ fun PomodoroTimerScreen(
                     toggleDoNotDisturb(context, activity)
                 }
         }) {
-            Text(text = "Stop")
+            Text(
+                text = "Stop",
+                fontWeight = FontWeight.Bold
+                )
         }
     }
     Spacer(modifier = Modifier.height(16.dp))

@@ -22,7 +22,7 @@
         android:theme="@style/Theme.ADHDTaskManager"
         tools:targetApi="31">
         <!--for viewing webpage-->
-        <activity android:name=".WebViewActivity" />
+        <activity android:name=".ui.help_screen.WebViewActivity" />
 
         <activity
             android:name=".MainActivity"

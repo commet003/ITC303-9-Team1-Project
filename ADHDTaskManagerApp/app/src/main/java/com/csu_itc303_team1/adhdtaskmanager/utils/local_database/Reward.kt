@@ -1,4 +1,4 @@
-package com.csu_itc303_team1.adhdtaskmanager.database.local
+package com.csu_itc303_team1.adhdtaskmanager.utils.local_database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

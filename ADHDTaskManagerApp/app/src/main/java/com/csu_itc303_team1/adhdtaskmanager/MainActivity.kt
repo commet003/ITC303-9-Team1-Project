@@ -58,16 +58,27 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.usersList
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
+import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -576,7 +587,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun showFocusNotification() {
+    private fun showFocusNotification() {
         val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
         val notification = NotificationCompat.Builder(
             applicationContext,
@@ -589,7 +600,7 @@ class MainActivity : ComponentActivity() {
         notificationManager.notify(1, notification)
     }
 
-    fun showBreakNotification() {
+    private fun showBreakNotification() {
         val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
         val notification = NotificationCompat.Builder(
             applicationContext,

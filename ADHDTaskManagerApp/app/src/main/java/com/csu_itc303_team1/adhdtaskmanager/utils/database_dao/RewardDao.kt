@@ -6,7 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.csu_itc303_team1.adhdtaskmanager.database.local.Reward
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 
 @Dao
 interface RewardDao {
