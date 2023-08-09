@@ -7,7 +7,7 @@ build/
 local.properties
 
 # API Keys File
-app/apikey.properties
+apikey.properties
 
 # Log/OS Files
 *.log
