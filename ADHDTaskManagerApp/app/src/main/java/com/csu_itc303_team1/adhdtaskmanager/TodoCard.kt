@@ -27,7 +27,14 @@ import androidx.compose.ui.unit.sp
 
 @SuppressLint("RememberReturnType")
 @Composable
-fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, index: Int, rewardViewModel: RewardViewModel) {
+fun TodoCard(
+    todo: Todo,
+    todoState: TodoState,
+    onEvent: (TodoEvent) -> Unit,
+    index: Int,
+    rewardViewModel: RewardViewModel,
+    usersViewModel: UsersViewModel
+    ) {
 
     rewardViewModel.allRewards.observeAsState(listOf())
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
@@ -100,7 +107,7 @@ fun TodoCard(todo: Todo, todoState: TodoState, onEvent: (TodoEvent) -> Unit, ind
                                 completedReward.timesAchieved =
                                     completedReward.timesAchieved + 1
                                 rewardViewModel.updateReward(completedReward)
-
+                                usersViewModel.completedTaskPoints()
                             }
                         } else {
                             println("Search Result on Todo Card is an empty list")

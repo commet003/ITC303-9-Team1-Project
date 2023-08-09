@@ -90,7 +90,7 @@ dependencies {
 
 
     // Google Play services library
-    implementation("com.google.android.gms:play-services-auth:20.4.1")
+    implementation("com.google.android.gms:play-services-auth:20.6.0")
 
     // Coil
     implementation("com.google.dagger:hilt-android:2.44")

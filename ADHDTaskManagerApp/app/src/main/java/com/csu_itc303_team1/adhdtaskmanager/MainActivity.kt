@@ -389,7 +389,8 @@ class MainActivity : ComponentActivity() {
                                             TodoScreen(
                                                 state = state,
                                                 onEvent = todoEvent,
-                                                rewardViewModel = rewardViewModel
+                                                rewardViewModel = rewardViewModel,
+                                                usersViewModel = userViewModel
                                             )
                                         }
 
@@ -415,7 +416,7 @@ class MainActivity : ComponentActivity() {
                                         composable(
                                             route = Screen.RewardsScreen.route
                                         ) {
-                                            RewardsScreen(rewardViewModel)
+                                            RewardsScreen(rewardViewModel, userViewModel)
                                         }
 
                                         // Completed Task Screen
@@ -434,6 +435,8 @@ class MainActivity : ComponentActivity() {
                                             LaunchedEffect(key1 = Unit) {
                                                 if(googleAuthUiClient.getSignedInUser() != null) {
                                                     navController.navigate("todo_screen")
+                                                    userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
+                                                    println("launched effect 1. user exists, I have run the code")
                                                     // Update top bar and drawer
                                                 }
                                             }
@@ -455,14 +458,13 @@ class MainActivity : ComponentActivity() {
                                                                 it1
                                                             )
                                                         }
-                                                    if (exist == true) {
-                                                        userViewModel.getUserFromFirebase(googleAuthUiClient)
-                                                    } else {
-                                                        userViewModel.convertToUserFromAuth(googleAuthUiClient)
+                                                    if (exist == false) {
+                                                        userViewModel.convertToUserFromAuth(
+                                                            googleAuthUiClient
+                                                        )
                                                         userViewModel.addUserToFirebase()
-
+                                                        println("I'm trying to add another user again.")
                                                     }
-
                                                 }
                                             }
 
