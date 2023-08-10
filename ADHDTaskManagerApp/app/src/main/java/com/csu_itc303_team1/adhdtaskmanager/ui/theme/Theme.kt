@@ -11,27 +11,33 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 private val DarkColorPalette = darkColorScheme(
     primary = NavyBlueLight,
     primaryContainer = BlueGrottoLight,
+    onPrimaryContainer = Color.White,
     secondary = BlueGreenLight,
     secondaryContainer = BabyBlueLight,
     background = BackgroundDark,
     onBackground = Color.White,
     surface = DiologBoxBackgroundDark,
     onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onSurface = Color.White
+    onSecondary = Color.White,
+    onSurface = Color.White,
+    errorContainer = Color(0xFFCF0026),
+    onErrorContainer = Color.White,
 )
 
 private val LightColorPalette = lightColorScheme(
     primary = NavyBlueDark,
     primaryContainer = BlueGrottoDark,
+    onPrimaryContainer = Color.White,
     secondary = BlueGreenDark,
+    onSecondary = Color.White,
     secondaryContainer = BabyBlueDark,
     background = BackgroundLight,
     surface = DiologBoxBackgroundLight,
     onPrimary = Color.White,
-    onSecondary = Color.Black,
     onBackground = Color.Black,
     onSurface = Color.Black,
+    errorContainer = Color(0xFF8D001A),
+    onErrorContainer = Color.White,
 )
 
 @Composable

@@ -40,6 +40,24 @@ class TodoViewModel(
 
     fun onEvent(event: TodoEvent) {
         when (event) {
+            // Todo Title Error
+            is TodoEvent.titleError -> {
+                _state.update {
+                    it.copy(
+                        titleError = event.error
+                    )
+                }
+            }
+
+            // Todo Description Error
+            is TodoEvent.descriptionError -> {
+                _state.update {
+                    it.copy(
+                        descriptionError = event.error
+                    )
+                }
+            }
+
             // Update Todo
             is TodoEvent.updateTodo -> {
                 viewModelScope.launch {
@@ -124,7 +142,12 @@ class TodoViewModel(
                 val dueTime = state.value.dueTime
                 val userId = state.value.userId
 
-                if (title.isBlank() || description.isBlank()) {
+                if (title.isEmpty()) {
+                    TodoEvent.titleError(true)
+                    return
+                }
+                if (description.isEmpty()) {
+                    TodoEvent.descriptionError(true)
                     return
                 }
 
@@ -149,7 +172,9 @@ class TodoViewModel(
                         dueDate = "",
                         dueTime = "",
                         showDialog = false,
-                        showEditTodoDialog = false
+                        showEditTodoDialog = false,
+                        titleError = false,
+                        descriptionError = false
                     )
                 }
             }
@@ -271,7 +296,9 @@ class TodoViewModel(
                         dueDate = "",
                         dueTime = "",
                         showDialog = false,
-                        showEditTodoDialog = false
+                        showEditTodoDialog = false,
+                        titleError = false,
+                        descriptionError = false
                     )
                 }
             }

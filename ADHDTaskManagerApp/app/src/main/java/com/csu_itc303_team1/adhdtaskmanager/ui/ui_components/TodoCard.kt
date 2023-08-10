@@ -25,13 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType")
 @Composable
 fun TodoCard(
@@ -46,7 +47,7 @@ fun TodoCard(
     rewardViewModel.allRewards.observeAsState(listOf())
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
-    var hours = remember {
+    val hours = remember {
         mutableIntStateOf(0)
     }
 
@@ -94,7 +95,6 @@ fun TodoCard(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Checkbox(
-
                     checked = todo.isCompleted, onCheckedChange = {
                         onEvent(TodoEvent.toggleCompleted(todo))
 

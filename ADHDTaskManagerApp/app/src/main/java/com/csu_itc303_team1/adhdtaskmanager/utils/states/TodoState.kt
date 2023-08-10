@@ -15,6 +15,8 @@ data class TodoState(
     var isClicked: Boolean = false,
     var id: Int = 0,
     val sortType: SortType = SortType.BY_NOT_COMPLETED,
+    val titleError: Boolean = false,
+    val descriptionError: Boolean = false,
     val showDialog: Boolean = false,
     val showEditTodoDialog: Boolean = false,
     val showDateSelector: Boolean = false,
