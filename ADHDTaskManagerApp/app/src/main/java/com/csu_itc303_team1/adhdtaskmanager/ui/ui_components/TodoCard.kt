@@ -90,9 +90,10 @@ fun TodoCard(
                 }
             }
             Row(
-                modifier = Modifier.height(60.dp),
+                modifier = Modifier.height(76.dp)
+                    .fillMaxWidth(0.9f),
                 verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start
             ) {
                 Checkbox(
                     checked = todo.isCompleted, onCheckedChange = {

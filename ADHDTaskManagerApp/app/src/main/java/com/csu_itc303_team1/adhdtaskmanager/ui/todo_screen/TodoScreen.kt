@@ -136,7 +136,7 @@ fun TodoScreen(
                               ExposedDropdownMenu(
                                   modifier = Modifier
                                       .width(150.dp)
-                                      .background(MaterialTheme.colorScheme.primaryContainer),
+                                      .background(MaterialTheme.colorScheme.surface),
                                   expanded = expanded,
                                   onDismissRequest = { expanded = false }) {
                                   SortType.values().forEach { sortType ->
@@ -151,25 +151,25 @@ fun TodoScreen(
                                                   "BY_PRIORITY" -> {
                                                       Text(
                                                           text = "By Priority",
-                                                          color = MaterialTheme.colorScheme.onSecondary
+                                                          color = MaterialTheme.colorScheme.onSurface
                                                       )
                                                   }
                                                   "BY_DATE_TIME" -> {
                                                       Text(
                                                           text = "By Date",
-                                                          color = MaterialTheme.colorScheme.onSecondary
+                                                          color = MaterialTheme.colorScheme.onSurface
                                                       )
                                                   }
                                                   "BY_COMPLETED" -> {
                                                       Text(
                                                           text = "By Completed",
-                                                          color = MaterialTheme.colorScheme.onSecondary
+                                                          color = MaterialTheme.colorScheme.onSurface
                                                       )
                                                   }
                                                   "BY_NOT_COMPLETED" -> {
                                                       Text(
                                                           text = "By Not Completed",
-                                                          color = MaterialTheme.colorScheme.onSecondary
+                                                          color = MaterialTheme.colorScheme.onSurface
                                                       )
                                                   }
                                               }

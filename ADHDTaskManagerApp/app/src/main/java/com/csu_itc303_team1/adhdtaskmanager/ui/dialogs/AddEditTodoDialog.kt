@@ -2,7 +2,9 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerLayoutType
@@ -44,8 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
@@ -96,15 +101,23 @@ fun AddEditTodoDialog(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Text(text =
-        if (state.showDialog){
-            "Add a new task"
-        } else{
-            "Edit task"
-        },
-            fontWeight = FontWeight.Bold,
-            fontSize = MaterialTheme.typography.titleLarge.fontSize
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text =
+            if (state.showDialog){
+                "Add a new task"
+            } else{
+                "Edit task"
+            },
+                fontWeight = FontWeight.Bold,
+                fontSize = 36.sp
+            )
+        }
+
 
 
         Column(
@@ -112,6 +125,12 @@ fun AddEditTodoDialog(
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
             TextField(
+                modifier = Modifier.border(
+                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                    shape = MaterialTheme.shapes.medium
+                )
+                    .width(280.dp),
+                singleLine = true,
                 value = if (state.showDialog){
                     state.title
                 }else {
@@ -126,10 +145,22 @@ fun AddEditTodoDialog(
                         onEvent(TodoEvent.setTitle(it))
                     }
                 },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+                shape = MaterialTheme.shapes.medium,
                 isError = state.titleError,
                 label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
             )
             TextField(
+                modifier = Modifier.border(
+                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                    shape = MaterialTheme.shapes.medium
+                )
+                    .width(280.dp),
+                singleLine = false,
+                maxLines = 4,
                 value = if (state.showDialog) {
                     state.description
                 } else {
@@ -143,9 +174,13 @@ fun AddEditTodoDialog(
                         onEvent(TodoEvent.setDescription(it))
                     }
                 },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+                shape = MaterialTheme.shapes.medium,
                 isError = state.descriptionError,
                 label = { Text("Provide a brief description") } // This line adds a hint to the TextField
-
             )
         }
 
