@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -506,20 +507,13 @@ class MainActivity : ComponentActivity() {
                                     ) {
 
                                         userRewardViewModel.allRewards.observeAsState(listOf())
-                                        val loginRewardListState = userRewardViewModel.findReward("Log In Reward").
-                                            observeAsState(listOf())
+                                        val loginRewardListState = userRewardViewModel.findReward("Log In Reward").observeAsState(listOf())
+
 
 
                                         LaunchedEffect(key1 = Unit) {
-                                            val loginReward = loginRewardListState.value[0]
                                             if (googleAuthUiClient.getSignedInUser() != null) {
                                                 navController.navigate("todo_screen")
-
-                                                googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                    userRewardViewModel.checkUserExists(
-                                                        it1, googleAuthUiClient, loginReward
-                                                    )
-                                                }
                                             }
                                         }
 
@@ -530,13 +524,14 @@ class MainActivity : ComponentActivity() {
                                                     "Sign in successful",
                                                     Toast.LENGTH_LONG
                                                 ).show()
+                                                Log.d("SignIn", loginRewardListState.value[0].toString())
+                                                navController.navigate("todo_screen")
                                                 val loginReward = loginRewardListState.value[0]
                                                 googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
                                                     userRewardViewModel.checkUserExists(
                                                         it1, googleAuthUiClient, loginReward
                                                     )
                                                 }
-                                                navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
 
                                             }
