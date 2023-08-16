@@ -266,9 +266,9 @@ class MainActivity : ComponentActivity() {
                             R.drawable.ic_complete,
                             R.drawable.ic_rewards,
                             R.drawable.ic_leaderboard,
+                            R.drawable.ic_pomodoro_timer,
                             R.drawable.ic_settings,
-                            R.drawable.ic_help,
-                            R.drawable.ic_pomodoro_timer
+                            R.drawable.ic_help
                         )
 
                         // Create a list of Screen objects
@@ -277,9 +277,9 @@ class MainActivity : ComponentActivity() {
                             Screen.CompletedScreen,
                             Screen.RewardsScreen,
                             Screen.LeaderboardScreen,
+                            Screen.PomodoroTimerScreen,
                             Screen.SettingsScreen,
                             Screen.HelpScreen,
-                            Screen.PomodoroTimerScreen
                         )
 
                         val selectedItem = remember { mutableStateOf(screens[0]) }
@@ -614,7 +614,7 @@ class MainActivity : ComponentActivity() {
         notificationManager.notify(2, notification)
     }
 
-    // creates Arraylist of users from the firestore database
+    // creates Arraylist of users from the Firestore database
     private fun getResponseUsingCallback() {
         leadViewModel.getResponseUsingCallback((object : FirebaseCallback {
             override fun onResponse(response: Response) {
