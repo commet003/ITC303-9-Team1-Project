@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class UsersViewModel(
     private val repo: UsersRepo = UsersRepo()
@@ -61,5 +63,26 @@ class UsersViewModel(
             user.value?.let { repo.updatePoints(it, points ) }
         }
     }
+
+    fun checkLastLogin(): Boolean {
+        val currentDate = LocalDate.now().toString()
+        val lastLogin = user.value?.lastLogin.toString()
+        var loggedInToday = true
+
+        if (currentDate != lastLogin) {
+            loggedInToday = false
+        }
+        return loggedInToday
+    }
+
+//    fun updateLastLogin() {
+//        val currentDate = LocalDate.now().toString()
+//        val loginStreak = user.value?.loginStreak?.plus(1)
+//        user.value?.let {
+//            if (loginStreak != null) {
+//                repo.updateLogin(it, currentDate, loginStreak)
+//            }
+//        }
+//    }
 
 }

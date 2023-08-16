@@ -13,6 +13,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlin.properties.Delegates
 
 class UsersRepo (
     // initializing the firestore database
@@ -44,7 +45,7 @@ class UsersRepo (
 
     fun checkExists(email: String): Boolean {
         val checkUser = rootRef.collection("users").document(email)
-        var userExist = false
+        var userExist = true
         checkUser.get()
             .addOnSuccessListener { document ->
                 userExist = if (document != null) {
@@ -98,24 +99,6 @@ class UsersRepo (
         awaitClose { registration.remove() }
     }
 
-    fun getLeaderboardThree(): ArrayList<Users> {
-        val leaderboard = ArrayList<Users>()
-        userRef.addSnapshotListener { value, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-
-                for (doc in value!!) {
-                    doc?.let {
-                        leaderboard.add(it.toObject())
-                    }
-                }
-                Log.d(TAG, "Current cites in CA: $leaderboard")
-            }
-        return leaderboard
-    }
-
     fun updatePoints(user: Users, points: Int){
         val ref = userRef.document(user.userID.toString())
 
@@ -124,5 +107,25 @@ class UsersRepo (
                 println("I updated Points successfully")}
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e)
                 println("I did not update Points")}
+    }
+
+    fun updateLoginDate(user: Users, date: String) {
+        val ref = userRef.document(user.userID.toString())
+
+        ref.update(
+            "lastLogin", date
+            )
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!")}
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e)}
+    }
+
+    fun updateLoginStreak(user: Users, streak: Int) {
+        val ref = userRef.document(user.userID.toString())
+
+        ref.update(
+            "loginStreak", streak
+        )
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!")}
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e)}
     }
 }

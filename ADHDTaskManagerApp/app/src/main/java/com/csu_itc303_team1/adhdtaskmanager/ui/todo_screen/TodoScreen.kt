@@ -47,6 +47,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
+import com.csu_itc303_team1.adhdtaskmanager.utils.userRewardViewModel.UserRewardViewModel
 import kotlinx.coroutines.launch
 
 
@@ -56,10 +57,9 @@ import kotlinx.coroutines.launch
 fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
-    rewardViewModel: RewardViewModel,
-    usersViewModel: UsersViewModel
+    userRewardViewModel: UserRewardViewModel
 ) {
-    rewardViewModel.allRewards.observeAsState(listOf())
+    userRewardViewModel.allRewards.observeAsState(listOf())
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
@@ -195,8 +195,7 @@ fun TodoScreen(
                                           todoState = state,
                                           onEvent = onEvent,
                                           index = state.todos.indexOf(todo),
-                                          rewardViewModel = rewardViewModel,
-                                          usersViewModel = usersViewModel
+                                          userRewardViewModel = userRewardViewModel
                                       )
                                   }
                               }

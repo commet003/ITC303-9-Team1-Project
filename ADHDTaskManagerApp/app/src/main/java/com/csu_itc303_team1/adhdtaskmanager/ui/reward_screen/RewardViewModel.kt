@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,41 +14,52 @@ import kotlinx.coroutines.launch
 
 class RewardViewModel(application: Application): ViewModel() {
 
-    var allRewards: LiveData<List<Reward>>
-    private val repo: RewardRepo
-    private var _searchResults = MutableLiveData<List<Reward>>((emptyList()))
-    var searchResults: LiveData<List<Reward>> = _searchResults
-
-
-    init {
-        val rewardDb = RewardDatabase.getInstance(application)
-        val rewardDao = rewardDb.rewardDao
-        repo = RewardRepo(rewardDao)
-
-        allRewards = repo.allRewards
-    }
-
-    fun insertReward(reward: Reward) {
-        repo.insertReward(reward)
-    }
-
-    fun findReward(name: String): LiveData<List<Reward>> {
-        viewModelScope.launch {
-            searchResults = repo.findReward(name)
-        }
-        return searchResults
-    }
-
-    fun updateReward(reward: Reward) {
-        repo.updateReward(reward)
-    }
-
-    fun deleteReward(reward: Reward) {
-        repo.deleteReward(reward)
-    }
-
-    fun updateState(rewardName: String) {
-        findReward(rewardName)
-    }
-
+//    var allRewards: LiveData<List<Reward>>
+//    private val repo: RewardRepo
+//    private var _searchResults = MutableLiveData<List<Reward>>((emptyList()))
+//    var searchResults: LiveData<List<Reward>> = _searchResults
+//
+//
+//    init {
+//        val rewardDb = RewardDatabase.getInstance(application)
+//        val rewardDao = rewardDb.rewardDao
+//        repo = RewardRepo(rewardDao)
+//
+//        allRewards = repo.allRewards
+//    }
+//
+//    fun insertReward(reward: Reward) {
+//        repo.insertReward(reward)
+//    }
+//
+////    fun findReward(name: String): LiveData<List<Reward>> {
+////        viewModelScope.launch {
+////            searchResults = repo.findReward(name)
+////        }
+////        return searchResults
+////    }
+//
+//    fun updateReward(reward: Reward) {
+//        repo.updateReward(reward)
+//    }
+//
+//    fun deleteReward(reward: Reward) {
+//        repo.deleteReward(reward)
+//    }
+//
+//    fun updateState(rewardName: String) {
+//        findReward(rewardName)
+//    }
+//
+//    fun loginReward() {
+//        findReward("Log In Reward")
+//        val result = searchResults.value?.get(0)
+//        if (result != null) {
+//            result.timesAchieved = result.timesAchieved.plus(1)
+//            repo.updateReward(result)
+//        } else {
+//            println("search equalled null")
+//        }
+//
+//    }
 }

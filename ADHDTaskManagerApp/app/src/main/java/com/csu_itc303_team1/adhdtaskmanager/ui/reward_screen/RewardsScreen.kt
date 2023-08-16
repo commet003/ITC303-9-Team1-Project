@@ -20,12 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.RewardCard
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.userRewardViewModel.UserRewardViewModel
 
 @Composable
-fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewModel) {
+fun RewardsScreen(userRewardViewModel: UserRewardViewModel) {
 
-    val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
-    val currentUser = usersViewModel.user.collectAsState()
+    val allRewards by userRewardViewModel.allRewards.observeAsState(listOf())
+    val currentUser = userRewardViewModel.user.collectAsState()
 
     Row(
         modifier = Modifier

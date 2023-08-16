@@ -13,7 +13,9 @@ data class Users (
     val password: String? = null,
     val username: String? = null,
     val country: String? = null,
-    val userID: String? = null
+    val userID: String? = null,
+    var lastLogin: String = "",
+    var loginStreak: Int = 0
         )
 
 // Final list of users ready for displaying

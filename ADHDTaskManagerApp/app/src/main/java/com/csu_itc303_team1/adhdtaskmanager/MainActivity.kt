@@ -77,8 +77,10 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
+import com.csu_itc303_team1.adhdtaskmanager.utils.userRewardViewModel.UserRewardViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -99,15 +101,25 @@ class MainActivity : ComponentActivity() {
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
-    private val rewardViewModel by viewModels<RewardViewModel>(
-        factoryProducer = {
-            object: ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RewardViewModel(application) as T
-                }
-            }
-        }
-    )
+//    private val rewardViewModel by viewModels<RewardViewModel>(
+//        factoryProducer = {
+//            object: ViewModelProvider.Factory{
+//                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//                    return RewardViewModel(application) as T
+//                }
+//            }
+//        }
+//    )
+
+//    private val userRewardViewModel by viewModels<UserRewardViewModel>(
+//        factoryProducer = {
+//            object: ViewModelProvider.Factory{
+//                override fun <T: ViewModel> create(modelClass: Class<T>): T {
+//                    return UserRewardViewModel(application) as T
+//                }
+//            }
+//        }
+//    )
 
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
@@ -138,6 +150,16 @@ class MainActivity : ComponentActivity() {
                 object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
                         return TodoViewModel(db.todoDao) as T
+                    }
+                }
+            }
+        )
+
+        val userRewardViewModel by viewModels<UserRewardViewModel>(
+            factoryProducer = {
+                object: ViewModelProvider.Factory{
+                    override fun <T: ViewModel> create(modelClass: Class<T>): T {
+                        return UserRewardViewModel(application) as T
                     }
                 }
             }
@@ -192,7 +214,7 @@ class MainActivity : ComponentActivity() {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
-                rewardViewModel.allRewards.observeAsState(listOf())
+                userRewardViewModel.allRewards.observeAsState(listOf())
 
 
 
@@ -442,8 +464,7 @@ class MainActivity : ComponentActivity() {
                                         TodoScreen(
                                             state = state,
                                             onEvent = todoEvent,
-                                            rewardViewModel = rewardViewModel,
-                                            usersViewModel = userViewModel
+                                            userRewardViewModel = userRewardViewModel
                                         )
                                     }
 
@@ -469,7 +490,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel)
+                                        RewardsScreen(userRewardViewModel)
                                     }
 
                                     // Completed Task Screen
@@ -484,15 +505,23 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.SignInScreen.route
                                     ) {
 
+                                        userRewardViewModel.allRewards.observeAsState(listOf())
+                                        val loginRewardListState = userRewardViewModel.findReward("Log In Reward").
+                                            observeAsState(listOf())
+
 
                                         LaunchedEffect(key1 = Unit) {
+                                            val loginReward = loginRewardListState.value[0]
                                             if (googleAuthUiClient.getSignedInUser() != null) {
                                                 navController.navigate("todo_screen")
-                                                userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
-                                                println("launched effect 1. user exists, I have run the code")
+
+                                                googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                    userRewardViewModel.checkUserExists(
+                                                        it1, googleAuthUiClient, loginReward
+                                                    )
+                                                }
                                             }
                                         }
-
 
                                         LaunchedEffect(key1 = signInState.isSignInSuccessful) {
                                             if (signInState.isSignInSuccessful) {
@@ -501,22 +530,15 @@ class MainActivity : ComponentActivity() {
                                                     "Sign in successful",
                                                     Toast.LENGTH_LONG
                                                 ).show()
-
+                                                val loginReward = loginRewardListState.value[0]
+                                                googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                    userRewardViewModel.checkUserExists(
+                                                        it1, googleAuthUiClient, loginReward
+                                                    )
+                                                }
                                                 navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
-                                                val exist =
-                                                    googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                        userViewModel.checkUserExists(
-                                                            it1
-                                                        )
-                                                    }
-                                                if (exist == false) {
-                                                    userViewModel.convertToUserFromAuth(
-                                                        googleAuthUiClient
-                                                    )
-                                                    userViewModel.addUserToFirebase()
-                                                    println("I'm trying to add another user again.")
-                                                }
+
                                             }
                                         }
 
@@ -584,7 +606,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            rewardViewModel.allRewards.observeAsState(listOf())
+            userRewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 
