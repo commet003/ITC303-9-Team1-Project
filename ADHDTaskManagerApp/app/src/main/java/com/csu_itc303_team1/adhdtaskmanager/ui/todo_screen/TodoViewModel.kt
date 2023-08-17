@@ -49,6 +49,10 @@ class TodoViewModel(
                 }
             }
 
+            is TodoEvent.ToggleLottieAnimation -> {
+                _state.value = _state.value.copy(showLottieAnimation = event.show)
+            }
+
             // Todo Description Error
             is TodoEvent.descriptionError -> {
                 _state.update {
@@ -132,6 +136,8 @@ class TodoViewModel(
                     it.copy(showEditTimeSelector = false)
                 }
             }
+
+
 
 
             TodoEvent.saveTodo -> {

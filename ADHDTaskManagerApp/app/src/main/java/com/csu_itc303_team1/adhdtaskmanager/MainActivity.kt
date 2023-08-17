@@ -85,6 +85,13 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+import android.content.Context
+import android.view.LayoutInflater
+import android.widget.TextView
+import android.view.Gravity
+
+
+
 
 
 @Suppress("UNCHECKED_CAST")
@@ -145,6 +152,20 @@ class MainActivity : ComponentActivity() {
 
         googleAuthUiClient.addAuthStateListener {
             isSignedIn.value = it
+            if (it) { // if signed in
+                // Inflate the custom toast layout
+                val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
+                val customToastMessage = customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
+                customToastMessage.text = "Welcome back! Be sure to check out the leaderboard for the latest standings"
+
+                // Create the toast with custom view
+                val customToast = Toast(this@MainActivity)
+                customToast.view = customToastRoot
+                customToast.duration = Toast.LENGTH_SHORT
+                customToast.setGravity(Gravity.CENTER, 0, 0) // Centering the toast
+                customToast.show()
+            }
         }
 
         setContent {

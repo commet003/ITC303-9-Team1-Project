@@ -42,7 +42,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
@@ -59,6 +61,7 @@ fun TodoScreen(
     rewardViewModel: RewardViewModel,
     usersViewModel: UsersViewModel
 ) {
+
     rewardViewModel.allRewards.observeAsState(listOf())
 
     val sheetState = rememberStandardBottomSheetState(
@@ -70,141 +73,156 @@ fun TodoScreen(
     )
     val scope = rememberCoroutineScope()
 
+    val showToast = remember { mutableStateOf(false) }
+
+
+
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetSwipeEnabled = false,
         sheetDragHandle = {},
         content = {
-                  Scaffold(
-                      floatingActionButton = {
-                          FloatingActionButton(
-                              containerColor = MaterialTheme.colorScheme.primaryContainer,
-                              onClick = {
-                                  onEvent(TodoEvent.showDialog)
-                                  scope.launch {
-                                      sheetState.expand()
-                                  }
-                              }
-                          ) {
-                              Icon(
-                                  tint = MaterialTheme.colorScheme.onPrimary,
-                                  imageVector = Icons.Default.Add,
-                                  modifier = Modifier
-                                      .background(MaterialTheme.colorScheme.primaryContainer)
-                                      .height(32.dp)
-                                      .width(32.dp),
-                                  contentDescription = "Add Todo"
-                              )
-                          }
-                      }
-                  ) { paddingValues ->
-                      var expanded by remember { mutableStateOf(false) }
+            Scaffold(
+                floatingActionButton = {
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        onClick = {
+                            onEvent(TodoEvent.showDialog)
+                            scope.launch {
+                                sheetState.expand()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            imageVector = Icons.Default.Add,
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .height(32.dp)
+                                .width(32.dp),
+                            contentDescription = "Add Todo"
+                        )
+                    }
+                }
+            ) { paddingValues ->
+                var expanded by remember { mutableStateOf(false) }
 
-                      if (state.showEditTodoDialog){
-                          scope.launch {
-                              sheetState.expand()
-                          }
-                      }
+                if (state.showEditTodoDialog){
+                    scope.launch {
+                        sheetState.expand()
+                    }
+                }
 
-                      Column (
-                          verticalArrangement = Arrangement.SpaceAround
-                      ){
-                          // TODO: This is where the task are filtered
-                          // If you only want the completed task to show, then you can set
-                          // sortType to SortType.BY_COMPLETED
-                          ExposedDropdownMenuBox(
-                              modifier = Modifier
-                                  .align(Alignment.End)
-                                  .padding(end = 10.dp),
-                              expanded = expanded,
-                              onExpandedChange = { expanded = !expanded}
-                          )
-                          {
-                              IconButton(
-                                  modifier = Modifier
-                                      .menuAnchor()
-                                      .align(Alignment.CenterHorizontally)
-                                  ,
-                                  onClick = { }) {
-                                  Icon(
-                                      tint = MaterialTheme.colorScheme.onBackground,
-                                      imageVector = Icons.Filled.List,
-                                      contentDescription = "Filter"
-                                  )
-                              }
+                Column (
+                    verticalArrangement = Arrangement.SpaceAround
+                ){
+                    // TODO: This is where the task are filtered
+                    // If you only want the completed task to show, then you can set
+                    // sortType to SortType.BY_COMPLETED
+                    ExposedDropdownMenuBox(
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(end = 10.dp),
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded}
+                    )
+                    {
+                        IconButton(
+                            modifier = Modifier
+                                .menuAnchor()
+                                .align(Alignment.CenterHorizontally)
+                            ,
+                            onClick = { }) {
+                            Icon(
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                imageVector = Icons.Filled.List,
+                                contentDescription = "Filter"
+                            )
+                        }
 
-                              ExposedDropdownMenu(
-                                  modifier = Modifier
-                                      .width(150.dp)
-                                      .background(MaterialTheme.colorScheme.surface),
-                                  expanded = expanded,
-                                  onDismissRequest = { expanded = false }) {
-                                  SortType.values().forEach { sortType ->
-                                      DropdownMenuItem(
-                                          modifier = Modifier.clip(MaterialTheme.shapes.medium),
-                                          onClick = {
-                                              expanded = false
-                                              onEvent(TodoEvent.sortBy(sortType))
-                                          },
-                                          text = {
-                                              when (sortType.name) {
-                                                  "BY_PRIORITY" -> {
-                                                      Text(
-                                                          text = "By Priority",
-                                                          color = MaterialTheme.colorScheme.onSurface
-                                                      )
-                                                  }
-                                                  "BY_DATE_TIME" -> {
-                                                      Text(
-                                                          text = "By Date",
-                                                          color = MaterialTheme.colorScheme.onSurface
-                                                      )
-                                                  }
-                                                  "BY_COMPLETED" -> {
-                                                      Text(
-                                                          text = "By Completed",
-                                                          color = MaterialTheme.colorScheme.onSurface
-                                                      )
-                                                  }
-                                                  "BY_NOT_COMPLETED" -> {
-                                                      Text(
-                                                          text = "By Not Completed",
-                                                          color = MaterialTheme.colorScheme.onSurface
-                                                      )
-                                                  }
-                                              }
-                                          }
-                                      )
-                                  }
-                              }
+                        ExposedDropdownMenu(
+                            modifier = Modifier
+                                .width(150.dp)
+                                .background(MaterialTheme.colorScheme.surface),
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }) {
+                            SortType.values().forEach { sortType ->
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    onClick = {
+                                        expanded = false
+                                        onEvent(TodoEvent.sortBy(sortType))
+                                    },
+                                    text = {
+                                        when (sortType.name) {
+                                            "BY_PRIORITY" -> {
+                                                Text(
+                                                    text = "By Priority",
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                            "BY_DATE_TIME" -> {
+                                                Text(
+                                                    text = "By Date",
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                            "BY_COMPLETED" -> {
+                                                Text(
+                                                    text = "By Completed",
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                            "BY_NOT_COMPLETED" -> {
+                                                Text(
+                                                    text = "By Not Completed",
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+                        }
 
 
-                          }
+                    }
 
-                          LazyColumn(
-                              contentPadding = paddingValues,
-                              modifier = Modifier.fillMaxSize(),
-                              verticalArrangement = Arrangement.spacedBy(1.dp)
-                          ) {
+                    LazyColumn(
+                        contentPadding = paddingValues,
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(1.dp)
+                    ) {
 
-                              items(state.todos) { todo ->
-                                  if (todo.userID == state.userId) {
+                        items(state.todos) { todo ->
+                            if (todo.userID == state.userId) {
 
-                                      TodoCard(
-                                          todo = todo,
-                                          todoState = state,
-                                          onEvent = onEvent,
-                                          index = state.todos.indexOf(todo),
-                                          rewardViewModel = rewardViewModel,
-                                          usersViewModel = usersViewModel
-                                      )
-                                  }
-                              }
-                          }
+                                TodoCard(
+                                    todo = todo,
+                                    todoState = state,
+                                    onEvent = onEvent,
+                                    index = state.todos.indexOf(todo),
+                                    rewardViewModel = rewardViewModel,
+                                    usersViewModel = usersViewModel,
+                                    showToast = showToast
 
-                      }
+                                )
+                            }
+                        }
+                    }
 
-                  }
+
+                }
+                lottieLoaderAnimation(isVisible = showToast.value)
+
+                CustomToastMessage(
+                    message = "Congrats on completing a task!",
+                    isVisible = showToast.value,
+                )
+
+
+
+            }
         },
         sheetPeekHeight = 0.dp,
         sheetContent = {
@@ -224,5 +242,6 @@ fun TodoScreen(
             }
         }
     )
+
 }
 
