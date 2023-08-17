@@ -63,8 +63,8 @@ fun PomodoroTimerScreen(
     var isWorkTime by remember { mutableStateOf(false) }
     var isBreakTime by remember { mutableStateOf(true) }
     var seconds by remember { mutableIntStateOf(0) }
-    var workTime by remember { mutableLongStateOf(initialWorkTime) }
-    var breakTime by remember { mutableLongStateOf(initialBreakTime) }
+    val workTime by remember { mutableLongStateOf(initialWorkTime) }
+    val breakTime by remember { mutableLongStateOf(initialBreakTime) }
     //var workTimeInput by remember { mutableStateOf("") }
     //var breakTimeInput by remember { mutableStateOf("") }
 
