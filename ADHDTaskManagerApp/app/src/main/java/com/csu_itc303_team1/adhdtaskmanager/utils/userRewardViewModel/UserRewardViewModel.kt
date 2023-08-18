@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.userRewardViewModel
 
 import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
@@ -14,7 +15,9 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -38,6 +41,9 @@ class UserRewardViewModel(
     private val rewardRepo: RewardRepo
     private var _searchResults = MutableLiveData<List<Reward>>()
     var searchResults: LiveData<List<Reward>> = _searchResults
+    var activeReward: Reward? = searchResults.value?.get(0)
+
+    var searchedReward: List<Reward> = listOf()
 
     init {
         val rewardDb = RewardDatabase.getInstance(application)
@@ -58,11 +64,29 @@ class UserRewardViewModel(
         }
     }
 
-    fun checkUserExists(id: String, googleUser: AuthUiClient, loginReward: Reward) {
+    fun checkUserExists(id: String, googleUser: AuthUiClient) {
         viewModelScope.launch(Dispatchers.IO) {
             val exists = userRepo.checkExists(id)
+            val reward = findRewardFive("Log In Reward")[0]
+
+            if (reward.title != "Log In Reward") {
+                println("Check User Exists. Could not find reward in Reward Database Fucking Bullshit")
+            } else {
+                if (exists) {
+                    getUser(id, reward )
+                    println("I guess user Exists. Ran get user code")
+
+                } else {
+                    println("userRewardViewModel: User Doesn't exist")
+                    println("userRewardViewModel: adding user")
+                    convertToUserFromAuth(googleUser)
+                    addUserToFirebase()
+                    getUser(id, reward)
+                }
+            }
+
             if (exists) {
-                getUser(id, loginReward)
+                getUser(id, reward )
                 println("I guess user Exists. Ran get user code")
 
             } else {
@@ -70,7 +94,7 @@ class UserRewardViewModel(
                 println("userRewardViewModel: adding user")
                 convertToUserFromAuth(googleUser)
                 addUserToFirebase()
-                getUser(id, loginReward)
+                getUser(id, reward)
 
             }
         }
@@ -153,7 +177,6 @@ class UserRewardViewModel(
             searchResults = rewardRepo.findReward(name)
         }
         return searchResults
-
     }
 
     fun updateReward(reward: Reward) {
@@ -180,9 +203,32 @@ class UserRewardViewModel(
         }
     }
 
-    fun findRewardTwo(name: String) {
-
+    suspend fun findRewardTwo(name: String): Reward {
+        val deferred: Deferred<Reward> = viewModelScope.async {
+            rewardRepo.findRewardTwo(name)
+        }
+        return deferred.await()
     }
 
+    fun findRewardThree(name: String): LiveData<Reward> {
+        return rewardRepo.findRewardThree(name)
+    }
+
+    suspend fun findRewardFour(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            searchedReward = rewardRepo.findRewardFour(name)
+            println(searchedReward[0])
+        }
+    }
+
+    suspend fun findRewardFive(name: String): List<Reward> {
+        var list: List<Reward> = listOf()
+        val please: Deferred<Unit> = viewModelScope.async {
+            list = rewardRepo.findRewardFour(name)
+            println(list[0])
+        }
+        please.await()
+        return list
+    }
 
 }

@@ -36,8 +36,16 @@ class RewardRepo(private val rewardDao: RewardDao) {
         return rewardDao.findReward(name)
     }
 
-    fun findRewardTwo(name: String): Reward {
+    suspend fun findRewardTwo(name: String): Reward {
         return rewardDao.findRewardTwo(name)
+    }
+
+    fun findRewardThree(name: String): LiveData<Reward> {
+        return rewardDao.findRewardThree(name)
+    }
+
+    suspend fun findRewardFour(name: String): List<Reward> {
+        return rewardDao.findRewardFour(name)
     }
 
 }

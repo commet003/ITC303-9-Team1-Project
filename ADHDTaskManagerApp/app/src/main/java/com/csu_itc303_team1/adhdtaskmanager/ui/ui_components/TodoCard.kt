@@ -46,8 +46,17 @@ fun TodoCard(
 
     userRewardViewModel.allRewards.observeAsState(listOf())
 
-    val search by userRewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
-    println(search.toString())
+    var result = Reward("", "", 0, 0, 0)
+    val search by userRewardViewModel.searchResults.observeAsState()
+    if (search != null){
+        result = search?.get(0)!!
+        println(result.toString())
+    }
+
+
+    LaunchedEffect(key1 = Unit) {
+        userRewardViewModel.findReward("Completed Task Reward")
+    }
 
 
     val hours = remember {
@@ -105,19 +114,14 @@ fun TodoCard(
                         // get the Completed Reward Entity and update the times achieved.
                         // rewardViewModel.findReward("Completed Task Reward")
 
-                        println(search.toString())
-                        if (search.isNotEmpty()) {
-                            val completedReward = search[0]
-
-                            if (!todo.isCompleted) {
-                                completedReward.timesAchieved =
-                                    completedReward.timesAchieved + 1
-                                userRewardViewModel.updateReward(completedReward)
-                                userRewardViewModel.completedTaskPoints()
-                            }
-                        } else {
-                            println("Search Result on Todo Card is an empty list")
+                        println(result.toString())
+                        if (!todo.isCompleted) {
+                            result.timesAchieved =
+                                result.timesAchieved + 1
+                            userRewardViewModel.updateReward(result)
+                            userRewardViewModel.completedTaskPoints()
                         }
+
 
 
                     },

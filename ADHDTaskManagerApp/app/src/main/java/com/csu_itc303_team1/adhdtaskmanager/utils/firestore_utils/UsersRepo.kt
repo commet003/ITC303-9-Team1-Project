@@ -43,26 +43,25 @@ class UsersRepo (
         }
     }
 
-    fun checkExists(email: String): Boolean {
-        val checkUser = rootRef.collection("users").document(email)
-        var userExist = true
-        checkUser.get()
-            .addOnSuccessListener { document ->
-                userExist = if (document != null) {
-                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                    println("UserRepo.checkExists: User Exists")
-                    true
+    fun checkExists(id: String): Boolean {
+        val checkUser = rootRef.collection("users").whereEqualTo("id", id)
+        var userExist = false
 
-                } else {
-                    Log.d(TAG, "No Such Document")
-                    println("UserRepo.checkExists: Does not exist")
-                    false
+        checkUser.get().addOnCompleteListener { task ->
+            Log.d(TAG, "Checking if User Exists")
+            if (task.isSuccessful) {
+                for (document in task.result) {
+                    val iD = document.getString("id")
+                    if (iD == id) {
+                        Log.d(TAG, "Found Match. User Exists")
+                        userExist = true
+                        break
+                    }
                 }
+            } else if (!task.isSuccessful) {
+                userExist = false
             }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with", exception)
-            }
-
+        }
         return userExist
     }
 

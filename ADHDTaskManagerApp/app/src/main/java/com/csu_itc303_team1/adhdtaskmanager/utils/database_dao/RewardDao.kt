@@ -27,7 +27,12 @@ interface RewardDao {
     fun findReward(name: String): LiveData<List<Reward>>
 
     @Query("SELECT * FROM rewards WHERE title = :name")
-    fun findRewardTwo(name: String): Reward
+    suspend fun findRewardTwo(name: String): Reward
 
+    @Query("SELECT * FROM rewards WHERE title = :name")
+    fun findRewardThree(name: String): LiveData<Reward>
+
+    @Query("SELECT * FROM rewards WHERE title = :name")
+    suspend fun findRewardFour(name: String): List<Reward>
 
 }

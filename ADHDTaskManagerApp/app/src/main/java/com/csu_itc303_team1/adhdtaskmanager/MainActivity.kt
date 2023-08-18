@@ -85,6 +85,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.userRewardViewModel.UserReward
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -506,32 +507,46 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.SignInScreen.route
                                     ) {
 
-                                        userRewardViewModel.allRewards.observeAsState(listOf())
-                                        val loginRewardListState = userRewardViewModel.findReward("Log In Reward").observeAsState(listOf())
+                                        //userRewardViewModel.allRewards.observeAsState(listOf())
+                                        //val loginRewardListState = userRewardViewModel.findReward("Log In Reward").observeAsState(listOf())
 
 
 
                                         LaunchedEffect(key1 = Unit) {
                                             if (googleAuthUiClient.getSignedInUser() != null) {
+                                                Toast.makeText(
+                                                    applicationContext,
+                                                    "Sign in as ${googleAuthUiClient.getSignedInUser()!!.username.toString()}",
+                                                    Toast.LENGTH_LONG
+                                                ).show()
                                                 navController.navigate("todo_screen")
+
+
+
+                                                googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                    userRewardViewModel.checkUserExists(
+                                                        it1, googleAuthUiClient
+                                                    )
+                                                }
                                             }
                                         }
 
                                         LaunchedEffect(key1 = signInState.isSignInSuccessful) {
+                                            delay(2000)
                                             if (signInState.isSignInSuccessful) {
                                                 Toast.makeText(
                                                     applicationContext,
                                                     "Sign in successful",
                                                     Toast.LENGTH_LONG
                                                 ).show()
-                                                Log.d("SignIn", loginRewardListState.value[0].toString())
-                                                navController.navigate("todo_screen")
-                                                val loginReward = loginRewardListState.value[0]
+
                                                 googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                    userRewardViewModel.checkUserExists(
-                                                        it1, googleAuthUiClient, loginReward
-                                                    )
+                                                        userRewardViewModel.checkUserExists(
+                                                            it1, googleAuthUiClient
+                                                        )
+
                                                 }
+                                                navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
 
                                             }
