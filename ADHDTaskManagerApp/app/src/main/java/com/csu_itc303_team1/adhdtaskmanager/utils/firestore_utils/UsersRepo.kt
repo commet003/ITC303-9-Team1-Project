@@ -8,12 +8,12 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlin.properties.Delegates
+import kotlinx.coroutines.tasks.await
 
 class UsersRepo (
     // initializing the firestore database
@@ -63,6 +63,19 @@ class UsersRepo (
             }
         }
         return userExist
+    }
+
+    suspend fun checkUserExists(id: String) : Boolean {
+        val ref = rootRef.collection("users").document(id)
+        val exist: Boolean
+        val doc = ref.get().await()
+        exist = doc.exists()
+        if (exist) {
+            Log.d("CheckUser", "CheckUserExists: Found User: ${doc.id}")
+        } else {
+            Log.d("CheckUser", "CheckUserExists: No User Found")
+        }
+        return exist
     }
 
     fun addToFirebaseDatabase(user: Users) {

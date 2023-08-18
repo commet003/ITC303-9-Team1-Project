@@ -18,6 +18,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -66,8 +67,10 @@ class UserRewardViewModel(
 
     fun checkUserExists(id: String, googleUser: AuthUiClient) {
         viewModelScope.launch(Dispatchers.IO) {
-            val exists = userRepo.checkExists(id)
+            val exists = userRepo.checkUserExists(id)
+
             val reward = findRewardFive("Log In Reward")[0]
+            println("Check User Exists. The User: $exists")
 
             if (reward.title != "Log In Reward") {
                 println("Check User Exists. Could not find reward in Reward Database Fucking Bullshit")
@@ -83,19 +86,6 @@ class UserRewardViewModel(
                     addUserToFirebase()
                     getUser(id, reward)
                 }
-            }
-
-            if (exists) {
-                getUser(id, reward )
-                println("I guess user Exists. Ran get user code")
-
-            } else {
-                println("userRewardViewModel: User Doesn't exist")
-                println("userRewardViewModel: adding user")
-                convertToUserFromAuth(googleUser)
-                addUserToFirebase()
-                getUser(id, reward)
-
             }
         }
     }
