@@ -54,14 +54,16 @@ class UserRewardViewModel(
         allRewards = rewardRepo.allRewards
     }
 
-    fun getUser(userId: String, loginReward: Reward) {
+    suspend fun getUser(userId: String, loginReward: Reward) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                // TODO: The Problem is the .collect under this line
                 userRepo.getUserTwo(userId).collect { user ->
                     _user.value = user
                 }
-                checkLastLogin(loginReward)
+                // TODO: Any code ran here doesn't run as .collect continues to do something
             }
+            // Todo: When I put checkLastLogin() here, the value of User is null
         }
     }
 
@@ -76,8 +78,12 @@ class UserRewardViewModel(
                 println("Check User Exists. Could not find reward in Reward Database Fucking Bullshit")
             } else {
                 if (exists) {
+
                     getUser(id, reward )
-                    println("I guess user Exists. Ran get user code")
+                    // Todo: This is where User needs to be not null but at this point, it is null
+                    // confirmed by the print statement underneath. hence the rest of the code doesn't get run
+                    println("I guess user Exists. Ran get user code. User: ${user.value.toString()}")
+                    checkLastLogin(reward)
 
                 } else {
                     println("userRewardViewModel: User Doesn't exist")
@@ -85,6 +91,7 @@ class UserRewardViewModel(
                     convertToUserFromAuth(googleUser)
                     addUserToFirebase()
                     getUser(id, reward)
+                    checkLastLogin(reward)
                 }
             }
         }
@@ -118,6 +125,8 @@ class UserRewardViewModel(
     fun checkLastLogin(loginReward: Reward) {
         val currentDate = LocalDate.now().toString()
         val lastLoginDate = user.value?.lastLogin.toString()
+        println("checking last log in")
+        println(user.value.toString())
 
         if (currentDate != lastLoginDate) {
             updateLogInStreak()
@@ -131,30 +140,33 @@ class UserRewardViewModel(
     }
 
     private fun updateLastLogin() {
-        val currentDate = LocalDate.now().toString()
-        user.value?.let { userRepo.updateLoginDate(it, currentDate) }
-        println("UpdateLastLogin: logged today's date as last Logged in.")
+        viewModelScope.launch(Dispatchers.IO){
+            val currentDate = LocalDate.now().toString()
+            user.value?.let { userRepo.updateLoginDate(it, currentDate) }
+            println("UpdateLastLogin: logged today's date as last Logged in.")
+        }
     }
 
     private fun updateLogInStreak() {
-        val yesterdaysDate = LocalDate.now().minusDays(1).toString()
-        val recordedDate = user.value?.lastLogin
+        viewModelScope.launch(Dispatchers.IO){
+            val yesterdaysDate = LocalDate.now().minusDays(1).toString()
+            val recordedDate = user.value?.lastLogin
 
-        if (recordedDate != yesterdaysDate) {
-            val newStreak = 1
-            user.value?.let { userRepo.updateLoginStreak(it, newStreak) }
-            println("Updated log in streak to $newStreak")
-        } else {
-            val newStreak = user.value?.loginStreak?.plus(1)
-            user.value?.let {
-                if (newStreak != null) {
-                    userRepo.updateLoginStreak(it, newStreak)
-                    println("Updated log in streak to $newStreak")
+            if (recordedDate != yesterdaysDate) {
+                val newStreak = 1
+                user.value?.let { userRepo.updateLoginStreak(it, newStreak) }
+                println("Updated log in streak to $newStreak")
+            } else {
+                val newStreak = user.value?.loginStreak?.plus(1)
+                user.value?.let {
+                    if (newStreak != null) {
+                        userRepo.updateLoginStreak(it, newStreak)
+                        println("Updated log in streak to $newStreak")
+                    }
                 }
             }
         }
     }
-
 
     // Reward ViewModel
 

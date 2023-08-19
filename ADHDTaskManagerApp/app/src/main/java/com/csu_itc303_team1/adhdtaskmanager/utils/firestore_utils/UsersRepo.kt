@@ -93,7 +93,7 @@ class UsersRepo (
 
 
 
-    fun getUserTwo(userId: String): Flow<Users?> = callbackFlow {
+    suspend fun getUserTwo(userId: String): Flow<Users?> = callbackFlow {
         val listener = object : EventListener<DocumentSnapshot> {
             override fun onEvent(snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException?) {
                 if (exception != null) {
@@ -111,6 +111,8 @@ class UsersRepo (
         awaitClose { registration.remove() }
     }
 
+    // TODO: The Below Update Points Logic do work when user isn't null. I assume the other two updates should work as well
+
     fun updatePoints(user: Users, points: Int){
         val ref = userRef.document(user.userID.toString())
 
@@ -123,6 +125,7 @@ class UsersRepo (
 
     fun updateLoginDate(user: Users, date: String) {
         val ref = userRef.document(user.userID.toString())
+        Log.d(TAG, "Found Document. $ref")
 
         ref.update(
             "lastLogin", date
@@ -133,6 +136,7 @@ class UsersRepo (
 
     fun updateLoginStreak(user: Users, streak: Int) {
         val ref = userRef.document(user.userID.toString())
+        Log.d(TAG, "Found Document. $ref")
 
         ref.update(
             "loginStreak", streak
