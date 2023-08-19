@@ -569,9 +569,9 @@ fun AddEditTodoDialog(
                 if (state.showDialog){
                     if (timePickerState.hour > 12) {
                         amPM.value = "PM"
-                        pmHours.value = timePickerState.hour - 12
+                        pmHours.intValue = timePickerState.hour - 12
                         Text(
-                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
+                            text = ("%02d".format(pmHours.intValue) + ":" + "%02d".format(
                                 timePickerState.minute
                             ) + " ${amPM.value}")
                         )
@@ -584,9 +584,9 @@ fun AddEditTodoDialog(
                 } else {
                     if (editTimePickerState.hour > 12) {
                         amPM.value = "PM"
-                        pmHours.value = editTimePickerState.hour - 12
+                        pmHours.intValue = editTimePickerState.hour - 12
                         Text(
-                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
+                            text = ("%02d".format(pmHours.intValue) + ":" + "%02d".format(
                                 editTimePickerState.minute
                             ) + " ${amPM.value}")
                         )

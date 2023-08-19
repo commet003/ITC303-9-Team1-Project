@@ -203,7 +203,7 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         if (isSignedIn.value) {
                             CenterAlignedTopAppBar(
-                                colors = TopAppBarColors(
+                                colors = TopAppBarDefaults.topAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.primary,
                                     scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
                                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
