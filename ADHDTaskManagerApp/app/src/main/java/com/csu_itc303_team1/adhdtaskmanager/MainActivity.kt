@@ -140,10 +140,7 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
-        InternalCoroutinesApi::class
-    )
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
