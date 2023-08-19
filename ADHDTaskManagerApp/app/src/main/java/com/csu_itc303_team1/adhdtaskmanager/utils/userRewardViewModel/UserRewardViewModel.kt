@@ -54,7 +54,9 @@ class UserRewardViewModel(
         allRewards = rewardRepo.allRewards
     }
 
-    suspend fun getUser(userId: String, loginReward: Reward) {
+    // You do not need to use this function.
+    // You can use googleUser to check if the user already exists
+    suspend fun getUser(userId: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 // TODO: The Problem is the .collect under this line
@@ -69,7 +71,9 @@ class UserRewardViewModel(
 
     fun checkUserExists(id: String, googleUser: AuthUiClient) {
         viewModelScope.launch(Dispatchers.IO) {
-            val exists = userRepo.checkUserExists(id)
+            // The line below checks if the current user exists in the user database
+            // returns true if the user exists and false if the user doesn't exist
+            val exists = googleUser.getSignedInUser()?.userId?.let { userRepo.checkUserExists(it) }
 
             val reward = findRewardFive("Log In Reward")[0]
             println("Check User Exists. The User: $exists")
@@ -77,28 +81,34 @@ class UserRewardViewModel(
             if (reward.title != "Log In Reward") {
                 println("Check User Exists. Could not find reward in Reward Database Fucking Bullshit")
             } else {
-                if (exists) {
+                if (exists == true) {
 
-                    getUser(id, reward )
+                    // If the user exists they are converted from Firebase Auth User
+                    // to User
+                    _user.value = convertToUserFromAuth(googleUser)
                     // Todo: This is where User needs to be not null but at this point, it is null
                     // confirmed by the print statement underneath. hence the rest of the code doesn't get run
-                    println("I guess user Exists. Ran get user code. User: ${user.value.toString()}")
+                    println("I guess user Exists. Ran get user code. User: ${user.value}")
                     checkLastLogin(reward)
 
                 } else {
                     println("userRewardViewModel: User Doesn't exist")
                     println("userRewardViewModel: adding user")
-                    convertToUserFromAuth(googleUser)
+
+                    // the line below sets both _user and currentUser to the
+                    // current signed in user, removing the need for the getUser function
+                    _user.value = convertToUserFromAuth(googleUser)
                     addUserToFirebase()
-                    getUser(id, reward)
                     checkLastLogin(reward)
                 }
             }
         }
     }
 
-    fun convertToUserFromAuth(user: AuthUiClient) {
-        currentUser = Users(
+    // Changed the convertToUserFromAuth function to return a User object
+    // The function will still set the currentUser variable to the current user
+    fun convertToUserFromAuth(user: AuthUiClient): Users {
+         currentUser =  Users(
             displayName = user.getSignedInUser()?.username,
             points = 0,
             emailAddress = null,
@@ -107,7 +117,7 @@ class UserRewardViewModel(
             country = null,
             userID = user.getSignedInUser()?.userId
         )
-
+        return currentUser
     }
 
     fun addUserToFirebase(){

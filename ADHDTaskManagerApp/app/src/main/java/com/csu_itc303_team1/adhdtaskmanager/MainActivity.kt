@@ -284,7 +284,7 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
 
-// icons to mimic drawer destinations
+                        // icons to mimic drawer destinations
                         val screenIcons = listOf(
                             R.drawable.ic_home,
                             R.drawable.ic_complete,
@@ -523,9 +523,9 @@ class MainActivity : ComponentActivity() {
 
 
 
-                                                googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                                                googleAuthUiClient.getSignedInUser()?.userId?.let {
                                                     userRewardViewModel.checkUserExists(
-                                                        it1, googleAuthUiClient
+                                                        it, googleAuthUiClient
                                                     )
                                                 }
                                             }
@@ -540,9 +540,9 @@ class MainActivity : ComponentActivity() {
                                                     Toast.LENGTH_LONG
                                                 ).show()
 
-                                                googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                        userRewardViewModel.checkUserExists(
-                                                            it1, googleAuthUiClient
+                                                googleAuthUiClient.getSignedInUser()?.userId?.let {
+                                                    userRewardViewModel.checkUserExists(
+                                                            it, googleAuthUiClient
                                                         )
 
                                                 }
