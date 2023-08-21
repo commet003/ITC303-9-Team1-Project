@@ -1,12 +1,18 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
-import android.Manifest
+import android.Manifest.permission.FOREGROUND_SERVICE
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
-import android.content.pm.PackageManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,6 +21,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
@@ -41,14 +47,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -58,6 +62,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import com.csu_itc303_team1.adhdtaskmanager.service.PomodoroTimerService
 import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
@@ -79,15 +84,16 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.InternalCoroutinesApi
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 
 @Suppress("UNCHECKED_CAST")
+@OptIn(ExperimentalAnimationApi::class)
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
@@ -112,6 +118,30 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
     private lateinit var userViewModel: UsersViewModel
+    private lateinit var pomodoroTimerService: PomodoroTimerService
+    private var isBound by mutableStateOf(false)
+
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as PomodoroTimerService.PomodoroTimerBinder
+            pomodoroTimerService = binder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            isBound = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Intent(this, PomodoroTimerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
@@ -126,9 +156,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
-        InternalCoroutinesApi::class
-    )
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,32 +187,6 @@ class MainActivity : ComponentActivity() {
 
 
             ADHDTaskManagerTheme {
-
-                /**
-                 * This is where the Pomodoro Timer Notification is created
-                 */
-
-                val context = LocalContext.current
-                var hasNotificationPermission by remember {
-                    mutableStateOf(ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED)
-                }
-
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        hasNotificationPermission = isGranted
-                    }
-                )
-
-                LaunchedEffect(key1 = hasNotificationPermission) {
-                    if (!hasNotificationPermission) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
-
 
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
@@ -233,10 +235,6 @@ class MainActivity : ComponentActivity() {
                                 },
                                 actions = {
                                     IconButton(onClick = {
-                                        if (hasNotificationPermission){
-                                            showFocusNotification()
-                                            showBreakNotification()
-                                        }
                                     }) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
@@ -566,16 +564,9 @@ class MainActivity : ComponentActivity() {
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             verticalArrangement = Arrangement.SpaceAround
                                         ){
-                                            PomodoroTimerScreen(
-                                                initialWorkTime = 1500L * 1000L,
-                                                initialBreakTime = 300L * 1000L,
-                                                handleColor = MaterialTheme.colorScheme.primary,
-                                                inactiveBarColor = MaterialTheme.colorScheme.surface,
-                                                activeBarColor = MaterialTheme.colorScheme.primary,
-                                                context = applicationContext,
-                                                activity = this@MainActivity,
-                                                modifier = Modifier.size(300.dp)
-                                            )
+                                            if (isBound) {
+                                                PomodoroTimerScreen(pomodoroTimerService = pomodoroTimerService)
+                                            }
                                         }
                                     }
                                 }
@@ -586,6 +577,24 @@ class MainActivity : ComponentActivity() {
             }
             rewardViewModel.allRewards.observeAsState(listOf())
         }
+        requestPermissions(POST_NOTIFICATIONS, FOREGROUND_SERVICE)
+    }
+
+    private fun requestPermissions(vararg permissions: String) {
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { result ->
+            result.entries.forEach {
+                Log.d("MainActivity", "${it.key} = ${it.value}")
+            }
+        }
+        requestPermissionLauncher.launch(permissions.asList().toTypedArray())
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        isBound = false
     }
 
     private fun showFocusNotification() {
