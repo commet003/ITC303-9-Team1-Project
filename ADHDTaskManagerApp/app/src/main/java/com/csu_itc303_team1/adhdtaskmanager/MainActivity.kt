@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.Manifest.permission.FOREGROUND_SERVICE
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.START_FOREGROUND_SERVICES_FROM_BACKGROUND
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
@@ -587,7 +588,7 @@ class MainActivity : ComponentActivity() {
             }
             rewardViewModel.allRewards.observeAsState(listOf())
         }
-        requestPermissions(POST_NOTIFICATIONS, FOREGROUND_SERVICE)
+        requestPermissions(POST_NOTIFICATIONS, FOREGROUND_SERVICE, START_FOREGROUND_SERVICES_FROM_BACKGROUND)
     }
 
     private fun requestPermissions(vararg permissions: String) {

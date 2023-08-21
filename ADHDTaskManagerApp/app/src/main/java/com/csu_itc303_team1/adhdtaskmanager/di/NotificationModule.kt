@@ -31,7 +31,7 @@ object NotificationModule {
             .setContentText("00:00")
             .setSmallIcon(R.drawable.ic_baseline_timer_24)
             .setOngoing(true)
-            .addAction(0, "Start", ServiceHelper.resumePendingIntent(context))
+            .addAction(0, "Start", ServiceHelper.startPendingIntent(context))
             .addAction(0, "Stop", ServiceHelper.cancelPendingIntent(context))
             .setContentIntent(ServiceHelper.clickPendingIntent(context))
     }

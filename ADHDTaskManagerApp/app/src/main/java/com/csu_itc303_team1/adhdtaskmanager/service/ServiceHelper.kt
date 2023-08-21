@@ -26,6 +26,16 @@ object ServiceHelper {
         )
     }
 
+    // Start Pending Intent
+    fun startPendingIntent(context: Context): PendingIntent {
+        val startIntent = Intent(context, PomodoroTimerService::class.java).apply {
+            putExtra(TIMER_STATE, PomodoroTimerState.Started.name)
+        }
+        return PendingIntent.getService(
+            context, CLICK_REQUEST_CODE, startIntent, FLAG
+        )
+    }
+
     fun stopPendingIntent(context: Context): PendingIntent {
         val stopIntent = Intent(context, PomodoroTimerService::class.java).apply {
             putExtra(TIMER_STATE, PomodoroTimerState.Stopped.name)

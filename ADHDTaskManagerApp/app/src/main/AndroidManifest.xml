@@ -20,9 +20,11 @@
         <service
             android:name=".service.PomodoroTimerService"
             android:enabled="true"
-            android:foregroundServiceType="shortService"
+            android:foregroundServiceType="specialUse"
             android:permission="android.permission.FOREGROUND_SERVICE"
-            android:exported="false" />
+            android:exported="false">
+        <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value=""/>
+        </service>
         <!--for viewing webpage-->
         <activity android:name=".ui.help_screen.WebViewActivity" />
         <activity

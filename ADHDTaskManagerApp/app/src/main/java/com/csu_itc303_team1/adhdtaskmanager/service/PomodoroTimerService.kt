@@ -54,7 +54,7 @@ class PomodoroTimerService : Service() {
         when (intent?.getStringExtra(TIMER_STATE)) {
             PomodoroTimerState.Started.name -> {
                 setPauseButton()
-                startForegroundService()
+                //startForegroundService()
                 startStopwatch { hours, minutes, seconds ->
                     updateNotification(hours = hours, minutes = minutes, seconds = seconds)
                 }
