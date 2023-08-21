@@ -4,7 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
-    id 'dagger.hilt.android.plugin'
+    id("com.google.dagger.hilt.android")
 }
 configurations.configureEach {
     resolutionStrategy {
@@ -27,6 +27,8 @@ android {
     defaultConfig {
         buildConfigField("String", "TODO_DATABASE_PASSPHRASE", apikeyProperties['TODO_DATABASE_PASSPHRASE'])
         buildConfigField("String", "WEB_CLIENT_ID", apikeyProperties['WEB_CLIENT_ID'])
+        renderscriptTargetApi 30
+        renderscriptSupportModeEnabled true
 
         applicationId "com.csu_itc303_team1.adhdtaskmanager"
         minSdk 28
@@ -82,6 +84,8 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation("androidx.transition:transition-ktx:1.4.1")
     implementation("androidx.compose.material:material:1.5.0")
+    implementation("com.airbnb.android:lottie-compose:4.1.0")
+
 
     // Material 3
     implementation("androidx.compose.material3:material3:1.2.0-alpha04")
@@ -100,9 +104,9 @@ dependencies {
     // Google Play services library
     implementation("com.google.android.gms:play-services-auth:20.6.0")
 
-    //Dagger - Hilt
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-android-compiler:2.44"
+    // Coil
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
 
     // Accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.30.1"

@@ -37,11 +37,10 @@ fun usersList(response: Response) {
 }
 
 
+val LeaderboardBlue = Color(0xFF045EA5)
+
 @Composable
 fun LeaderboardItem(user: Users, rank: Int) {
-
-    // This will be each row in the leaderboard
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -49,37 +48,28 @@ fun LeaderboardItem(user: Users, rank: Int) {
             .height(45.dp)
             .padding(start = 10.dp)
     ) {
-
         Text(
             text = rank.toString(),
             fontSize = 22.sp,
-            color = Color.Black
+            color = LeaderboardBlue
         )
-
         Spacer(modifier = Modifier.width(15.dp))
-
-        Spacer(modifier = Modifier.width(15.dp))
-        // Text for the Drawer Item
         Text(
-            text = user.displayName.toString(),
+            text = user.displayName ?: "",
             fontSize = 22.sp,
-            color = Color.Black
+            color = LeaderboardBlue
         )
-
         Spacer(modifier = Modifier.width(15.dp))
-        // Text for the Drawer Item
         Text(
-            text = user.country.toString(),
+            text = user.country ?: "",
             fontSize = 22.sp,
-            color = Color.Black
+            color = LeaderboardBlue
         )
-
         Spacer(modifier = Modifier.width(50.dp))
-        // Text for the Drawer Item
         Text(
             text = user.points.toString(),
             fontSize = 22.sp,
-            color = Color.Black
+            color = LeaderboardBlue
         )
     }
 }
