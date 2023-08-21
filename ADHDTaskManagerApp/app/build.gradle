@@ -6,7 +6,7 @@ plugins {
     id 'com.google.gms.google-services'
     id("com.google.dagger.hilt.android")
 }
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         eachDependency {
             if ((requested.group == "org.jetbrains.kotlin") && (requested.name.startsWith("kotlin-stdlib"))) {
@@ -27,6 +27,8 @@ android {
     defaultConfig {
         buildConfigField("String", "TODO_DATABASE_PASSPHRASE", apikeyProperties['TODO_DATABASE_PASSPHRASE'])
         buildConfigField("String", "WEB_CLIENT_ID", apikeyProperties['WEB_CLIENT_ID'])
+        renderscriptTargetApi 30
+        renderscriptSupportModeEnabled true
 
         applicationId "com.csu_itc303_team1.adhdtaskmanager"
         minSdk 28
@@ -77,12 +79,13 @@ kotlin {
 dependencies {
     
     // Compose
-    implementation "androidx.compose.runtime:runtime-livedata:1.4.3"
+    implementation "androidx.compose.runtime:runtime-livedata:1.5.0"
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation("androidx.transition:transition-ktx:1.4.1")
-    implementation("androidx.compose.material:material:1.4.1")
-    implementation("androidx.compose.material3:material3:1.0.1")
+    implementation("androidx.compose.material:material:1.5.0")
+    implementation("com.airbnb.android:lottie-compose:4.1.0")
+
 
     // Material 3
     implementation("androidx.compose.material3:material3:1.2.0-alpha04")
@@ -90,7 +93,7 @@ dependencies {
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.2.0")) // Import the BoM for the Firebase platform
-    implementation("com.google.firebase:firebase-auth-ktx:21.1.0")     // Dependency for the Firebase Authentication library
+    implementation("com.google.firebase:firebase-auth-ktx:22.1.1")     // Dependency for the Firebase Authentication library
     implementation 'com.google.firebase:firebase-functions-ktx:20.3.1'
 
 
@@ -103,7 +106,6 @@ dependencies {
 
     // Coil
     implementation("com.google.dagger:hilt-android:2.44")
-    implementation 'androidx.wear.compose:compose-material3:1.0.0-alpha08'
     kapt("com.google.dagger:hilt-android-compiler:2.44")
 
     // Accompanist
@@ -120,7 +122,7 @@ dependencies {
 
 
     // ktx dependencies
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.10"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0'
     implementation("androidx.core:core-ktx:1.10.1")
 
@@ -146,6 +148,7 @@ dependencies {
     //noinspection GradleDependency
     debugImplementation "androidx.compose.compiler:compiler:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    //noinspection GradleDependency
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
     implementation "androidx.compose.ui:ui:$compose_version"
 
@@ -154,13 +157,13 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.4.3"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.5.0"
 
 
     // Navigation
-    implementation "androidx.navigation:navigation-compose:2.7.0-rc01"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.0-rc01'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.0-rc01'
+    implementation "androidx.navigation:navigation-compose:2.7.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.0'
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"

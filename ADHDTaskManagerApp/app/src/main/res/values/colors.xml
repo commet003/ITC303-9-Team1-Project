@@ -22,6 +22,7 @@
     <color name="onSecondaryDark">#FFFFFF</color>
     <color name="secondaryVariant">@color/BabyBlueLight</color>
     <color name="secondaryVariantDark">@color/BabyBlueDark</color>
+    <color name="toastBackground">#11143e</color>
 
 
 </resources>
