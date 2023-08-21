@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,7 +55,7 @@ fun LeaderboardCard(
                     text = rank.toString(),
                     modifier = Modifier
                         .wrapContentWidth(Alignment.Start),
-                    color = Color.DarkGray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 22.sp
                 )
             }
@@ -69,7 +68,7 @@ fun LeaderboardCard(
                 Text(
                     text = user.displayName.toString(),
                     modifier = Modifier,
-                    color = Color.DarkGray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 22.sp
                 )
             }
@@ -80,7 +79,7 @@ fun LeaderboardCard(
                 Text(
                     text = user.country.toString(),
                     modifier = Modifier,
-                    color = Color.DarkGray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 22.sp
                 )
             }
@@ -92,7 +91,7 @@ fun LeaderboardCard(
                     text = user.points.toString(),
                     modifier = Modifier
                         .wrapContentWidth(Alignment.End),
-                    color = Color.DarkGray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 22.sp,
                     textAlign = TextAlign.End
                 )

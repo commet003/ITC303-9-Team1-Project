@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
@@ -18,23 +19,26 @@ class AuthUiClient(
 ) {
     private val auth = Firebase.auth
     private var _isSignedIn = false
+    private val usersViewModel = UsersViewModel()
 
-    // Function to addAuthStateListener to the firebase auth
+
+    // Function to authStateListener to the firebase auth
     // Changes the value of _isSignedIn to true if the user is signed in
     // Changes the value of _isSignedIn to false if the user is signed out
-    fun addAuthStateListener(listener: (Boolean) -> Unit) {
+    fun authStateListener(listener: (Boolean) -> Unit) {
         auth.addAuthStateListener {
             _isSignedIn = it.currentUser != null
             listener(_isSignedIn)
         }
     }
 
-
-    // Public getter fun for _isSignedIn
-    fun getSignedIn(): Boolean {
-        return _isSignedIn
+    // lister for change with users username
+    fun usernameListener(listener: (String?) -> Unit) {
+        auth.addAuthStateListener {
+            val username = it.currentUser?.displayName
+            listener(username)
+        }
     }
-
 
 
     suspend fun signIn(): IntentSender? {

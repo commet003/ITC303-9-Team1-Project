@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardCard
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
 
 @Composable
 fun LeaderboardScreen() {
@@ -42,7 +42,7 @@ fun LeaderboardScreen() {
             text = "Rank",
             modifier = Modifier
                 .wrapContentWidth(Alignment.Start),
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         Spacer(modifier = Modifier.width(60.dp))
@@ -50,7 +50,7 @@ fun LeaderboardScreen() {
         Text(
             text = "Name",
             modifier = Modifier,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         Spacer(modifier = Modifier.width(60.dp))
@@ -58,7 +58,7 @@ fun LeaderboardScreen() {
         Text(
             text = "Country",
             modifier = Modifier,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         Spacer(modifier = Modifier.width(60.dp))
@@ -68,7 +68,7 @@ fun LeaderboardScreen() {
             modifier = Modifier
                 .wrapContentWidth(Alignment.End)
             ,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
     }

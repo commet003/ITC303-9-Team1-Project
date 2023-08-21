@@ -19,8 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,8 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.service.PomodoroTimerService
 import com.csu_itc303_team1.adhdtaskmanager.service.PomodoroTimerState
 import com.csu_itc303_team1.adhdtaskmanager.service.ServiceHelper
+import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_IDLE
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_PAUSE
-import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_START
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_STOP
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.formatTime
 
@@ -131,7 +129,7 @@ fun PomodoroTimerScreen(
                     ServiceHelper.triggerForegroundService(
                         context = context,
                         action = if (currentState == PomodoroTimerState.Started) ACTION_SERVICE_PAUSE
-                        else ACTION_SERVICE_START
+                        else ACTION_SERVICE_IDLE
                     )
                 },
                 shape = MaterialTheme.shapes.medium,

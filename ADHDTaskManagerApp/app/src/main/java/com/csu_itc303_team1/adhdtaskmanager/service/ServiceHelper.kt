@@ -3,7 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.service
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.compose.animation.ExperimentalAnimationApi
 import com.csu_itc303_team1.adhdtaskmanager.MainActivity
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.CLICK_REQUEST_CODE
@@ -16,10 +15,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.TIMER_STATE
 @ExperimentalAnimationApi
 object ServiceHelper {
 
-    private val FLAG = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            PendingIntent.FLAG_IMMUTABLE
-        else
-            0
+    private const val FLAG = PendingIntent.FLAG_IMMUTABLE
 
     fun clickPendingIntent(context: Context): PendingIntent {
         val clickIntent = Intent(context, MainActivity::class.java).apply {

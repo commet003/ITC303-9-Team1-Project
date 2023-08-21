@@ -33,6 +33,7 @@ class UsersViewModel(
         }
     }
 
+
     fun checkUserExists(id: String): Boolean {
         return repo.checkExists(id)
     }
@@ -60,6 +61,10 @@ class UsersViewModel(
         if (points != null) {
             user.value?.let { repo.updatePoints(it, points ) }
         }
+    }
+
+    fun updateUsername(username: String) {
+        user.value?.let { repo.updateUsername(it, username) }
     }
 
 }

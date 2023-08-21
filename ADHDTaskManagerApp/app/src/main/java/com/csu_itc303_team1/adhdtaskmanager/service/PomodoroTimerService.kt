@@ -6,10 +6,10 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.NotificationCompat
+import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_IDLE
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_PAUSE
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_START
 import com.csu_itc303_team1.adhdtaskmanager.utils.common.Constants.ACTION_SERVICE_STOP
@@ -87,6 +87,9 @@ class PomodoroTimerService : Service() {
                     cancelStopwatch()
                     stopForegroundService()
                 }
+                ACTION_SERVICE_IDLE -> {
+                    startForegroundService()
+                }
             }
         }
         return super.onStartCommand(intent, flags, startId)
@@ -134,14 +137,12 @@ class PomodoroTimerService : Service() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_LOW
+        )
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun updateNotification(hours: String, minutes: String, seconds: String) {

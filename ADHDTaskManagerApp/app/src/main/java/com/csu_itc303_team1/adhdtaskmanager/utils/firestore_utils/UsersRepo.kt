@@ -125,4 +125,15 @@ class UsersRepo (
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e)
                 println("I did not update Points")}
     }
+
+    // Update current users username
+    fun updateUsername(user: Users, username: String){
+        val ref = userRef.document(user.userID.toString())
+
+        ref.update("displayName", username)
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!")
+                println("I updated Username successfully")}
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e)
+                println("I did not update Username")}
+    }
 }

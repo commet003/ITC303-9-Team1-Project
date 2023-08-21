@@ -115,6 +115,22 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    private val googleAuthUiClient by lazy {
+        AuthUiClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
+
+    // Boolean value to check if the user is signed in or not
+    private val isSignedIn by lazy {
+        mutableStateOf(false)
+    }
+
+    private val username by lazy {
+        mutableStateOf("")
+    }
+
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
     private lateinit var userViewModel: UsersViewModel
@@ -139,21 +155,9 @@ class MainActivity : ComponentActivity() {
         Intent(this, PomodoroTimerService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
+        Log.d("Current User Username", "Current User Username: ${googleAuthUiClient.getSignedInUser()?.username}")
     }
 
-
-
-    private val googleAuthUiClient by lazy {
-        AuthUiClient(
-            context = applicationContext,
-            oneTapClient = Identity.getSignInClient(applicationContext)
-        )
-    }
-
-    // Boolean value to check if the user is signed in or not
-    private val isSignedIn by lazy {
-        mutableStateOf(false)
-    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -171,7 +175,7 @@ class MainActivity : ComponentActivity() {
             }
         )
 
-        googleAuthUiClient.addAuthStateListener {
+        googleAuthUiClient.authStateListener {
             isSignedIn.value = it
         }
 
@@ -184,6 +188,11 @@ class MainActivity : ComponentActivity() {
             userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
+
+            googleAuthUiClient.usernameListener {
+                userViewModel.updateUsername(it.toString())
+                username.value = it.toString()
+            }
 
 
             ADHDTaskManagerTheme {
@@ -428,6 +437,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
 
+
                                 // NavHost for controlling the pages.
                                 NavHost(
                                     navController = navController,
@@ -467,7 +477,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel)
+                                        RewardsScreen(rewardViewModel, userViewModel, username.value)
                                     }
 
                                     // Completed Task Screen

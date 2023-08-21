@@ -22,7 +22,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.RewardCard
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 
 @Composable
-fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewModel) {
+fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewModel, username: String) {
 
     val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
     val currentUser = usersViewModel.user.collectAsState()
@@ -48,12 +48,11 @@ fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewMod
                         fontSize = 30.sp
                     )
                 } else {
-                    currentUser.value!!.username?.let {
-                        Text(
-                            text = it,
+                    Text(
+                            text = username,
                             fontSize = 30.sp
                         )
-                    }
+
                 }
             }
 
