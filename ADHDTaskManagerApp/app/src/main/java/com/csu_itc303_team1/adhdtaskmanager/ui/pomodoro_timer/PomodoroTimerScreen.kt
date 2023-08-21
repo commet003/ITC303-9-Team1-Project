@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -18,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,9 +46,11 @@ fun PomodoroTimerScreen(
 ) {
 
     val context = LocalContext.current
+    val hours by pomodoroTimerService.hours
     val minutes by pomodoroTimerService.minutes
     val seconds by pomodoroTimerService.seconds
     val currentState by pomodoroTimerService.currentState
+
 
 
     Column(
@@ -70,16 +75,18 @@ fun PomodoroTimerScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Box(
+            modifier = Modifier.size(300.dp),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(
-                progress = 0f,
+                modifier = Modifier.size(250.dp),
+                progress = 1f,
                 strokeWidth = 10.dp,
                 strokeCap = StrokeCap.Round,
                 color = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = formatTime(seconds = seconds, minutes = minutes, hours = ""),
+                text = formatTime(seconds = seconds, minutes = minutes, hours = hours),
                 fontSize = 44.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground

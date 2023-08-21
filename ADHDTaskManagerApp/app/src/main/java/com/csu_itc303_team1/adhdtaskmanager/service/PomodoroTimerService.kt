@@ -1,12 +1,12 @@
 package com.csu_itc303_team1.adhdtaskmanager.service
 
-
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.NotificationCompat
@@ -43,7 +43,6 @@ class PomodoroTimerService : Service() {
         private set
     var minutes = mutableStateOf("00")
         private set
-
     var hours = mutableStateOf("00")
         private set
     var currentState = mutableStateOf(PomodoroTimerState.Idle)
@@ -54,38 +53,38 @@ class PomodoroTimerService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.getStringExtra(TIMER_STATE)) {
             PomodoroTimerState.Started.name -> {
-                setStopButton()
+                setPauseButton()
                 startForegroundService()
-                startTimer {hours, minutes, seconds ->
+                startStopwatch { hours, minutes, seconds ->
                     updateNotification(hours = hours, minutes = minutes, seconds = seconds)
                 }
             }
             PomodoroTimerState.Stopped.name -> {
-                pauseTimer()
+                stopStopwatch()
                 setResumeButton()
             }
             PomodoroTimerState.Canceled.name -> {
-                pauseTimer()
-                stopTimer()
+                stopStopwatch()
+                cancelStopwatch()
                 stopForegroundService()
             }
         }
         intent?.action.let {
             when (it) {
                 ACTION_SERVICE_START -> {
-                    setStopButton()
+                    setPauseButton()
                     startForegroundService()
-                    startTimer {hours, minutes, seconds ->
+                    startStopwatch { hours, minutes, seconds ->
                         updateNotification(hours = hours, minutes = minutes, seconds = seconds)
                     }
                 }
                 ACTION_SERVICE_PAUSE -> {
-                    pauseTimer()
+                    stopStopwatch()
                     setResumeButton()
                 }
                 ACTION_SERVICE_STOP -> {
-                    pauseTimer()
-                    stopTimer()
+                    stopStopwatch()
+                    cancelStopwatch()
                     stopForegroundService()
                 }
             }
@@ -93,30 +92,30 @@ class PomodoroTimerService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun startTimer(onTick: (h: String, m: String, s: String) -> Unit) {
+    private fun startStopwatch(onTick: (h: String, m: String, s: String) -> Unit) {
         currentState.value = PomodoroTimerState.Started
         timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
-            duration = duration.minus(1.seconds)
+            duration = duration.plus(1.seconds)
             updateTimeUnits()
             onTick(hours.value, minutes.value, seconds.value)
         }
     }
 
-    private fun pauseTimer() {
+    private fun stopStopwatch() {
         if (this::timer.isInitialized) {
             timer.cancel()
         }
         currentState.value = PomodoroTimerState.Stopped
     }
 
-    private fun stopTimer() {
+    private fun cancelStopwatch() {
         duration = Duration.ZERO
         currentState.value = PomodoroTimerState.Idle
         updateTimeUnits()
     }
 
     private fun updateTimeUnits() {
-        duration.toComponents {hours, minutes, seconds ->
+        duration.toComponents { hours, minutes, seconds, _ ->
             this@PomodoroTimerService.hours.value = hours.toInt().pad()
             this@PomodoroTimerService.minutes.value = minutes.pad()
             this@PomodoroTimerService.seconds.value = seconds.pad()
@@ -135,12 +134,14 @@ class PomodoroTimerService : Service() {
     }
 
     private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            NOTIFICATION_CHANNEL_ID,
-            NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
-        )
-        notificationManager.createNotificationChannel(channel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     private fun updateNotification(hours: String, minutes: String, seconds: String) {
@@ -157,13 +158,13 @@ class PomodoroTimerService : Service() {
     }
 
     @SuppressLint("RestrictedApi")
-    private fun setStopButton() {
+    private fun setPauseButton() {
         notificationBuilder.mActions.removeAt(0)
         notificationBuilder.mActions.add(
-            1,
+            0,
             NotificationCompat.Action(
                 0,
-                "Stop",
+                "Pause",
                 ServiceHelper.stopPendingIntent(this)
             )
         )
