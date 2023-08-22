@@ -35,12 +35,6 @@ fun SwitchRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        //.toggleable(
-        // value = checked,
-        // enabled = enabled,
-        //role = Role.Switch,
-        //onValueChange = onCheckedChange
-        //),
         verticalAlignment = Alignment.CenterVertically
     ){
 
@@ -67,7 +61,7 @@ fun SwitchRow(
 
         Switch(
             checked = checked,
-            onCheckedChange = null,
+            onCheckedChange = onCheckedChange, // Update this line
             enabled = enabled)
     }
 }

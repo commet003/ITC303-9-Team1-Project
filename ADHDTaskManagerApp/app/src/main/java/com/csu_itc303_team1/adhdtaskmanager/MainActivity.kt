@@ -98,12 +98,19 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupWindow
 import androidx.lifecycle.Lifecycle
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
+
+    private val settingsViewModel by viewModels<SettingsViewModel>()
+
+
+
+
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
     private val db by lazy {
@@ -216,6 +223,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
+
+            val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
             val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
             // Retrieve's Leaderboard data onCreate
@@ -225,7 +234,8 @@ class MainActivity : ComponentActivity() {
             getResponseUsingCallback()
 
 
-            ADHDTaskManagerTheme {
+            ADHDTaskManagerTheme(darkTheme = isDarkTheme) {
+
 
                 /**
                  * This is where the Pomodoro Timer Notification is created
@@ -519,10 +529,12 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.SettingsScreen.route
                                     ) {
                                         SettingsScreen(
-                                            googleAuthUiClient,
+                                            settingsViewModel = settingsViewModel,
+                                            currentUser = googleAuthUiClient,
                                             context = applicationContext,
-                                            scope
+                                            scope = scope
                                         )
+
                                     }
 
                                     // Leaderboard Screen
