@@ -19,12 +19,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
+import androidx.compose.foundation.background
+import androidx.compose.material3.CardElevation
+import androidx.compose.material.Card
+
+
+
+
+
+
+
+
+val LeaderboardBlue = Color(0xFF045EA5)
+
 
 @Composable
-fun LeaderboardCard(
-    user: Users,
-    rank: Int
-) {
+fun LeaderboardCard(user: Users, rank: Int) {
     Card(
         shape = MaterialTheme.shapes.small,
         modifier = Modifier
@@ -34,69 +44,40 @@ fun LeaderboardCard(
                 top = 4.dp,
                 bottom = 4.dp
             )
-            .fillMaxWidth(),
-       /* elevation = CardElevation(
-            defaultElevation = 8.dp,
-            pressedElevation = 16.dp,
-            focusedElevation = 8.dp,
-            hoveredElevation = 8.dp,
-            draggedElevation = 8.dp,
-            disabledElevation = 0.dp
-        ),*/
+            .fillMaxWidth()
+            .background(Color.White),
+        elevation = 4.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 12.dp)
-        ){
-            Column(
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = rank.toString(),
-                    modifier = Modifier
-                        .wrapContentWidth(Alignment.Start),
-                    color = Color.DarkGray,
-                    fontSize = 22.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(50.dp))
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = user.displayName.toString(),
-                    modifier = Modifier,
-                    color = Color.DarkGray,
-                    fontSize = 22.sp
-                )
-            }
-            Spacer(modifier = Modifier.width(45.dp))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = user.country.toString(),
-                    modifier = Modifier,
-                    color = Color.DarkGray,
-                    fontSize = 22.sp
-                )
-            }
-            Spacer(modifier = Modifier.width(60.dp))
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = user.points.toString(),
-                    modifier = Modifier
-                        .wrapContentWidth(Alignment.End),
-                    color = Color.DarkGray,
-                    fontSize = 22.sp,
-                    textAlign = TextAlign.End
-                )
-            }
+        ) {
+            Text(
+                text = rank.toString(),
+                modifier = Modifier.weight(1f),
+                color = LeaderboardBlue,
+                fontSize = 22.sp
+            )
+            Text(
+                text = user.displayName ?: "",
+                modifier = Modifier.weight(2f),
+                color = Color.Black,
+                fontSize = 22.sp
+            )
+            Text(
+                text = user.country ?: "",
+                modifier = Modifier.weight(2f),
+                color = Color.Black,
+                fontSize = 22.sp
+            )
+            Text(
+                text = user.points.toString(),
+                modifier = Modifier.weight(1f),
+                color = LeaderboardBlue,
+                fontSize = 22.sp,
+                textAlign = TextAlign.End
+            )
         }
     }
 }
