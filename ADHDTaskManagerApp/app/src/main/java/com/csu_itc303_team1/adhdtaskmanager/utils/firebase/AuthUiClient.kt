@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
@@ -14,7 +15,9 @@ import java.util.concurrent.CancellationException
 
 class AuthUiClient(
     private val context: Context,
-    private val oneTapClient: SignInClient
+    private val oneTapClient: SignInClient,
+    private val usersRepo: UsersRepo
+
 ) {
     private val auth = Firebase.auth
     private var _isSignedIn = false
@@ -133,14 +136,23 @@ class AuthUiClient(
     }
 
     // Update anonymous users profile username
+// Update anonymous users profile username
     suspend fun updateUsername(username: String): SignInResult {
         return try {
             val user = auth.currentUser
+
             user?.updateProfile(
                 com.google.firebase.auth.UserProfileChangeRequest.Builder()
                     .setDisplayName(username)
                     .build()
             )?.await()
+
+            // Update Firestore using the UsersRepo
+            user?.uid?.let { uid ->
+                val userMap = hashMapOf("username" to username)
+                usersRepo.updateUser(uid, userMap)
+            }
+
             SignInResult(
                 data = user?.run {
                     UserData(

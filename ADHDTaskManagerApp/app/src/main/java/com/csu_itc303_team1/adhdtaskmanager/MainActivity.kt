@@ -100,6 +100,7 @@ import android.widget.PopupWindow
 import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 
 
@@ -134,11 +135,16 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
     private lateinit var leadViewModel: LeaderboardViewModel
     private lateinit var userViewModel: UsersViewModel
+    private val usersRepo by lazy {
+        UsersRepo()
+    }
+
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
             context = applicationContext,
-            oneTapClient = Identity.getSignInClient(applicationContext)
+            oneTapClient = Identity.getSignInClient(applicationContext),
+            usersRepo = usersRepo
         )
     }
 

@@ -13,8 +13,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 class UsersRepo (
+
     // initializing the firestore database
     private val rootRef: FirebaseFirestore = FirebaseFirestore.getInstance(),
     // creating a reference to the Firestore Collection, Users
@@ -125,4 +127,10 @@ class UsersRepo (
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e)
                 println("I did not update Points")}
     }
+
+    // Add this function:
+    suspend fun updateUser(uid: String, userMap: HashMap<String, *>) {
+        userRef.document(uid).update(userMap as Map<String, Any>).await()
+    }
+
 }
