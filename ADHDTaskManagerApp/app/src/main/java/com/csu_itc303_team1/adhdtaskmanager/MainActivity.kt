@@ -4,9 +4,19 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -14,7 +24,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -73,33 +83,18 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.LayoutInflater
-import android.widget.TextView
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupWindow
-import androidx.lifecycle.Lifecycle
-import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
-import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 
 
 @Suppress("UNCHECKED_CAST")
@@ -140,11 +135,7 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
-        InternalCoroutinesApi::class
-    )
-
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
