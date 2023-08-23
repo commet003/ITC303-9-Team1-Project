@@ -19,8 +19,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
 import com.csu_itc303_team1.adhdtaskmanager.R
+import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.RewardDao
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.SignInState
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
+import kotlinx.coroutines.coroutineScope
+import kotlin.math.log
 
 @Composable
 fun SignInScreen(
@@ -28,6 +34,7 @@ fun SignInScreen(
     onSignInClick: () -> Unit,
     onAnonymousSignIn: () -> Unit
 ) {
+
     val context = LocalContext.current
     LaunchedEffect(key1 = state.signInError) {
         state.signInError?.let { error ->
@@ -59,6 +66,8 @@ fun SignInScreen(
                         contentColor = Color.White
                     ),
                     onClick = onSignInClick
+
+
                 ) {
                     Image(
                         painter = painterResource(
@@ -72,6 +81,9 @@ fun SignInScreen(
                         modifier = Modifier.padding(6.dp),
                         fontSize = 18.sp
                     )
+
+
+
                 }
 
                 ElevatedButton(

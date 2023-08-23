@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -75,9 +76,10 @@ fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewMod
             }
         }
     }
+    Spacer(modifier = Modifier.height(15.dp))
 
     LazyColumn(
-        modifier = Modifier.padding(10.dp, 150.dp, 10.dp)
+        modifier = Modifier.padding(10.dp, 150.dp, 6.dp)
     ) {
         items(allRewards) { reward ->
             RewardCard(reward)

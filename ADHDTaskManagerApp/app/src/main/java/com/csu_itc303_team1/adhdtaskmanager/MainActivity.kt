@@ -101,6 +101,7 @@ import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
+import com.airbnb.lottie.LottieAnimationView
 
 
 @Suppress("UNCHECKED_CAST")
