@@ -60,7 +60,7 @@ fun LeaderboardCard(user: Users, rank: Int) {
                 fontSize = 22.sp
             )
             Text(
-                text = user.displayName ?: "",
+                text = user.username ?: "",
                 modifier = Modifier.weight(2f),
                 color = Color.Black,
                 fontSize = 22.sp

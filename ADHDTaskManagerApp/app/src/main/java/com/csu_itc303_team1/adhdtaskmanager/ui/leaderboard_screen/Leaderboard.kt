@@ -24,15 +24,15 @@ fun usersList(response: Response) {
     // for each user, add them to the arraylist
 
     response.users?.let { users ->
-            users.forEach{ user ->
-                Final.addToList(user)
-                user.displayName?.let { Log.i(TAG, it) }
+        users.forEach{ user ->
+            Final.addToList(user)
+            user.displayName?.let { Log.i(TAG, it) }
 
-            }
         }
-        response.exception?.message?.let {
-            Log.e(TAG, it)
-        }
+    }
+    response.exception?.message?.let {
+        Log.e(TAG, it)
+    }
 
 }
 
@@ -73,4 +73,3 @@ fun LeaderboardItem(user: Users, rank: Int) {
         )
     }
 }
-

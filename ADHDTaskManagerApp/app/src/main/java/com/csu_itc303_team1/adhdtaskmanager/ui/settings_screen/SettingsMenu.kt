@@ -30,11 +30,14 @@ fun SwitchRow(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     enabled: Boolean = true,
+    titleColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified,  // Default value if not provided
+    titleFontWeight: androidx.compose.ui.text.font.FontWeight = androidx.compose.ui.text.font.FontWeight.Normal,  // Default value if not provided
+    descColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
 
@@ -49,13 +52,16 @@ fun SwitchRow(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
-                modifier = Modifier.alpha(contentAlpha)
+                modifier = Modifier.alpha(contentAlpha),
+                color = titleColor,  // Apply the color
+                fontWeight = titleFontWeight
             )
 
             Text(
                 text = desc,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.alpha(contentAlpha)
+                modifier = Modifier.alpha(contentAlpha),
+                color = descColor  // Apply the color
             )
         }
 

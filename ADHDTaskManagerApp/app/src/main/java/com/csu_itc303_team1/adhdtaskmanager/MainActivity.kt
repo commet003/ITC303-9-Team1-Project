@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.pm.PackageManager
+import androidx.activity.viewModels
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -99,6 +100,7 @@ import android.widget.ImageView
 import android.widget.PopupWindow
 import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
@@ -107,7 +109,12 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    private val settingsViewModel by viewModels<SettingsViewModel>()
+    // First, instantiate the UsersViewModel (assuming you've not done it elsewhere in the code)
+    private val usersViewModel by viewModels<UsersViewModel>()
+
+    private val settingsViewModel by viewModels<SettingsViewModel> {
+        SettingsViewModelFactory(application, usersViewModel)
+    }
 
 
 
@@ -531,18 +538,14 @@ class MainActivity : ComponentActivity() {
                                     }
 
                                     // Settings Screen
-                                    composable(
-                                        route = Screen.SettingsScreen.route
-                                    ) {
+                                    composable(route = Screen.SettingsScreen.route) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
                                             context = applicationContext,
                                             scope = scope
                                         )
-
                                     }
-
                                     // Leaderboard Screen
                                     composable(
                                         route = Screen.LeaderboardScreen.route

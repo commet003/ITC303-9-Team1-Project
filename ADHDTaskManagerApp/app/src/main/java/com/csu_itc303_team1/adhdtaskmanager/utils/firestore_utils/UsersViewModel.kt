@@ -14,6 +14,11 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 
 
 class UsersViewModel(
@@ -31,6 +36,10 @@ class UsersViewModel(
     fun initializeAuthUiClient(context: Context, oneTapClient: SignInClient) {
         authUiClient = AuthUiClient(context, oneTapClient, repo)
     }
+
+    private val storage = FirebaseStorage.getInstance()
+    private val storageRef = storage.reference
+
 
     fun getUser(userId: String) {
         viewModelScope.launch {
@@ -68,6 +77,16 @@ class UsersViewModel(
         if (points != null) {
             user.value?.let { repo.updatePoints(it, points) }
         }
+    }
+
+    fun fetchImageList(directory: String): Flow<List<Uri>> = flow {
+        val listResult = storageRef.child(directory).listAll().await()
+        val uriList = mutableListOf<Uri>()
+        for (reference in listResult.items) {
+            val downloadUri = reference.getDownloadUrl().await() // Corrected here
+            uriList.add(downloadUri)
+        }
+        emit(uriList)
     }
 
 }
