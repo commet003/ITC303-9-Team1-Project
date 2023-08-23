@@ -39,6 +39,7 @@ fun RewardCard(reward: Reward){
                 Text(
                     text = "You have achieved: " + reward.timesAchieved + " Times",
                     fontSize = 20.sp
+
                 )
             }
 
