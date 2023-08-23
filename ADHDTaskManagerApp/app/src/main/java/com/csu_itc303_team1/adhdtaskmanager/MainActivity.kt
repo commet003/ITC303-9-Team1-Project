@@ -516,11 +516,11 @@ class MainActivity : ComponentActivity() {
 
 
 
-                                                googleAuthUiClient.getSignedInUser()?.userId?.let {
+                                               /* googleAuthUiClient.getSignedInUser()?.userId?.let {
                                                     userRewardViewModel.checkUserExists(
-                                                        it, googleAuthUiClient
+                                                        googleAuthUiClient
                                                     )
-                                                }
+                                                }*/
                                             }
                                         }
 
@@ -535,7 +535,7 @@ class MainActivity : ComponentActivity() {
 
                                                 googleAuthUiClient.getSignedInUser()?.userId?.let {
                                                     userRewardViewModel.checkUserExists(
-                                                            it, googleAuthUiClient
+                                                            googleAuthUiClient
                                                         )
 
                                                 }
