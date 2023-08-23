@@ -1,6 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.ui_components
 
 import android.annotation.SuppressLint
+import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,14 +26,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
-import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.utils.userRewardViewModel.UserRewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.unit.Dp
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Canvas
+import androidx.compose.material3.R
+import androidx.compose.runtime.rememberUpdatedState
+import kotlin.math.cos
+import kotlin.math.sin
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import com.csu_itc303_team1.adhdtaskmanager.databinding.CustomToastBinding
+import androidx.compose.runtime.*
+import androidx.compose.ui.zIndex
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionResult
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+
 @SuppressLint("RememberReturnType")
 @Composable
 fun TodoCard(
@@ -41,25 +74,29 @@ fun TodoCard(
     todoState: TodoState,
     onEvent: (TodoEvent) -> Unit,
     index: Int,
-    userRewardViewModel: UserRewardViewModel
-    ) {
+    rewardViewModel: RewardViewModel,
+    usersViewModel: UsersViewModel,
+    showToast: MutableState<Boolean>
+) {
 
-    userRewardViewModel.allRewards.observeAsState(listOf())
+    val showToastTrigger = remember { mutableStateOf(0) } // For triggering the toast
+    val showLottieAnimation = remember { mutableStateOf(false) }
 
-    var result = Reward("", "", 0, 0, 0)
-    val search by userRewardViewModel.searchResults.observeAsState()
-    if (search != null){
-        result = search?.get(0)!!
-        println(result.toString())
+
+    LaunchedEffect(showToastTrigger.value) {
+        if (showToastTrigger.value > 0) {
+            showToast.value = true
+            delay(3000) // 3 seconds
+            showToast.value = false
+        }
     }
 
 
-    LaunchedEffect(key1 = Unit) {
-        userRewardViewModel.findReward("Completed Task Reward")
-    }
+    rewardViewModel.allRewards.observeAsState(listOf())
+    val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
 
-    val hours = remember {
+    var hours = remember {
         mutableIntStateOf(0)
     }
 
@@ -84,7 +121,6 @@ fun TodoCard(
                     text = todo.title,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 22.sp,
-                    // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -102,28 +138,32 @@ fun TodoCard(
                 }
             }
             Row(
-                modifier = Modifier.height(76.dp)
-                    .fillMaxWidth(0.9f),
+                modifier = Modifier.height(60.dp),
                 verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Center
             ) {
                 Checkbox(
-                    checked = todo.isCompleted, onCheckedChange = {
+                    checked = todo.isCompleted,
+                    onCheckedChange = {
                         onEvent(TodoEvent.toggleCompleted(todo))
 
-                        // get the Completed Reward Entity and update the times achieved.
-                        // rewardViewModel.findReward("Completed Task Reward")
 
-                        println(result.toString())
-                        if (!todo.isCompleted) {
-                            result.timesAchieved =
-                                result.timesAchieved + 1
-                            userRewardViewModel.updateReward(result)
-                            userRewardViewModel.completedTaskPoints()
+                        if (search.isNotEmpty()) {
+                            val completedReward = search[0]
+
+                            if (!todo.isCompleted) {
+                                completedReward.timesAchieved =
+                                    completedReward.timesAchieved + 1
+                                rewardViewModel.updateReward(completedReward)
+                                usersViewModel.completedTaskPoints()
+
+                                showToastTrigger.value += 1 // Increment to trigger the toast
+                                onEvent(TodoEvent.ToggleLottieAnimation(true))
+                                showLottieAnimation.value
+                            }
+                        } else {
+                            println("Search Result on Todo Card is an empty list")
                         }
-
-
-
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.onPrimary,
@@ -132,11 +172,9 @@ fun TodoCard(
                     )
                 )
                 Spacer(modifier = Modifier.width(10.dp))
-
                 Text(
                     color = MaterialTheme.colorScheme.onPrimary,
                     text = todo.description,
-                    // Line through if completed
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
             }
@@ -149,14 +187,13 @@ fun TodoCard(
             ) {
                 Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
-
                 Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
                 if (todo.dueTime.isNotEmpty()) {
                     if (todo.dueTime.slice(0..1).toInt() > 12) {
-                        hours.intValue = todo.dueTime.slice(0..1).toInt() - 12
+                        hours.value = todo.dueTime.slice(0..1).toInt() - 12
                         Text(
-                            text = "${hours.intValue}:${todo.dueTime.slice(3..4)} PM",
+                            text = "${hours.value}:${todo.dueTime.slice(3..4)} PM",
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
@@ -180,13 +217,86 @@ fun TodoCard(
                         tint = MaterialTheme.colorScheme.onPrimary,
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Todo"
-
                     )
                 }
-
             }
         }
     }
-    //   }
 
+
+    lottieLoaderAnimation(isVisible = showToast.value)
 }
+
+
+
+// Custom Toast Composable
+
+@Composable
+fun CustomToastMessage(
+    message: String,
+    isVisible: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize() // Fills the entire screen
+            .background(Color.Transparent)
+    ) {
+        if (isVisible) {
+            // Display the toast box
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = modifier
+                    .wrapContentWidth(align = Alignment.CenterHorizontally) // Adjust width based on content
+                    .wrapContentHeight(align = Alignment.CenterVertically) // Adjust height based on content
+                    .background(
+                        Color(0xFF11143E), // Using the RGBA color you provided for the box background
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(horizontal = 48.dp, vertical = 24.dp) // Adjust the padding to make the box larger
+                    .zIndex(1f) // Ensure the toast message is displayed below the Lottie animation
+            ) {
+                Text(
+                    text = message,
+                    color = Color.White, // Setting the text color to white
+                    fontSize = 18.sp
+                )
+            }
+        }
+    }
+}
+
+
+
+
+@Composable
+fun lottieLoaderAnimation(isVisible: Boolean) {
+    if (isVisible) {
+        val comositeResult: LottieCompositionResult = rememberLottieComposition(
+            spec = LottieCompositionSpec.RawRes(com.csu_itc303_team1.adhdtaskmanager.R.raw.animation_llc3c1bg)
+        )
+        val progressionAnimation by animateLottieCompositionAsState(
+            comositeResult.value,
+            isPlaying = true,
+            iterations = 1,
+            speed = 1.0f
+        )
+        LottieAnimation(
+            composition = comositeResult.value,
+            progress = progressionAnimation,
+            modifier = Modifier
+                .fillMaxSize() // This makes sure the animation occupies the entire screen
+                .zIndex(Float.MAX_VALUE) // This gives it the highest possible z-index
+        )
+    }
+}
+
+
+
+
+
+
+
+
+

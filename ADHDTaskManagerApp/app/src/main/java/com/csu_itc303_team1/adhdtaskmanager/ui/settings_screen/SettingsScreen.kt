@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,18 +25,23 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
+    settingsViewModel: SettingsViewModel,
     currentUser: AuthUiClient,
     context: Context,
     scope: CoroutineScope
 ) {
 
 
+    val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
+
+
+
     Column(verticalArrangement = Arrangement.Center) {
         SwitchRow(
-            title = "Example: Dark Mode",
+            title = "Dark Mode",
             desc = "Changes the Application's Theme from Light to Dark.",
-            checked = false,
-            onCheckedChange = null,
+            checked = isDarkTheme,
+            onCheckedChange = { settingsViewModel.toggleTheme(it) },
             enabled = true
         )
         Divider(color = Color.Black, thickness = 1.dp)
