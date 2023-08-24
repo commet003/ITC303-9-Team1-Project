@@ -28,6 +28,8 @@ fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewMod
     val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
     val currentUser = usersViewModel.user.collectAsState()
 
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()

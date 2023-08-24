@@ -102,6 +102,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.airbnb.lottie.LottieAnimationView
+import com.csu_itc303_team1.adhdtaskmanager.ui.userScreen.uScreenPreview
 
 
 @Suppress("UNCHECKED_CAST")
@@ -346,7 +347,8 @@ class MainActivity : ComponentActivity() {
                             R.drawable.ic_leaderboard,
                             R.drawable.ic_pomodoro_timer,
                             R.drawable.ic_settings,
-                            R.drawable.ic_help
+                            R.drawable.ic_help,
+                            R.drawable.ic_user_screen
                         )
 
                         // Create a list of Screen objects
@@ -358,6 +360,7 @@ class MainActivity : ComponentActivity() {
                             Screen.PomodoroTimerScreen,
                             Screen.SettingsScreen,
                             Screen.HelpScreen,
+                            Screen.UserScreen
                         )
 
                         val selectedItem = remember { mutableStateOf(screens[0]) }
@@ -634,6 +637,11 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.HelpScreen.route
                                     ) {
                                         HelpScreen()
+                                    }
+                                    composable(
+                                        route = Screen.UserScreen.route
+                                    ) {
+                                        uScreenPreview()
                                     }
 
                                     composable(
