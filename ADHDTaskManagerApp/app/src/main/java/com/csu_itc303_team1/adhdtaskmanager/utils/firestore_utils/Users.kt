@@ -13,7 +13,8 @@ data class Users (
     val password: String? = null,
     val username: String? = null,
     val country: String? = null,
-    val userID: String? = null
+    val userID: String? = null,
+    val profileImage: String? = null
         )
 
 // Final list of users ready for displaying

@@ -63,7 +63,8 @@ class UsersViewModel(
             password = null,
             username = authUiClient.getSignedInUser()?.username,
             country = null,
-            userID = authUiClient.getSignedInUser()?.userId
+            userID = authUiClient.getSignedInUser()?.userId,
+            profileImage = authUiClient.getSignedInUser()?.profilePictureUrl
         )
     }
 

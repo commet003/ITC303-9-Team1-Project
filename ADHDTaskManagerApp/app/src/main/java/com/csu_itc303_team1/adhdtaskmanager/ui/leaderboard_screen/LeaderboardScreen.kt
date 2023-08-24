@@ -22,20 +22,13 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardCard
 @Composable
 fun LeaderboardScreen() {
 
+    // You should define or fetch this default image URL from a constant or Firebase Storage
+    val defaultImageUrl = "https://firebasestorage.googleapis.com/v0/b/adhdtaskmanager-d532d.appspot.com/o/default-user-profile-picture%2FUntitled.png?alt=media&token=0461fb17-8ef2-4192-9c9d-25dfacfd7420"
 
     // get list of users and sort it by points
     val usersList = Final.finalDataList
-    val sortedList = usersList.sortedWith(compareByDescending { it.points})
+    val sortedList = usersList.sortedWith(compareByDescending { it.points })
 
-//    Column(
-//        modifier = Modifier.fillMaxSize(),
-//
-//    ){
-//        // display each user as a leaderboard item
-//        for (element in sortedList) {
-//            LeaderboardItem(user = element, rank = sortedList.indexOf(element) + 1)
-//        }
-//    }
     Row(modifier = Modifier.padding(12.dp)) {
         Text(
             text = "Rank",
@@ -43,6 +36,8 @@ fun LeaderboardScreen() {
             color = LeaderboardBlue,
             fontSize = 18.sp
         )
+        // Added space for the Mascot header here
+        Spacer(modifier = Modifier.width(78.dp))
         Text(
             text = "Name",
             modifier = Modifier.weight(2f),
@@ -69,7 +64,7 @@ fun LeaderboardScreen() {
         contentPadding = PaddingValues(0.dp, 35.dp, 0.dp)
     ) {
         items(items = sortedList) { element ->
-            LeaderboardCard(user = element, rank = sortedList.indexOf(element) + 1)
+            LeaderboardCard(user = element, rank = sortedList.indexOf(element) + 1, defaultProfileImageUrl = defaultImageUrl)
         }
     }
 }

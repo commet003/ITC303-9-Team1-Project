@@ -104,6 +104,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
+import com.google.firebase.storage.FirebaseStorage
 
 
 @Suppress("UNCHECKED_CAST")
@@ -160,6 +161,18 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
+
+    private var defaultProfileImageUrl: String? = null
+
+    fun fetchDefaultProfileImage() {
+        val storageReference = FirebaseStorage.getInstance().reference
+        val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")
+
+        defaultProfileImageRef.downloadUrl.addOnSuccessListener { uri ->
+            defaultProfileImageUrl = uri.toString()
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
         InternalCoroutinesApi::class
@@ -178,6 +191,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         )
+
 
         googleAuthUiClient.addAuthStateListener {
             isSignedIn.value = it
@@ -231,7 +245,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
+        fetchDefaultProfileImage()
 
 
         setContent {
