@@ -109,7 +109,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    // First, instantiate the UsersViewModel (assuming you've not done it elsewhere in the code)
+    // First, instantiate the UsersViewModel
     private val usersViewModel by viewModels<UsersViewModel>()
 
     private val settingsViewModel by viewModels<SettingsViewModel> {
