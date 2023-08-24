@@ -655,6 +655,7 @@ class MainActivity : ComponentActivity() {
                                             verticalArrangement = Arrangement.SpaceAround
                                         ){
                                             PomodoroTimerScreen(
+                                                settingsViewModel = settingsViewModel, // Pass the instance here
                                                 initialWorkTime = 1500L * 1000L,
                                                 initialBreakTime = 300L * 1000L,
                                                 handleColor = MaterialTheme.colorScheme.primary,

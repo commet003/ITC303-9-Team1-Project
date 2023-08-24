@@ -27,11 +27,27 @@ class SettingsViewModel(
         prefs.getBoolean("isDarkTheme", false)
     )
 
+    // LiveData for Pomodoro work timer and break timer
+    val workTimerValue: MutableLiveData<Int>
+    val breakTimerValue: MutableLiveData<Int>
+
+    init {
+        workTimerValue = MutableLiveData(
+            prefs.getInt("workTimerValue", 25) // default 25 minutes
+        )
+        breakTimerValue = MutableLiveData(
+            prefs.getInt("breakTimerValue", 5)  // default 5 minutes
+        )
+    }
+
     // LiveData to hold profile image URLs
     val profileImages = MutableLiveData<List<String>>()
 
     // LiveData to hold the current user's profile image URL
     val currentUserProfileImage = MutableLiveData<String?>()
+
+
+
 
     // Toggle the theme preference and save it
     fun toggleTheme(isDark: Boolean) {
@@ -40,6 +56,24 @@ class SettingsViewModel(
             putBoolean("isDarkTheme", isDark)
             apply()
         }
+    }
+
+    fun saveTimerValues(workTime: Int, breakTime: Int) {
+        workTimerValue.value = workTime
+        breakTimerValue.value = breakTime
+        with(prefs.edit()) {
+            putInt("workTimerValue", workTime)
+            putInt("breakTimerValue", breakTime)
+            apply()
+        }
+    }
+
+    fun getWorkTimerValue(): Int {
+        return prefs.getInt("workTimerValue", 25)
+    }
+
+    fun getBreakTimerValue(): Int {
+        return prefs.getInt("breakTimerValue", 5)
     }
 
     fun fetchProfilePictures() {

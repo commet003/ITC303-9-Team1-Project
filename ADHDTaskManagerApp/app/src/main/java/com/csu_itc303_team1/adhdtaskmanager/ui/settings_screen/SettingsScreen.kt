@@ -64,6 +64,8 @@ fun SettingsScreen(
     val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
     val imageList by settingsViewModel.profileImages.observeAsState(initial = listOf())
     val currentProfileImage by settingsViewModel.currentUserProfileImage.observeAsState(initial = null)
+    var workTimeInput by remember { mutableStateOf(settingsViewModel.getWorkTimerValue().toString()) }
+    var breakTimeInput by remember { mutableStateOf(settingsViewModel.getBreakTimerValue().toString()) }
 
     // Fetch the profile pictures once when the screen is created
     LaunchedEffect(key1 = Unit, key2 = currentUser.getSignedInUser()?.userId) {
@@ -147,6 +149,55 @@ fun SettingsScreen(
             }
 
             Spacer(modifier = Modifier.height(10.dp))
+
+// This should be outside the AnimatedVisibility
+// Heading for Pomodoro Timer Adjustment
+            Text(
+                text = "Pomodoro Timer Adjustment",
+                color = Color(4, 64, 165),
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = "Input in minutes how long you would like your timer to run for.",
+                color = Color(4, 94, 165, 255),
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            TextField(
+                value = workTimeInput,
+                onValueChange = {
+                    workTimeInput = it
+                },
+                label = { Text("Work Timer (minutes)") }
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            TextField(
+                value = breakTimeInput,
+                onValueChange = {
+                    breakTimeInput = it
+                },
+                label = { Text("Break Timer (minutes)") }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(onClick = {
+                val workTime = workTimeInput.toIntOrNull() ?: 0
+                val breakTime = breakTimeInput.toIntOrNull() ?: 0
+                settingsViewModel.saveTimerValues(workTime, breakTime)
+            }) {
+                Text(text = "Save Timer Settings")
+
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
         // Image Picker Overlay: Moved outside of the main Column, but still inside the Box
@@ -194,9 +245,12 @@ fun SettingsScreen(
                                 )
                             }
                         }
+
+
                     }
                 }
             }
+
         }
     }
 }
