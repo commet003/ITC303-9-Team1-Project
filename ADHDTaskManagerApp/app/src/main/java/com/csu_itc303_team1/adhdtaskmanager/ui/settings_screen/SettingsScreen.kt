@@ -87,8 +87,9 @@ fun SettingsScreen(
 
             SwitchRow(
                 title = "Dark Mode",
-                titleColor = Color(4, 94, 165, 255),
-                titleFontWeight = FontWeight.Bold,
+                titleColor = Color(4, 64, 165), // Made adjustments here
+                titleFontWeight = FontWeight.Bold, // And here
+                titleFontSize = 20.sp, // Add this line
                 desc = "Changes the Application's Theme from Light to Dark.",
                 descColor = Color(4, 94, 165, 255),
                 checked = isDarkTheme,
