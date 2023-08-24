@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.userScreen
 
 
+import android.annotation.SuppressLint
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,6 +27,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
@@ -35,21 +41,22 @@ import com.google.android.gms.auth.api.identity.Identity
 @Composable
 fun userScreen(
 
-    client: AuthUiClient,
+    client: AuthUiClient, usersViewModel: UsersViewModel,
+    rewardViewModel: RewardViewModel
 
 ) {
-    val context = LocalContext.current
-    var viewManualClicked by remember { mutableStateOf(false) }
-    var viewArchitectureClicked by remember { mutableStateOf(false) }
-    var viewVideoClicked by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-    val usersList = Final.finalDataList
+//    val context = LocalContext.current
+//    var viewManualClicked by remember { mutableStateOf(false) }
+//    var viewArchitectureClicked by remember { mutableStateOf(false) }
+//    var viewVideoClicked by remember { mutableStateOf(false) }
+//    val coroutineScope = rememberCoroutineScope()
+//    val usersList = Final.finalDataList
+//    val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
 
-
+    val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
     val signedInUser = client.getSignedInUser()
 
-
-
+    val currentUser = usersViewModel.user.collectAsState()
 
 
 
@@ -115,11 +122,9 @@ fun userScreen(
                 fontSize = 18.sp
             )
             Text(
-                //text = user.points.toString(),
-                //text = user.points.toString(),
-                //text = user.points.toString(),
+
                 //text = currentUser.value?.points.toString(),
-                text = "SSS",
+                text = rewardViewModel.allRewards.value.toString(),
                 color = Color.Black,
                 fontSize = 18.sp
             )
@@ -167,6 +172,7 @@ fun userScreen(
 }
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Preview
 @Composable
 fun uScreenPreview() {
@@ -176,14 +182,17 @@ fun uScreenPreview() {
      val usersRepo= UsersRepo()
 
     val authUiClient = AuthUiClient(context, oneTapClient)
+     val rewardViewModel: RewardViewModel
+    //rewardViewModel = ViewModelProvider(this).get(RewardViewModel::class.java)
+    rewardViewModel = RewardViewModel(application = Application())
 
-    var t =  Users()
-    var f = UsersRepo()
-    var k = Response()
 
+    //val rewardViewModel  = ViewModel()
+    val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
     val uvm  = UsersViewModel()
 
-
-    userScreen(authUiClient)
+    print("Point is " + uvm.user.value?.points.toString())
+    print("Point is $usersRepo")
+    userScreen(authUiClient, uvm, rewardViewModel)
 }
 
