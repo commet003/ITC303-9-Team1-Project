@@ -37,7 +37,7 @@ fun LeaderboardScreen() {
             fontSize = 18.sp
         )
         // Added space for the Mascot header here
-        Spacer(modifier = Modifier.width(78.dp))
+        Spacer(modifier = Modifier.width(94.dp))
         Text(
             text = "Name",
             modifier = Modifier.weight(2f),

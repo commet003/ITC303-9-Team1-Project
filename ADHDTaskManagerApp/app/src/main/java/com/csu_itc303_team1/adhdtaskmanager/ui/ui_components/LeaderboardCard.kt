@@ -65,7 +65,7 @@ fun LeaderboardCard(user: Users, rank: Int, defaultProfileImageUrl: String?) {
                     painter = rememberImagePainter(data = url),
                     contentDescription = "User's Mascot",
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(105.dp)
                         .padding(0.dp, 0.dp, 8.dp, 0.dp)
                 )
             }
