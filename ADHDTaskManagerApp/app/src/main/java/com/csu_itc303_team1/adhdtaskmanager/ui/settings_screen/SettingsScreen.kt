@@ -148,7 +148,9 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Divider(color = Color.Black, thickness = 1.dp)
+
+            Spacer(modifier = Modifier.height(15.dp))
 
 // This should be outside the AnimatedVisibility
 // Heading for Pomodoro Timer Adjustment
