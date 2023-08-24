@@ -1,10 +1,16 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen
 
 import android.content.Context
+import android.content.IntentSender
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -17,7 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.google.firebase.auth.AuthCredential
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -26,6 +35,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
+    signInViewModel: SignInViewModel,
     currentUser: AuthUiClient,
     context: Context,
     scope: CoroutineScope
@@ -33,6 +43,23 @@ fun SettingsScreen(
 
 
     val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
+    var convertUserAuthIntentSender: IntentSender?
+    var convertedUser: AuthCredential?
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == ComponentActivity.RESULT_OK) {
+                scope.launch {
+                    val convertedSignInResult =
+                        currentUser.getUsersGoogleCredentials(
+                            intent = result.data ?: return@launch
+                        )
+                    currentUser.convertAnonymousUserToGoogleUser(convertedSignInResult)
+                }
+            }
+        }
+    )
 
 
 
@@ -70,6 +97,22 @@ fun SettingsScreen(
                 }
             }) {
             Text(text = "Update Username")
+        }
+
+        Row {
+            Button(onClick = {
+                scope.launch{
+                    val convertUserAuthIntentSender =
+                        currentUser.signIn()
+                    launcher.launch(
+                        IntentSenderRequest.Builder(
+                            convertUserAuthIntentSender ?: return@launch
+                        ).build()
+                    )
+                }
+            }) {
+                Text(text = "Sign Out")
+            }
         }
     }
 }

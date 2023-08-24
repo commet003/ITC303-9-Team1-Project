@@ -109,9 +109,6 @@ class MainActivity : ComponentActivity() {
     private val settingsViewModel by viewModels<SettingsViewModel>()
 
 
-
-
-
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
     private val db by lazy {
         Room.databaseBuilder(
@@ -137,6 +134,7 @@ class MainActivity : ComponentActivity() {
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
+            activity = this,
             context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
@@ -530,6 +528,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
+                                            signInViewModel = signInViewModel,
                                             currentUser = googleAuthUiClient,
                                             context = applicationContext,
                                             scope = scope

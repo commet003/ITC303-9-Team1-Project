@@ -1,11 +1,18 @@
 package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
+import android.widget.Toast
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
+import com.csu_itc303_team1.adhdtaskmanager.MainActivity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.identity.SignInCredential
+import com.google.api.AuthProvider
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -13,9 +20,14 @@ import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 
 class AuthUiClient(
+    private val activity: Activity,
     private val context: Context,
     private val oneTapClient: SignInClient
 ) {
+    private lateinit var credential: SignInCredential
+    private lateinit var googleIdToken: String
+    private lateinit var googleCredentials: AuthCredential
+
     private val auth = Firebase.auth
     private var _isSignedIn = false
 
@@ -51,9 +63,9 @@ class AuthUiClient(
     }
 
     suspend fun signInWithIntent(intent: Intent): SignInResult {
-        val credential = oneTapClient.getSignInCredentialFromIntent(intent)
-        val googleIdToken = credential.googleIdToken
-        val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
+        credential = oneTapClient.getSignInCredentialFromIntent(intent)
+        googleIdToken = credential.googleIdToken!!
+        googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
             SignInResult(
@@ -74,6 +86,34 @@ class AuthUiClient(
                 errorMessage = e.message
             )
         }
+    }
+
+    fun getUsersGoogleCredentials(intent: Intent): AuthCredential{
+        val convertorGoogleUser = oneTapClient.getSignInCredentialFromIntent(intent)
+        val convertorGoogleIdToken = convertorGoogleUser.googleIdToken!!
+        return GoogleAuthProvider.getCredential(convertorGoogleIdToken, null)
+    }
+
+    fun convertAnonymousUserToGoogleUser(authCredential: AuthCredential) {
+        auth.currentUser!!.linkWithCredential(authCredential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Convert Anon User to a Google User", "linkWithCredential:success")
+                    val user = task.result?.user
+                    Toast.makeText(
+                        context,
+                        "Authentication successful.",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                } else {
+                    Log.w("Convert Anon User to a Google User", "linkWithCredential:failure", task.exception)
+                    Toast.makeText(
+                        context,
+                        "Authentication failed.",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
     }
 
 
