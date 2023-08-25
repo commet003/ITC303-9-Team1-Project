@@ -102,6 +102,7 @@ import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.firebase.storage.FirebaseStorage
@@ -110,7 +111,7 @@ import com.google.firebase.storage.FirebaseStorage
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    // First, instantiate the UsersViewModel
+    // Instantiate the UsersViewModel
     private val usersViewModel by viewModels<UsersViewModel>()
 
     private val settingsViewModel by viewModels<SettingsViewModel> {
@@ -201,47 +202,57 @@ class MainActivity : ComponentActivity() {
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
 
                 // Capture and blur screenshot
-                val screenshot = takeScreenshot(contentView)
-                val blurredScreenshot = blurBitmap(screenshot, applicationContext)
+                captureScreenshotWhenReady(contentView) { screenshot ->
+                    val blurredScreenshot = blurBitmap(screenshot, applicationContext)
 
-                // Display blurred screenshot as a background
-                val blurredBackground = ImageView(applicationContext)
-                blurredBackground.setImageBitmap(blurredScreenshot)
-                val params = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                contentView.addView(blurredBackground, params)
+                    // Display blurred screenshot as a background
+                    val blurredBackground = ImageView(applicationContext)
+                    blurredBackground.setImageBitmap(blurredScreenshot)
+                    val params = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    )
+                    contentView.addView(blurredBackground, params)
 
-                // Inflate the custom toast layout
-                val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
+                    // Inflate the custom toast layout
+                    val layoutInflater =
+                        getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
 
-                val customToastMessage = customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
-                customToastMessage.text = "Welcome back! Be sure to check out the leaderboard for the latest standings"
+                    val customToastMessage =
+                        customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
+                    customToastMessage.text =
+                        "Welcome back! Be sure to check out the leaderboard for the latest standings"
 
-                // Find the LottieAnimationView and start the animation
-                val lottieAnimation = customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
-                lottieAnimation.playAnimation()
+                    // Find the LottieAnimationView and start the animation
+                    val lottieAnimation =
+                        customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
+                    lottieAnimation.playAnimation()
 
-                // Create a PopupWindow with custom view
-                val customPopup = PopupWindow(
-                    customToastRoot,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    false
-                )
-                customPopup.animationStyle = android.R.style.Animation_Toast
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                    customPopup.showAtLocation(findViewById(android.R.id.content), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 0)
+                    // Create a PopupWindow with custom view
+                    val customPopup = PopupWindow(
+                        customToastRoot,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        false
+                    )
+                    customPopup.animationStyle = android.R.style.Animation_Toast
+                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        customPopup.showAtLocation(
+                            findViewById(android.R.id.content),
+                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                            0,
+                            0
+                        )
+                    }
+
+                    // Use a Handler to control the duration of the PopupWindow
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        customPopup.dismiss()
+                        // Remove or hide blurred background when done
+                        contentView.removeView(blurredBackground)
+                    }, 6000) // Dismiss popup after 6 seconds
                 }
-
-                // Use a Handler to control the duration of the PopupWindow
-                Handler(Looper.getMainLooper()).postDelayed({
-                    customPopup.dismiss()
-                    // Remove or hide blurred background when done
-                    contentView.removeView(blurredBackground)
-                }, 6000) // Dismiss popup after 6 seconds
             }
         }
 

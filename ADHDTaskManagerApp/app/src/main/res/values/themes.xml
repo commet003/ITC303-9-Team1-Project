@@ -16,9 +16,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
 
 
-
     </style>
-
 
 
     <style name="Theme.ADHDTaskManager.NoActionBar">
@@ -29,6 +27,7 @@
     <style name="Theme.ADHDTaskManager.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.ADHDTaskManager.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="Theme.ProgressBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/NavyBlueDark</item>
@@ -44,15 +43,13 @@
     </style>
 
 
-
-
     <!--Here, android: indeterminateDrawable sets the picture displayed in
         the animation or the xml file of this animation and android: indeterminateOnly
            This property is set to true,the progress bar will be ignored Progress and present
            an infinite loop of animation
     -->
     <style name="CircularDeterminateProgressBar">
-        <item name="android:indeterminateOnly">false </item>
+        <item name="android:indeterminateOnly">false</item>
         <item name="android:progressDrawable">@drawable/circle</item>
     </style>
 </resources>
