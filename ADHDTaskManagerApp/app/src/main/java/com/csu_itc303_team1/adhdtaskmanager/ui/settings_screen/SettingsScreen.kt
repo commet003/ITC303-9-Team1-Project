@@ -44,11 +44,16 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.TextFieldDefaults
 
 
 // For now, this is just a placeholder code for a functional screen
@@ -66,6 +71,8 @@ fun SettingsScreen(
     val currentProfileImage by settingsViewModel.currentUserProfileImage.observeAsState(initial = null)
     var workTimeInput by remember { mutableStateOf(settingsViewModel.getWorkTimerValue().toString()) }
     var breakTimeInput by remember { mutableStateOf(settingsViewModel.getBreakTimerValue().toString()) }
+    var selectedCountry by remember { mutableStateOf("") }
+    var showCountryDropdown by remember { mutableStateOf(false) }
 
     // Fetch the profile pictures once when the screen is created
     LaunchedEffect(key1 = Unit, key2 = currentUser.getSignedInUser()?.userId) {
@@ -78,6 +85,12 @@ fun SettingsScreen(
             settingsViewModel.fetchCurrentUserProfileImage(userId)
         }
     }
+
+    val countryList = listOf(
+        "United States", "Canada", "United Kingdom", "Australia", "Germany",
+        "India", "France", "Italy", "Spain", "Brazil", "Russia" //... add more countries
+    )
+
     Box(modifier = Modifier.fillMaxSize()) {
         // Original Content
         Column(
@@ -127,6 +140,55 @@ fun SettingsScreen(
             }) {
                 Text(text = "Update Username")
             }
+
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+// Title for Country Selection
+            Text(text = " ", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+// Dropdown for Country Selection
+            Box(
+                modifier = Modifier
+                    .width(LocalConfiguration.current.screenWidthDp.dp * 0.72f) // Set width to 1/3 of screen width
+                    .border(width = 1.dp, color = Color.Gray) // To give a boundary similar to TextField
+                    .clickable { showCountryDropdown = !showCountryDropdown }
+                    .padding(12.dp)
+            ) {
+                Text(text = if (selectedCountry.isNotEmpty()) selectedCountry else "Select a Country")
+
+                DropdownMenu(expanded = showCountryDropdown, onDismissRequest = { showCountryDropdown = false }) {
+                    countryList.forEach { country ->
+                        DropdownMenuItem(onClick = {
+                            selectedCountry = country
+                            showCountryDropdown = false
+                        }) {
+                            Text(text = country)
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(onClick = {
+                scope.launch {
+                    currentUser.getSignedInUser()?.userId?.let { userId ->
+                        settingsViewModel.updateUserCountry(userId, selectedCountry)
+                        Toast.makeText(context, "Country Updated", Toast.LENGTH_LONG).show()
+                        selectedCountry = ""
+                    }
+                }
+            }) {
+                Text(text = "Update Country")
+            }
+
+
+
+
+
 
             Spacer(modifier = Modifier.height(10.dp))
 

@@ -51,6 +51,14 @@ class UsersViewModel(
         }
     }
 
+    fun updateUserCountry(userId: String, newCountry: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                repo.updateCountry(userId, newCountry)
+            }
+        }
+    }
+
     fun checkUserExists(id: String): Boolean {
         return repo.checkExists(id)
     }

@@ -47,7 +47,9 @@ class SettingsViewModel(
     val currentUserProfileImage = MutableLiveData<String?>()
 
 
-
+    fun updateUserCountry(userId: String, newCountry: String) {
+        usersViewModel.updateUserCountry(userId, newCountry)
+    }
 
     // Toggle the theme preference and save it
     fun toggleTheme(isDark: Boolean) {

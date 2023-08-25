@@ -44,6 +44,18 @@ class UsersRepo (
         }
     }
 
+    fun updateCountry(userId: String, newCountry: String) {
+        val db = FirebaseFirestore.getInstance()
+        val userRef = db.collection("users").document(userId)
+        userRef.update("country", newCountry)
+            .addOnSuccessListener {
+                // Handle successful update, maybe log it or show a toast
+            }
+            .addOnFailureListener { exception ->
+                // Handle failure, log it or show an error
+            }
+    }
+
     fun checkExists(email: String): Boolean {
         val checkUser = rootRef.collection("users").document(email)
         var userExist = false
@@ -103,18 +115,18 @@ class UsersRepo (
     fun getLeaderboardThree(): ArrayList<Users> {
         val leaderboard = ArrayList<Users>()
         userRef.addSnapshotListener { value, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-
-                for (doc in value!!) {
-                    doc?.let {
-                        leaderboard.add(it.toObject())
-                    }
-                }
-                Log.d(TAG, "Current cites in CA: $leaderboard")
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                return@addSnapshotListener
             }
+
+            for (doc in value!!) {
+                doc?.let {
+                    leaderboard.add(it.toObject())
+                }
+            }
+            Log.d(TAG, "Current cites in CA: $leaderboard")
+        }
         return leaderboard
     }
 
