@@ -1,10 +1,10 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.animation.Animator
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.lottie.LottieAnimationView
 
 class ADHDTaskManager : AppCompatActivity() {
 
@@ -12,16 +12,19 @@ class ADHDTaskManager : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_splash)
 
-        val videoView = findViewById<VideoView>(R.id.videoView)
-        val uri = Uri.parse("android.resource://" + packageName + "/" + R.raw.your_video_file_name)
-        videoView.setVideoURI(uri)
+        val lottieAnimationView = findViewById<LottieAnimationView>(R.id.lottieAnimationView)
 
-        videoView.setOnCompletionListener {
-            // Start MainActivity when video finishes
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()  // Close this activity
-        }
-
-        videoView.start()
+        lottieAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
+                startActivity(Intent(this@ADHDTaskManager, MainActivity::class.java))
+                finish()
+            }
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
+        })
     }
 }
+
+
+
