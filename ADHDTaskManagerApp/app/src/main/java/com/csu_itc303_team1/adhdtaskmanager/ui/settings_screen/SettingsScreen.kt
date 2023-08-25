@@ -54,6 +54,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.text.style.TextAlign
+import com.airbnb.lottie.model.content.CircleShape
+import androidx.compose.foundation.shape.CircleShape
+
 
 
 // For now, this is just a placeholder code for a functional screen
@@ -227,39 +231,49 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             Text(
-                text = "Input in minutes how long you would like your timer to run for.",
+                text = "Input how long you would like your timer to run for then click the tick to confirm.",
                 color = Color(4, 94, 165, 255),
             )
 
             Spacer(modifier = Modifier.height(5.dp))
 
-            TextField(
-                value = workTimeInput,
-                onValueChange = {
-                    workTimeInput = it
-                },
-                label = { Text("Work Timer (minutes)") }
-            )
+// Wrapping the TextFields and the save button inside a Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Putting the two TextFields next to each other
+                Column {
+                    TextField(
+                        value = workTimeInput,
+                        onValueChange = {
+                            workTimeInput = it
+                        },
+                        label = { Text("Work Timer (minutes)") }
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    TextField(
+                        value = breakTimeInput,
+                        onValueChange = {
+                            breakTimeInput = it
+                        },
+                        label = { Text("Break Timer (minutes)") }
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(5.dp))
-
-            TextField(
-                value = breakTimeInput,
-                onValueChange = {
-                    breakTimeInput = it
-                },
-                label = { Text("Break Timer (minutes)") }
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Button(onClick = {
-                val workTime = workTimeInput.toIntOrNull() ?: 0
-                val breakTime = breakTimeInput.toIntOrNull() ?: 0
-                settingsViewModel.saveTimerValues(workTime, breakTime)
-            }) {
-                Text(text = "Save Timer Settings")
-
+                // Making the button circular and placed to the right
+                Button(
+                    onClick = {
+                        val workTime = workTimeInput.toIntOrNull() ?: 0
+                        val breakTime = breakTimeInput.toIntOrNull() ?: 0
+                        settingsViewModel.saveTimerValues(workTime, breakTime)
+                    },
+                    modifier = Modifier.size(50.dp),  // Adjust size as needed
+                    shape = CircleShape  // Making it circular
+                ) {
+                    Text(text = "✓", textAlign = TextAlign.Center)
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -319,10 +333,3 @@ fun SettingsScreen(
         }
     }
 }
-
-
-
-
-
-
-
