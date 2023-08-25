@@ -1,9 +1,10 @@
 package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
-import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
+import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
@@ -13,11 +14,13 @@ import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 
 class AuthUiClient(
-    private val context: Context,
+    firestoreViewModel: FirestoreViewModel,
     private val oneTapClient: SignInClient
 ) {
     private val auth = Firebase.auth
     private var _isSignedIn = false
+    private val localFirestoreViewModel = firestoreViewModel
+
 
     // Function to addAuthStateListener to the firebase auth
     // Changes the value of _isSignedIn to true if the user is signed in
@@ -25,16 +28,12 @@ class AuthUiClient(
     fun addAuthStateListener(listener: (Boolean) -> Unit) {
         auth.addAuthStateListener {
             _isSignedIn = it.currentUser != null
+            if(_isSignedIn) {
+                localFirestoreViewModel.addUserToFirestore(this.getSignedInUser()!!)
+            }
             listener(_isSignedIn)
         }
     }
-
-
-    // Public getter fun for _isSignedIn
-    fun getSignedIn(): Boolean {
-        return _isSignedIn
-    }
-
 
 
     suspend fun signIn(): IntentSender? {
@@ -59,9 +58,12 @@ class AuthUiClient(
             SignInResult(
                 data = user?.run {
                     UserData(
-                        userId = uid,
+                        userID = uid,
                         username = displayName,
-                        profilePictureUrl = photoUrl?.toString()
+                        profilePicture = photoUrl?.toString(),
+                        rewardsPoints = 0,
+                        lastLogin = null,
+                        loginStreak = 0,
                     )
                 },
                 errorMessage = null
@@ -90,9 +92,13 @@ class AuthUiClient(
 
     fun getSignedInUser(): UserData? = auth.currentUser?.run {
         UserData(
-            userId = uid,
+            userID = uid,
             username = displayName,
-            profilePictureUrl = photoUrl?.toString()
+            profilePicture = photoUrl?.toString(),
+            rewardsPoints = 0,
+            lastLogin = null,
+            loginStreak = 0,
+            rewardsEarned = REWARDS_COUNTS.toMutableMap()
         )
     }
 
@@ -115,9 +121,13 @@ class AuthUiClient(
             SignInResult(
                 data = user?.run {
                     UserData(
-                        userId = uid,
+                        userID = uid,
                         username = displayName,
-                        profilePictureUrl = photoUrl?.toString()
+                        profilePicture = photoUrl?.toString(),
+                        rewardsPoints = 0,
+                        lastLogin = null,
+                        loginStreak = 0,
+                        rewardsEarned = REWARDS_COUNTS.toMutableMap()
                     )
                 },
                 errorMessage = null
@@ -144,9 +154,13 @@ class AuthUiClient(
             SignInResult(
                 data = user?.run {
                     UserData(
-                        userId = uid,
+                        userID = uid,
                         username = displayName,
-                        profilePictureUrl = photoUrl?.toString()
+                        profilePicture = photoUrl?.toString(),
+                        rewardsPoints = 0,
+                        lastLogin = null,
+                        loginStreak = 0,
+                        rewardsEarned = REWARDS_COUNTS.toMutableMap()
                     )
                 },
                 errorMessage = null

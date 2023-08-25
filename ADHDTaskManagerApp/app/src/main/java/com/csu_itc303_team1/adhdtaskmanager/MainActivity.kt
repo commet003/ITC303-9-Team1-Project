@@ -4,9 +4,20 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -49,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -61,56 +73,33 @@ import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.usersList
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.LayoutInflater
-import android.widget.TextView
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupWindow
-import androidx.lifecycle.Lifecycle
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
-import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
-
-
-
-
+    private val firestoreViewModel by viewModels<FirestoreViewModel>()
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
     private val db by lazy {
@@ -121,23 +110,13 @@ class MainActivity : ComponentActivity() {
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
-    private val rewardViewModel by viewModels<RewardViewModel>(
-        factoryProducer = {
-            object: ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RewardViewModel(application) as T
-                }
-            }
-        }
-    )
 
     private lateinit var navController: NavHostController
-    private lateinit var leadViewModel: LeaderboardViewModel
-    private lateinit var userViewModel: UsersViewModel
+
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
-            context = applicationContext,
+            firestoreViewModel = firestoreViewModel,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
@@ -148,11 +127,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
-        InternalCoroutinesApi::class
-    )
-
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -168,6 +145,7 @@ class MainActivity : ComponentActivity() {
 
         googleAuthUiClient.addAuthStateListener {
             isSignedIn.value = it
+
             if (it) { // if signed in
 
                 // Define contentView here
@@ -227,11 +205,7 @@ class MainActivity : ComponentActivity() {
             val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
             val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
-            // Retrieve's Leaderboard data onCreate
-            leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
-            userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
-            // Puts it into a readable format
-            getResponseUsingCallback()
+
 
 
             ADHDTaskManagerTheme(darkTheme = isDarkTheme) {
@@ -269,7 +243,7 @@ class MainActivity : ComponentActivity() {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
-                rewardViewModel.allRewards.observeAsState(listOf())
+                //rewardViewModel.allRewards.observeAsState(listOf())
 
 
 
@@ -486,7 +460,7 @@ class MainActivity : ComponentActivity() {
                                 val state by viewModel.state.collectAsState()
                                 if (isSignedIn.value) {
                                     state.userId =
-                                        googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                        googleAuthUiClient.getSignedInUser()?.userID ?: ""
                                 }
                                 //val rewardState by rewardViewModel.collectAsState()
                                 val todoEvent = viewModel::onEvent
@@ -518,9 +492,9 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         TodoScreen(
                                             state = state,
-                                            onEvent = todoEvent,
-                                            rewardViewModel = rewardViewModel,
-                                            usersViewModel = userViewModel
+                                            currentUser = googleAuthUiClient,
+                                            firestoreViewModel = firestoreViewModel,
+                                            onEvent = todoEvent
                                         )
                                     }
 
@@ -548,7 +522,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel)
+                                        RewardsScreen(googleAuthUiClient, firestoreViewModel)
                                     }
 
                                     // Completed Task Screen
@@ -567,7 +541,6 @@ class MainActivity : ComponentActivity() {
                                         LaunchedEffect(key1 = Unit) {
                                             if (googleAuthUiClient.getSignedInUser() != null) {
                                                 navController.navigate("todo_screen")
-                                                userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
                                                 println("launched effect 1. user exists, I have run the code")
                                             }
                                         }
@@ -583,19 +556,6 @@ class MainActivity : ComponentActivity() {
 
                                                 navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
-                                                val exist =
-                                                    googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                        userViewModel.checkUserExists(
-                                                            it1
-                                                        )
-                                                    }
-                                                if (exist == false) {
-                                                    userViewModel.convertToUserFromAuth(
-                                                        googleAuthUiClient
-                                                    )
-                                                    userViewModel.addUserToFirebase()
-                                                    println("I'm trying to add another user again.")
-                                                }
                                             }
                                         }
 
@@ -663,7 +623,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            rewardViewModel.allRewards.observeAsState(listOf())
+            //rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 
@@ -692,14 +652,4 @@ class MainActivity : ComponentActivity() {
             .build()
         notificationManager.notify(2, notification)
     }
-
-    // creates Arraylist of users from the Firestore database
-    private fun getResponseUsingCallback() {
-        leadViewModel.getResponseUsingCallback((object : FirebaseCallback {
-            override fun onResponse(response: Response) {
-                usersList(response)
-            }
-        }))
-    }
-
 }
