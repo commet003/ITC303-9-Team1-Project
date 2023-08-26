@@ -60,8 +60,6 @@ fun TodoScreen(
     onEvent: (TodoEvent) -> Unit
 ) {
 
-    //rewardViewModel.allRewards.observeAsState(listOf())
-
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
         skipHiddenState = false
@@ -92,7 +90,7 @@ fun TodoScreen(
                         }
                     ) {
                         Icon(
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             imageVector = Icons.Default.Add,
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.primaryContainer)
@@ -132,7 +130,7 @@ fun TodoScreen(
                             ,
                             onClick = { }) {
                             Icon(
-                                tint = MaterialTheme.colorScheme.onBackground,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 imageVector = Icons.Filled.List,
                                 contentDescription = "Filter"
                             )

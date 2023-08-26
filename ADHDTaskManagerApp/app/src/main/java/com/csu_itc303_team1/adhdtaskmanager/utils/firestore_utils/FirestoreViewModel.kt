@@ -6,6 +6,7 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
@@ -14,8 +15,6 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.dataObjects
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -33,8 +32,30 @@ class FirestoreViewModel(
 ): ViewModel() {
 
     private val _user = MutableStateFlow<UserData?>(null)
+
     val user: StateFlow<UserData?>
         get() = _user
+
+    fun getResponse(callback: FirebaseCallback) {
+        usersRef.get().addOnCompleteListener { task ->
+            val response = Response()
+            if (task.isSuccessful) {
+
+                // For each document in the collection, create a user object
+
+                val result = task.result
+                result?.let {
+                    response.leaderboardUsers = result.documents.mapNotNull {snapShot ->
+                        snapShot.toObject(UserData::class.java)
+                    }
+                }
+            } else {
+                response.exception = task.exception
+            }
+            callback.onResponse(response)
+        }
+    }
+
 
     @SuppressLint("RestrictedApi")
     private fun checkUserExists(userId: String): Boolean{
@@ -60,18 +81,6 @@ class FirestoreViewModel(
         }
     }
 
-    fun getUsersFromFirestore() {
-        db.collection("users")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.w(ContentValues.TAG, "Error getting documents.", exception)
-            }
-    }
 
      fun getUser(userId: String): UserData? {
          viewModelScope.launch {
@@ -153,8 +162,20 @@ class FirestoreViewModel(
             .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 
+    fun updateUsername(userId: String, newUsername: String){
+        val washingtonRef = usersRef.document(userId)
+        washingtonRef
+            .update("username", newUsername)
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+    }
 
-    fun getUsersForLeaderboard(): Flow<List<UserData>> {
-        return usersRef.orderBy("name", Query.Direction.DESCENDING).limit(50).dataObjects()
+    // Get user profile picture from cloud storage
+    fun updateUserProfilePicture(userId: String, newProfilePicture: String){
+        val washingtonRef = usersRef.document(userId)
+        washingtonRef
+            .update("profilePicture", newProfilePicture)
+            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 }

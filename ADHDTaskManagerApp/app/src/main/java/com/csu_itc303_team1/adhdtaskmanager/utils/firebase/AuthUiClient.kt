@@ -142,39 +142,6 @@ class AuthUiClient(
         }
     }
 
-    // Update anonymous users profile username
-    suspend fun updateUsername(username: String): SignInResult {
-        return try {
-            val user = auth.currentUser
-            user?.updateProfile(
-                com.google.firebase.auth.UserProfileChangeRequest.Builder()
-                    .setDisplayName(username)
-                    .build()
-            )?.await()
-            SignInResult(
-                data = user?.run {
-                    UserData(
-                        userID = uid,
-                        username = displayName,
-                        profilePicture = photoUrl?.toString(),
-                        rewardsPoints = 0,
-                        lastLogin = null,
-                        loginStreak = 0,
-                        rewardsEarned = REWARDS_COUNTS.toMutableMap()
-                    )
-                },
-                errorMessage = null
-            )
-        } catch(e: Exception) {
-            e.printStackTrace()
-            if(e is CancellationException) throw e
-            SignInResult(
-                data = null,
-                errorMessage = e.message
-            )
-        }
-    }
-
     // Get is user anonymous
     fun isUserAnonymous(): Boolean {
         return auth.currentUser?.isAnonymous ?: false

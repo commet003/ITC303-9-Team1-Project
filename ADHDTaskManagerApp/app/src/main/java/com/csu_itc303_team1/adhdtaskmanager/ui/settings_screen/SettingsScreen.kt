@@ -1,8 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen
 
 import android.content.Context
-import android.widget.Toast
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -18,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -27,6 +26,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
     currentUser: AuthUiClient,
+    firestoreViewModel: FirestoreViewModel,
     context: Context,
     scope: CoroutineScope
 ) {
@@ -58,12 +58,7 @@ fun SettingsScreen(
         Button(
             onClick = {
                 scope.launch {
-                    currentUser.updateUsername(username)
-                    Toast.makeText(
-                        context,
-                        "Username Updated",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    firestoreViewModel.updateUsername(currentUser.getSignedInUser()?.userID.toString(), username)
 
                     // reset the username
                     username = ""

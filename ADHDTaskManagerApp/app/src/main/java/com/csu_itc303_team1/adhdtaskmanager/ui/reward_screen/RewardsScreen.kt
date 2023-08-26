@@ -44,7 +44,7 @@ fun RewardsScreen(
                 horizontalArrangement = Arrangement.Center,
             ) {
                     Text(
-                        text = if(currentUser.getSignedInUser()?.username != null) currentUser.getSignedInUser()?.username.toString() else "Username Not Found",
+                        text = if(user?.username != null) user.username else "User",
                         fontSize = 30.sp
                     )
 

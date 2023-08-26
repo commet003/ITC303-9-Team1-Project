@@ -33,3 +33,5 @@ val LEVELS = mapOf<Int, Int>(
     9 to 100000,
     10 to 150000,
 )
+
+const val DEFAULT_PROFILE_PICTURE = "https://firebasestorage.googleapis.com/v0/b/adhdtaskmanager-d532d.appspot.com/o/default-user-profile-picture%2FUntitled.png?alt=media&token=0461fb17-8ef2-4192-9c9d-25dfacfd7420"
