@@ -47,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -88,6 +89,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
@@ -95,6 +97,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -132,9 +135,17 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
+    private val currentUser by lazy {
+        mutableStateOf(UserData())
+    }
+
+    private val loginSeconds by lazy {
+        mutableLongStateOf(0L)
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "InflateParams")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -153,6 +164,17 @@ class MainActivity : ComponentActivity() {
             isSignedIn.value = it
 
             if (it) { // if signed in
+
+                    currentUser.value = firestoreViewModel.getUser(googleAuthUiClient.getCurrentUserId())!!
+                    loginSeconds.longValue = currentUser.value.lastLogin.seconds
+
+
+
+                if (currentUser.value.lastLogin.toDate().before(Timestamp.now().toDate()) && firestoreViewModel.checkUserLastLogin(loginSeconds.longValue)) {
+                    firestoreViewModel.updateLastLoginDate(currentUser.value.userID.toString())
+                } else if (!firestoreViewModel.checkUserLastLogin(loginSeconds.longValue)) {
+                    firestoreViewModel.resetUserLoginStreak(currentUser.value.userID.toString())
+                }
 
                 // Define contentView here
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
@@ -413,15 +435,15 @@ class MainActivity : ComponentActivity() {
                                                 onClick = {
                                                     scope.launch {
                                                         googleAuthUiClient.signOut()
-                                                        if (googleAuthUiClient.getSignedInUser() == null) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Signed out",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
+
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Signed out",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
+
                                                         navController.navigate(Screen.SignInScreen.route)
                                                     }
 
@@ -465,8 +487,7 @@ class MainActivity : ComponentActivity() {
                                 // on Default
                                 val state by viewModel.state.collectAsState()
                                 if (isSignedIn.value) {
-                                    state.userId =
-                                        googleAuthUiClient.getSignedInUser()?.userID ?: ""
+                                    state.userId = currentUser.value.userID.toString()
                                 }
                                 //val rewardState by rewardViewModel.collectAsState()
                                 val todoEvent = viewModel::onEvent
@@ -498,7 +519,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         TodoScreen(
                                             state = state,
-                                            currentUser = googleAuthUiClient,
+                                            currentUser = currentUser.value,
                                             firestoreViewModel = firestoreViewModel,
                                             onEvent = todoEvent
                                         )
@@ -510,9 +531,8 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
-                                            currentUser = googleAuthUiClient,
+                                            currentUser = currentUser.value,
                                             firestoreViewModel = firestoreViewModel,
-                                            context = applicationContext,
                                             scope = scope
                                         )
 
@@ -529,7 +549,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(googleAuthUiClient, firestoreViewModel)
+                                        RewardsScreen(currentUser.value.userID.toString(), firestoreViewModel)
                                     }
 
                                     // Completed Task Screen
@@ -546,7 +566,7 @@ class MainActivity : ComponentActivity() {
 
 
                                         LaunchedEffect(key1 = Unit) {
-                                            if (googleAuthUiClient.getSignedInUser() != null) {
+                                            if (currentUser.value != null) {
                                                 navController.navigate("todo_screen")
                                                 println("launched effect 1. user exists, I have run the code")
                                             }

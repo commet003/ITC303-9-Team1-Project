@@ -14,17 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 
 @Composable
 fun RewardCard(
     rewardTitle: String,
     index: Int,
-    currentUser: AuthUiClient,
-    firestoreViewModel: FirestoreViewModel){
-    val user = firestoreViewModel.getUser(currentUser.getSignedInUser()?.userID.toString())
-    val rewardTimesAchieved = if(user?.rewardsEarned?.keys?.elementAt(index) != null) user.rewardsEarned[rewardTitle] else 0
+    currentUser: UserData){
+    val rewardTimesAchieved = if(currentUser.rewardsEarned?.keys?.elementAt(index) != null) currentUser.rewardsEarned[rewardTitle] else 0
     val total = rewardTimesAchieved?.times(REWARDS.values.elementAt(index))
 
     Card(

@@ -42,7 +42,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 fun TodoScreen(
     state: TodoState,
     firestoreViewModel: FirestoreViewModel,
-    currentUser: AuthUiClient,
+    currentUser: UserData,
     onEvent: (TodoEvent) -> Unit
 ) {
 

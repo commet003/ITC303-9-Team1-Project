@@ -1,7 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Date
 
 class FirestoreViewModel(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
@@ -70,29 +68,29 @@ class FirestoreViewModel(
 
     fun addUserToFirestore(currentUser: UserData){
         Log.d("CurrentUser ID", currentUser.userID.toString())
-        if (checkUserExists(currentUser.userID.toString())){
+        if (!checkUserExists(currentUser.userID.toString())){
             usersRef.document(currentUser.userID.toString()).set(currentUser)
                 .addOnSuccessListener { documentReference ->
-                    Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: $documentReference")
+                    Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
                 }
                 .addOnFailureListener { e ->
-                    Log.w(ContentValues.TAG, "Error adding document", e)
+                    Log.w(TAG, "Error adding document", e)
                 }
         }
     }
 
 
-     fun getUser(userId: String): UserData? {
-         viewModelScope.launch {
-             withContext(Dispatchers.IO) {
+    fun getUser(userId: String): UserData? {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
                 getUserFromFirestore(userId).collect {
-                     _user.value = it
-                 }
-             }
-         }
+                    _user.value = it
+                }
+            }
+        }
 
-         return _user.value
-     }
+        return _user.value
+    }
 
 
     private fun getUserFromFirestore(userId: String): Flow<UserData?> {
@@ -123,7 +121,7 @@ class FirestoreViewModel(
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
-    fun incrementUserLoginStreak(userId: String){
+    private fun incrementUserLoginStreak(userId: String){
         val washingtonRef = db.collection("users").document(userId)
         washingtonRef
             .update("loginStreak", FieldValue.increment(1))
@@ -139,10 +137,22 @@ class FirestoreViewModel(
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
+    // Check if user last signed in more than 1 day ago
+    fun checkUserLastLogin(lastLoginSeconds: Long): Boolean{
+        var userLastLogin = false
+
+        val today = Timestamp.now()
+        val difference = today.seconds - lastLoginSeconds
+        if (difference < 86400){
+            userLastLogin = true
+        }
+        return userLastLogin
+    }
+
     fun resetUserLoginStreak(userId: String) {
         val washingtonRef = db.collection("users").document(userId)
         washingtonRef
-            .update("loginStreak", 0)
+            .update("loginStreak", 1)
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
@@ -150,9 +160,10 @@ class FirestoreViewModel(
     fun updateLastLoginDate(userId: String){
         val washingtonRef = db.collection("users").document(userId)
         washingtonRef
-            .update("lastLogin", Timestamp(Date()))
+            .update("lastLogin", Timestamp.now())
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+        incrementUserLoginStreak(userId)
     }
 
     fun deleteUser(userId: String){
@@ -166,15 +177,6 @@ class FirestoreViewModel(
         val washingtonRef = usersRef.document(userId)
         washingtonRef
             .update("username", newUsername)
-            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
-    }
-
-    // Get user profile picture from cloud storage
-    fun updateUserProfilePicture(userId: String, newProfilePicture: String){
-        val washingtonRef = usersRef.document(userId)
-        washingtonRef
-            .update("profilePicture", newProfilePicture)
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }

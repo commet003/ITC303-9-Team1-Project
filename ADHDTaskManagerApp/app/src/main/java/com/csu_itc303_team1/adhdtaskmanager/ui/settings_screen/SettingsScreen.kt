@@ -1,10 +1,9 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -15,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -25,9 +24,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
-    currentUser: AuthUiClient,
+    currentUser: UserData,
     firestoreViewModel: FirestoreViewModel,
-    context: Context,
     scope: CoroutineScope
 ) {
 
@@ -44,11 +42,11 @@ fun SettingsScreen(
             onCheckedChange = { settingsViewModel.toggleTheme(it) },
             enabled = true
         )
-        Divider(color = Color.Black, thickness = 1.dp)
+        HorizontalDivider(thickness = 1.dp, color = Color.Black)
         EDropDownRow()
-        Divider(color = Color.Black, thickness = 1.dp)
+        HorizontalDivider(thickness = 1.dp, color = Color.Black)
         TextFieldEdittor()
-        Divider(color = Color.Black, thickness = 1.dp)
+        HorizontalDivider(thickness = 1.dp, color = Color.Black)
         Text("Update Username")
         var username by remember { mutableStateOf("") }
         TextField(value = username, onValueChange = {
@@ -58,7 +56,7 @@ fun SettingsScreen(
         Button(
             onClick = {
                 scope.launch {
-                    firestoreViewModel.updateUsername(currentUser.getSignedInUser()?.userID.toString(), username)
+                    firestoreViewModel.updateUsername(currentUser.userID.toString(), username)
 
                     // reset the username
                     username = ""

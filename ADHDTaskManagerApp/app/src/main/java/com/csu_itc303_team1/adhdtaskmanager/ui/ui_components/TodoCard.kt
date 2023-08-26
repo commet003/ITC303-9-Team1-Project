@@ -24,7 +24,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD_NAME
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
@@ -37,7 +37,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun TodoCard(
     todo: Todo,
-    currentUser: AuthUiClient,
+    currentUser: UserData,
     firestoreViewModel: FirestoreViewModel,
     onEvent: (TodoEvent) -> Unit,
     showToast: MutableState<Boolean>
@@ -111,8 +111,8 @@ fun TodoCard(
                     onCheckedChange = {
                         onEvent(TodoEvent.toggleCompleted(todo))
                         if (!todo.isCompleted) {
-                            firestoreViewModel.updateUserRewardsPoints(TASK_COMPLETED_REWARD, currentUser.getSignedInUser()!!.userID.toString())
-                            firestoreViewModel.incrementRewardCount(currentUser.getSignedInUser()!!.userID.toString(), TASK_COMPLETED_REWARD_NAME)
+                            firestoreViewModel.updateUserRewardsPoints(TASK_COMPLETED_REWARD, currentUser.userID.toString())
+                            firestoreViewModel.incrementRewardCount(currentUser.userID.toString(), TASK_COMPLETED_REWARD_NAME)
                             showToastTrigger.intValue += 1 // Increment to trigger the toast
                             onEvent(TodoEvent.ToggleLottieAnimation(true))
                             showLottieAnimation.value

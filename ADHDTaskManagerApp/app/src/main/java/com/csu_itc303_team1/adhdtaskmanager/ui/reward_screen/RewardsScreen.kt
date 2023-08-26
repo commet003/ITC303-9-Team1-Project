@@ -17,16 +17,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.RewardCard
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 
 @SuppressLint("FlowOperatorInvokedInComposition")
 @Composable
 fun RewardsScreen(
-    currentUser: AuthUiClient,
+    currentUser: String,
     firestoreViewModel: FirestoreViewModel
 ) {
-    val user = firestoreViewModel.getUser(currentUser.getSignedInUser()?.userID.toString())
+    val user = firestoreViewModel.getUser(currentUser)
 
     Row(
         modifier = Modifier
@@ -74,7 +73,7 @@ fun RewardsScreen(
         modifier = Modifier.padding(10.dp, 150.dp, 10.dp)
     ) {
         items(REWARDS_COUNTS.size) { reward ->
-            RewardCard(currentUser.getSignedInUser()!!.rewardsEarned?.keys?.elementAt(reward)!!, reward, currentUser, firestoreViewModel)
+            RewardCard(user?.rewardsEarned?.keys?.elementAt(reward)!!, reward, user)
         }
     }
 }

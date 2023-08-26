@@ -12,7 +12,7 @@ data class UserData(
     val username: String? = null,
     val profilePicture: String? = null,
     val rewardsPoints: Int = 0,
-    val lastLogin: Timestamp? = null,
+    val lastLogin: Timestamp = Timestamp.now(),
     val loginStreak: Int? = null,
     val rewardsEarned: MutableMap<String, Int>? = null,
 )
