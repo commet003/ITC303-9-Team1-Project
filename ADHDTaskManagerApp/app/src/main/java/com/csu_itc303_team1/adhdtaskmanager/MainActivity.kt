@@ -4,14 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
-import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -88,11 +86,13 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+<<<<<<< HEAD
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
+=======
+>>>>>>> parent of 15a1b0c (Rewards System working)
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
@@ -108,7 +108,6 @@ class MainActivity : ComponentActivity() {
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
     private val firestoreViewModel by viewModels<FirestoreViewModel>()
-
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
     private val db by lazy {
@@ -230,7 +229,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
 
-            val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(false)
+            val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
             val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
 
@@ -283,16 +282,16 @@ class MainActivity : ComponentActivity() {
                         if (isSignedIn.value) {
                             CenterAlignedTopAppBar(
                                 colors = TopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 title = {
                                     Text(
                                         "ADHD Task Manager",
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        color = MaterialTheme.colorScheme.onPrimary,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -304,7 +303,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Menu,
                                             contentDescription = "Menu"
                                         )
@@ -318,7 +317,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Person,
                                             contentDescription = "Profile"
                                         )
@@ -531,8 +530,13 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
+<<<<<<< HEAD
                                             currentUser = currentUser.value,
                                             firestoreViewModel = firestoreViewModel,
+=======
+                                            currentUser = googleAuthUiClient,
+                                            context = applicationContext,
+>>>>>>> parent of 15a1b0c (Rewards System working)
                                             scope = scope
                                         )
 
@@ -652,28 +656,6 @@ class MainActivity : ComponentActivity() {
             }
             //rewardViewModel.allRewards.observeAsState(listOf())
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        firestoreViewModel.getResponse(object : FirebaseCallback {
-            override fun onResponse(response: Response) {
-                Log.d("LeaderboardScreen", "onResponse called")
-                response.leaderboardUsers?.let { users ->
-                    users.forEach{ user ->
-                        if (!Final.finalDataList.contains(user)) {
-                            Final.addToList(user)
-                        }
-                        user.username?.let { Log.i(ContentValues.TAG, it) }
-
-                    }
-                }
-                response.exception?.message?.let {
-                    Log.e(ContentValues.TAG, it)
-                }
-            }
-        })
     }
 
     private fun showFocusNotification() {

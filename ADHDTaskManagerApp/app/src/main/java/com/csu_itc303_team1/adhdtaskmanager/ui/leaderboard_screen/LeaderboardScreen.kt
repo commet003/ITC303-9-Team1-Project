@@ -1,64 +1,63 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardCard
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
-
 
 @Composable
 fun LeaderboardScreen() {
 
-    // get list of users and sort it by points
-    val usersList = Final.finalDataList.sortedWith(compareByDescending { it.rewardsPoints })
-    Log.d("LeaderboardScreen", usersList.size.toString())
 
-    /*Row(
-        modifier = Modifier.padding(top = 20.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.weight(0.2f))
+    // get list of users and sort it by points
+    val usersList = Final.finalDataList
+    val sortedList = usersList.sortedWith(compareByDescending { it.rewardsPoints})
+
+    Row(modifier = Modifier.padding(12.dp)) {
         Text(
             text = "Rank",
             modifier = Modifier.weight(1f),
+            color = LeaderboardBlue,
             fontSize = 18.sp
         )
-
-        Spacer(modifier = Modifier.weight(1f))
-
         Text(
             text = "Name",
             modifier = Modifier.weight(2f),
+            color = LeaderboardBlue,
             fontSize = 18.sp
         )
-
-        Spacer(modifier = Modifier.weight(1f))
-
+        Text(
+            text = "Country",
+            modifier = Modifier.weight(2f),
+            color = LeaderboardBlue,
+            fontSize = 18.sp
+        )
         Text(
             text = "Points",
             modifier = Modifier.weight(1f),
+            color = LeaderboardBlue,
             fontSize = 18.sp
         )
-        Spacer(modifier = Modifier.weight(0.2f))
     }
-    Spacer(modifier = Modifier.height(20.dp))*/
+    Spacer(modifier = Modifier.height(20.dp))
 
     LazyColumn(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background),
-        contentPadding = PaddingValues(0.dp, 5.dp, 0.dp, 0.dp)
+        modifier = Modifier,
+        contentPadding = PaddingValues(0.dp, 35.dp, 0.dp)
     ) {
-        items(usersList.size){user ->
-            LeaderboardCard(user = usersList[user], rank = user + 1, userProfileImageUrl = usersList[user].profilePicture)
+        items(items = sortedList) { element ->
+            LeaderboardCard(user = element, rank = sortedList.indexOf(element) + 1)
         }
-
     }
 }
 

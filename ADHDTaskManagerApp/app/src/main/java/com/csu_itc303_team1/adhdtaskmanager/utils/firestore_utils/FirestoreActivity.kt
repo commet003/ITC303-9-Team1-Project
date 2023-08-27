@@ -9,8 +9,9 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 data class Response(
-    var leaderboardUsers: List<UserData>? = null,
+    var users: List<UserData>? = null,
     var exception: Exception? = null,
+    var user: UserData? = null
 )
 
 
@@ -39,9 +40,11 @@ class FirestoreActivity: Activity() {
             if (exception != null) {
                 response.exception = exception
             } else {
-                response.leaderboardUsers = snapshot?.toObjects(UserData::class.java)
+                response.users = snapshot?.toObjects(UserData::class.java)
             }
+            Final.finalDataList = response.users as ArrayList<UserData>
         }
+
     }
 
     override fun onStop() {
