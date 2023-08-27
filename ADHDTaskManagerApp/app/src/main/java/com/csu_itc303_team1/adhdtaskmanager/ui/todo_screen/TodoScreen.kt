@@ -3,6 +3,9 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
@@ -30,6 +34,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,28 +44,62 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
+<<<<<<< HEAD
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
+=======
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+>>>>>>> parent of 25e01d5 (Simplified Firestore and Rewards systems)
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.IntSize
+import androidx.core.view.drawToBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.draw
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+
+
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
+<<<<<<< HEAD
     firestoreViewModel: FirestoreViewModel,
     currentUser: UserData,
     onEvent: (TodoEvent) -> Unit
+=======
+    onEvent: (TodoEvent) -> Unit,
+    rewardViewModel: RewardViewModel,
+    usersViewModel: UsersViewModel
+>>>>>>> parent of 25e01d5 (Simplified Firestore and Rewards systems)
 ) {
 
-    //rewardViewModel.allRewards.observeAsState(listOf())
+    rewardViewModel.allRewards.observeAsState(listOf())
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
@@ -193,14 +232,17 @@ fun TodoScreen(
                     ) {
 
                         items(state.todos) { todo ->
-                            if (todo.userId == state.userId) {
+                            if (todo.userID == state.userId) {
 
                                 TodoCard(
                                     todo = todo,
-                                    currentUser = currentUser,
-                                    firestoreViewModel = firestoreViewModel,
+                                    todoState = state,
                                     onEvent = onEvent,
+                                    index = state.todos.indexOf(todo),
+                                    rewardViewModel = rewardViewModel,
+                                    usersViewModel = usersViewModel,
                                     showToast = showToast
+
                                 )
                             }
                         }
@@ -210,7 +252,7 @@ fun TodoScreen(
                 }
 
 
-                LottieLoaderAnimation(isVisible = showToast.value)
+                lottieLoaderAnimation(isVisible = showToast.value)
 
                 CustomToastMessage(
                     message = "Congrats on completing a task!",
@@ -224,6 +266,11 @@ fun TodoScreen(
         },
         sheetPeekHeight = 0.dp,
         sheetContent = {
+            var priorityExpandedMenu by remember { mutableStateOf(false) }
+            var prioritySelection by remember { mutableStateOf("") }
+            var titleError by remember { mutableStateOf(false) }
+            var descriptionError by remember { mutableStateOf(false) }
+
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceEvenly,

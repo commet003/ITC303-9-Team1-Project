@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+<<<<<<< HEAD
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 
@@ -23,6 +24,16 @@ fun RewardCard(
     currentUser: UserData){
     val rewardTimesAchieved = if(currentUser.rewardsEarned?.keys?.elementAt(index) != null) currentUser.rewardsEarned[rewardTitle] else 0
     val total = rewardTimesAchieved?.times(REWARDS.values.elementAt(index))
+=======
+import androidx.core.graphics.toColor
+import androidx.core.graphics.toColorInt
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
+
+@Composable
+fun RewardCard(reward: Reward){
+    val total: Int = reward.timesAchieved * reward.pointsAwarded
+
+>>>>>>> parent of 25e01d5 (Simplified Firestore and Rewards systems)
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -43,21 +54,24 @@ fun RewardCard(
         ){
             Column {
                 Text(
-                    text = when (rewardTitle) {
-                        "SIGN_IN_REWARD" -> "Sign In Reward"
-                        "TASK_COMPLETED_REWARD" -> "Task Completed Reward"
-                        "WEEK_LONG_STREAK_REWARD" -> "Week Long Streak Reward"
-                        else -> { "Reward"}
-                    },
+                    text = reward.title,
                     fontSize = 24.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
+                    if(reward.timesAchieved > 1){
                         Text(
-                        text = if (rewardTimesAchieved != null && rewardTimesAchieved > 1) "You have achieved this reward $rewardTimesAchieved Times" else "You have achieved this reward $rewardTimesAchieved Time",
+                        text = "You have achieved this reward " + reward.timesAchieved + " Times",
                         fontSize = 20.sp
                         )
+                    }
+                    else {
+                        Text(
+                            text = "You have achieved this reward " + reward.timesAchieved + " Time",
+                            fontSize = 20.sp
+                        )
 
+                    }
 
 
 
@@ -80,10 +94,20 @@ fun RewardCard(
             modifier = Modifier.padding(10.dp)
         ){
             Column {
+                if(total > 1){
                 Text(
-                    text = if (total != null && total > 1) " You have earned $total points" else " You have earned $total point",
+                    text = " You have earned $total points",
                     fontSize = 20.sp
                 )
+
+            }
+                else{
+                    Text(
+                        text = " You have earned $total point",
+                        fontSize = 20.sp
+                    )
+
+                }
 
             }
 
