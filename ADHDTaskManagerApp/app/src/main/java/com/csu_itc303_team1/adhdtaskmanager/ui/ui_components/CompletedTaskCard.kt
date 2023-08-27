@@ -59,7 +59,7 @@ fun CompletedTaskCard(todo: Todo) {
             ) {
                 Text(
                     text = todo.description,
-                   )
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Completed On:"
