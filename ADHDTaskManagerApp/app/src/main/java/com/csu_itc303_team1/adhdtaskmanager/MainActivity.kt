@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -26,6 +27,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -93,8 +95,6 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
     private val firestoreViewModel by viewModels<FirestoreViewModel>()
-    private val firestoreDatabase = Firebase.firestore.app
+    //private val firestoreDatabase = Firebase.firestore.app
 
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
@@ -133,6 +133,7 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
@@ -246,13 +247,11 @@ class MainActivity : ComponentActivity() {
                 }
 
 
-                // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
-                //rewardViewModel.allRewards.observeAsState(listOf())
 
 
 
@@ -635,7 +634,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            //rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 
