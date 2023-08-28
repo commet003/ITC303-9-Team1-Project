@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
@@ -31,10 +32,15 @@ class AuthUiClient(
         auth.addAuthStateListener {
             _isSignedIn = it.currentUser != null
             localFirestoreViewModel.viewModelScope.launch {
-                if (localFirestoreViewModel.checkUserExists(auth.currentUser?.uid.toString())) {
+                val dbUser = localFirestoreViewModel.checkUserExists(auth.currentUser?.uid.toString())
+                if (dbUser && it.currentUser != null) {
+                    Log.d("AuthUiClient", "Existing user logged in")
                     localFirestoreViewModel.updateLastLoginDate(auth.currentUser?.uid.toString())
-                }else {
+                }else if (it.currentUser != null && !dbUser) {
+                    Log.d("AuthUiClient", "New user added to firestore")
                     localFirestoreViewModel.addUserToFirestore()
+                } else {
+                    Log.d("AuthUiClient", "User is signed out")
                 }
             }
             listener(_isSignedIn)

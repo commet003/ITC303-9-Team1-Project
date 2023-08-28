@@ -47,9 +47,7 @@ class FirestoreViewModel(
         usersRef.get().addOnCompleteListener { task ->
             val response = Response()
             if (task.isSuccessful) {
-
                 // For each document in the collection, create a user object
-
                 val result = task.result
                 result?.let {
                     response.leaderboardUsers = result.documents.mapNotNull {snapShot ->

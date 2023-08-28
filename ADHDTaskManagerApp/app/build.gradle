@@ -98,7 +98,7 @@ dependencies {
 
 
     // Firestore
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.7.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.7.1'
 
 
     // Google Play services library
@@ -126,7 +126,7 @@ dependencies {
 
 
     // ktx dependencies
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.21"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0'
     implementation("androidx.core:core-ktx:1.10.1")
 
@@ -165,9 +165,9 @@ dependencies {
 
 
     // Navigation
-    implementation "androidx.navigation:navigation-compose:2.7.0"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.0'
+    implementation "androidx.navigation:navigation-compose:2.7.1"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.1'
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"

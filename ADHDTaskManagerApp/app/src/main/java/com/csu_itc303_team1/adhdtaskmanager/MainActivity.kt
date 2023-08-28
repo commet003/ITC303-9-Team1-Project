@@ -640,23 +640,24 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
 
-        firestoreViewModel.getResponse(object : FirebaseCallback {
-            override fun onResponse(response: Response) {
-                Log.d("LeaderboardScreen", "onResponse called")
-                response.leaderboardUsers?.let { users ->
-                    users.forEach{ user ->
-                        if (!Final.finalDataList.contains(user)) {
-                            Final.addToList(user)
-                        }
-                        user.username?.let { Log.i(ContentValues.TAG, it) }
+            firestoreViewModel.getResponse(object : FirebaseCallback {
+                override fun onResponse(response: Response) {
+                    Log.d("LeaderboardScreen", "onResponse called")
+                    response.leaderboardUsers?.let { users ->
+                        users.forEach{ user ->
+                            if (!Final.finalDataList.contains(user)) {
+                                Final.addToList(user)
+                            }
+                            user.username?.let { Log.i(ContentValues.TAG, it) }
 
+                        }
+                    }
+                    response.exception?.message?.let {
+                        Log.e(ContentValues.TAG, it)
                     }
                 }
-                response.exception?.message?.let {
-                    Log.e(ContentValues.TAG, it)
-                }
             }
-        })
+            )
     }
 
     private fun showFocusNotification() {

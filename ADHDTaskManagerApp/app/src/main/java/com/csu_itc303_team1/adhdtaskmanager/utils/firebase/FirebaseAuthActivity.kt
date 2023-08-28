@@ -1,6 +1,6 @@
-package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
+//package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
-import android.os.Bundle
+/*import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
 import com.google.firebase.auth.FirebaseAuth
@@ -62,4 +62,4 @@ class FirebaseAuthActivity : AppCompatActivity() {
     fun signOut() {
         Firebase.auth.signOut()
     }
-}
+}*/
