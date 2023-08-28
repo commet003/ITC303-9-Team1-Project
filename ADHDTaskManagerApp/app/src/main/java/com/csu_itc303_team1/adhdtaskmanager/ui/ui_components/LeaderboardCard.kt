@@ -29,7 +29,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun LeaderboardCard(user: UserData, rank: Int, userProfileImageUrl: String?) {
+fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
     Card(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
@@ -45,12 +45,22 @@ fun LeaderboardCard(user: UserData, rank: Int, userProfileImageUrl: String?) {
             pressedElevation = 8.dp,
             disabledElevation = 0.dp
         ),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        colors = when{
+            (user.userID != currentUserId) -> CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            else -> CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+
     ) {
         Row(
             modifier = Modifier
@@ -63,13 +73,16 @@ fun LeaderboardCard(user: UserData, rank: Int, userProfileImageUrl: String?) {
             Text(
                 text = rank.toString(),
                 modifier = Modifier.weight(0.8f),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = when {
+                    (user.userID != currentUserId) -> MaterialTheme.colorScheme.onSecondaryContainer
+                    else -> MaterialTheme.colorScheme.onTertiaryContainer
+                },
                 fontSize = 18.sp  // Adjusted font size
             )
 
             Image(
                 painter = rememberImagePainter(
-                    data = userProfileImageUrl ?: DEFAULT_PROFILE_PICTURE,
+                    data = user.profilePicture ?: DEFAULT_PROFILE_PICTURE,
                 ),
                 contentDescription = "User's Profile Picture",
                 alignment = Alignment.Center,
@@ -85,7 +98,10 @@ fun LeaderboardCard(user: UserData, rank: Int, userProfileImageUrl: String?) {
             Text(
                 text = user.username ?: "",
                 modifier = Modifier.weight(2f),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = when {
+                    (user.userID != currentUserId) -> MaterialTheme.colorScheme.onSecondaryContainer
+                    else -> MaterialTheme.colorScheme.onTertiaryContainer
+                },
                 fontSize = 18.sp,  // Adjusted font size
                 fontStyle = FontStyle.Italic // Added a cursive style for a playful look
             )
@@ -95,7 +111,10 @@ fun LeaderboardCard(user: UserData, rank: Int, userProfileImageUrl: String?) {
             Text(
                 text = user.rewardsPoints.toString(),
                 modifier = Modifier.weight(1f),
-                color = MaterialTheme.colorScheme.primary,
+                color = when {
+                    (user.userID != currentUserId) -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.secondary
+                },
                 fontSize = 18.sp,  // Adjusted font size
                 textAlign = TextAlign.Center
             )

@@ -7,7 +7,6 @@ import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -27,7 +26,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -95,6 +93,8 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -105,6 +105,7 @@ class MainActivity : ComponentActivity() {
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
     private val firestoreViewModel by viewModels<FirestoreViewModel>()
+    private val firestoreDatabase = Firebase.firestore.app
 
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
@@ -132,7 +133,6 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
@@ -149,58 +149,61 @@ class MainActivity : ComponentActivity() {
             }
         )
 
-        googleAuthUiClient.addAuthStateListener {
-            isSignedIn.value = it
+        lifecycleScope.launch {
+            googleAuthUiClient.addAuthStateListener {
+                isSignedIn.value = it
 
-            if (it) { // if signed in
+                if (it) { // if signed in
 
-                // Define contentView here
-                val contentView = findViewById<ViewGroup>(android.R.id.content)
+                    // Define contentView here
+                    val contentView = findViewById<ViewGroup>(android.R.id.content)
 
-                // Capture and blur screenshot
-                val screenshot = takeScreenshot(contentView)
-                val blurredScreenshot = blurBitmap(screenshot, applicationContext)
+                    // Capture and blur screenshot
+                    val screenshot = takeScreenshot(contentView)
+                    val blurredScreenshot = blurBitmap(screenshot, applicationContext)
 
-                // Display blurred screenshot as a background
-                val blurredBackground = ImageView(applicationContext)
-                blurredBackground.setImageBitmap(blurredScreenshot)
-                val params = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                contentView.addView(blurredBackground, params)
+                    // Display blurred screenshot as a background
+                    val blurredBackground = ImageView(applicationContext)
+                    blurredBackground.setImageBitmap(blurredScreenshot)
+                    val params = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    )
+                    contentView.addView(blurredBackground, params)
 
-                // Inflate the custom toast layout
-                val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
+                    // Inflate the custom toast layout
+                    val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
 
-                val customToastMessage = customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
-                customToastMessage.text = "Welcome back! Be sure to check out the leaderboard for the latest standings"
+                    val customToastMessage = customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
+                    customToastMessage.text = "Welcome back! Be sure to check out the leaderboard for the latest standings"
 
-                // Find the LottieAnimationView and start the animation
-                val lottieAnimation = customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
-                lottieAnimation.playAnimation()
+                    // Find the LottieAnimationView and start the animation
+                    val lottieAnimation = customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
+                    lottieAnimation.playAnimation()
 
-                // Create a PopupWindow with custom view
-                val customPopup = PopupWindow(
-                    customToastRoot,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    false
-                )
-                customPopup.animationStyle = android.R.style.Animation_Toast
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                    customPopup.showAtLocation(findViewById(android.R.id.content), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 0)
+                    // Create a PopupWindow with custom view
+                    val customPopup = PopupWindow(
+                        customToastRoot,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        false
+                    )
+                    customPopup.animationStyle = android.R.style.Animation_Toast
+                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        customPopup.showAtLocation(findViewById(android.R.id.content), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 0)
+                    }
+
+                    // Use a Handler to control the duration of the PopupWindow
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        customPopup.dismiss()
+                        // Remove or hide blurred background when done
+                        contentView.removeView(blurredBackground)
+                    }, 5000) // Dismiss popup after 6 seconds
                 }
-
-                // Use a Handler to control the duration of the PopupWindow
-                Handler(Looper.getMainLooper()).postDelayed({
-                    customPopup.dismiss()
-                    // Remove or hide blurred background when done
-                    contentView.removeView(blurredBackground)
-                }, 6000) // Dismiss popup after 6 seconds
             }
         }
+
 
 
 
@@ -522,7 +525,9 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.LeaderboardScreen.route
                                     ) {
-                                        LeaderboardScreen()
+                                        LeaderboardScreen(
+                                            firestoreViewModel = firestoreViewModel
+                                        )
                                     }
 
                                     // Rewards Screen

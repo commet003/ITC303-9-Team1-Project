@@ -1,11 +1,13 @@
 package com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.csu_itc303_team1.adhdtaskmanager.SIGN_IN_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.WEEK_LONG_STREAK_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.WEEK_LONG_STREAK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 import com.google.firebase.Timestamp
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.Date
 
@@ -32,6 +35,10 @@ class FirestoreViewModel(
 ): ViewModel() {
 
     private val _user = MutableStateFlow<UserData?>(null)
+    private val _userExists = MutableStateFlow(false)
+
+    val userExists: StateFlow<Boolean>
+        get() = _userExists
 
     val user: StateFlow<UserData?>
         get() = _user
@@ -58,27 +65,31 @@ class FirestoreViewModel(
 
 
     @SuppressLint("RestrictedApi")
-    private fun checkUserExists(userId: String): Boolean{
-        var userExists = false
-        db.collection("users").document(userId).get()
+    suspend fun checkUserExists(userId: String): Boolean{
+        usersRef.document(userId).get()
             .addOnSuccessListener { document ->
-                userExists = document != null
-            }
-        return userExists
+                if (document != null) {
+                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                    _user.value = document.toObject(UserData::class.java)
+                    _userExists.value = true
+                } else {
+                    Log.d(TAG, "No such document")
+                    _userExists.value = false
+                }
+            }.await().data
+        return _userExists.value
     }
 
 
-    fun addUserToFirestore(currentUser: UserData){
-        Log.d("CurrentUser ID", currentUser.userID.toString())
-        if (checkUserExists(currentUser.userID.toString())){
-            usersRef.document(currentUser.userID.toString()).set(currentUser)
+    fun addUserToFirestore(){
+        Log.d("CurrentUser ID", _user.value.toString())
+            usersRef.document(_user.value?.userID.toString()).set(_user.value!!)
                 .addOnSuccessListener { documentReference ->
-                    Log.d(ContentValues.TAG, "DocumentSnapshot added with ID: $documentReference")
+                    Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
                 }
                 .addOnFailureListener { e ->
-                    Log.w(ContentValues.TAG, "Error adding document", e)
+                    Log.w(TAG, "Error adding document", e)
                 }
-        }
     }
 
 
@@ -123,36 +134,104 @@ class FirestoreViewModel(
             .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
-    fun incrementUserLoginStreak(userId: String){
+    private suspend fun incrementUserLoginStreak(userId: String){
         val washingtonRef = db.collection("users").document(userId)
         washingtonRef
-            .update("loginStreak", FieldValue.increment(1))
+            .update("loginStreak", FieldValue.increment(1),
+                "rewardsPoints", FieldValue.increment(SIGN_IN_REWARD.toLong()),
+                "rewardsEarned.SIGN_IN_REWARD", FieldValue.increment(1))
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }.await()
     }
 
-    fun incrementRewardCount(userId: String, rewardName: String){
-        val washingtonRef = db.collection("users").document(userId)
+    suspend fun incrementRewardCount(userId: String, rewardName: String){
+        val washingtonRef = usersRef.document(userId)
         washingtonRef
             .update("rewardsEarned.$rewardName", FieldValue.increment(1))
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }.await()
     }
 
-    fun resetUserLoginStreak(userId: String) {
-        val washingtonRef = db.collection("users").document(userId)
+    private suspend fun resetUserLoginStreak(userId: String) {
+        val washingtonRef = usersRef.document(userId)
         washingtonRef
-            .update("loginStreak", 0)
+            .update("loginStreak", 1)
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }.await()
     }
 
-    fun updateLastLoginDate(userId: String){
-        val washingtonRef = db.collection("users").document(userId)
+    // Check that the users last login was not today or more than one day ago
+    private suspend fun checkLastLogin(userId: String): Boolean{
+        var lastLogin = false
+        val washingtonRef = usersRef.document(userId)
+        washingtonRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                    val user = document.toObject(UserData::class.java)
+                    if (user != null) {
+                        val lastLoginDate = user.lastLogin
+                        val today = Timestamp.now().seconds
+                        if (lastLoginDate != null) {
+                            val lastLoginDateSeconds = lastLoginDate.seconds
+                            val difference = today - lastLoginDateSeconds
+                            if (difference in 86401..172799){
+                                lastLogin = true
+                            } else if (difference > 172800){
+                                viewModelScope.launch {
+                                    resetUserLoginStreak(userId)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "No such document")
+                }
+            }.await().data
+        return lastLogin
+    }
+
+    // Check if login streak is greater than or equal to 7
+    private suspend fun checkLoginStreak(userId: String): Boolean{
+        var loginStreak = false
+        val washingtonRef = usersRef.document(userId)
+        washingtonRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                    val user = document.toObject(UserData::class.java)
+                    if (user != null) {
+                        val loginStreakCount = user.loginStreak
+                        if (loginStreakCount != null) {
+                            if (loginStreakCount >= 7){
+                                loginStreak = true
+                            }
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "No such document")
+                }
+            }.await().data
+        return loginStreak
+    }
+
+
+    suspend fun updateLastLoginDate(userId: String){
+
+        if (checkLastLogin(userId)){
+            incrementUserLoginStreak(userId)
+        }
+        if (checkLoginStreak(userId)){
+            updateUserRewardsPoints(userId = userId, rewardPoints = WEEK_LONG_STREAK_REWARD)
+            incrementRewardCount(userId = userId, rewardName = WEEK_LONG_STREAK_REWARD_NAME)
+            resetUserLoginStreak(userId)
+        }
+
+        val washingtonRef = usersRef.document(userId)
         washingtonRef
             .update("lastLogin", Timestamp(Date()))
             .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
+            .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }.await()
     }
 
     fun deleteUser(userId: String){

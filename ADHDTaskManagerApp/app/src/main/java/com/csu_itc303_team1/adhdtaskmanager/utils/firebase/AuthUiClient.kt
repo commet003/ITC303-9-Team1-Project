@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
 import android.content.Intent
 import android.content.IntentSender
+import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
@@ -10,6 +11,7 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 
@@ -25,11 +27,15 @@ class AuthUiClient(
     // Function to addAuthStateListener to the firebase auth
     // Changes the value of _isSignedIn to true if the user is signed in
     // Changes the value of _isSignedIn to false if the user is signed out
-    fun addAuthStateListener(listener: (Boolean) -> Unit) {
+    suspend fun addAuthStateListener(listener: (Boolean) -> Unit) {
         auth.addAuthStateListener {
             _isSignedIn = it.currentUser != null
-            if(_isSignedIn) {
-                localFirestoreViewModel.addUserToFirestore(this.getSignedInUser()!!)
+            localFirestoreViewModel.viewModelScope.launch {
+                if (localFirestoreViewModel.checkUserExists(auth.currentUser?.uid.toString())) {
+                    localFirestoreViewModel.updateLastLoginDate(auth.currentUser?.uid.toString())
+                }else {
+                    localFirestoreViewModel.addUserToFirestore()
+                }
             }
             listener(_isSignedIn)
         }

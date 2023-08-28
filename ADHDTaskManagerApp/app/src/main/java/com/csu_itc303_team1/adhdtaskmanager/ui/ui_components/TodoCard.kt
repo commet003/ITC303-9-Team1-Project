@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionResult
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -29,8 +30,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewM
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.delay
-
-
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("RememberReturnType")
@@ -92,10 +92,14 @@ fun TodoCard(
                     onClick = {
                         onEvent(TodoEvent.toggleIsClicked(todo))
                         onEvent(TodoEvent.showEditTodoDialog)
-                    }
+                    },
+                    enabled = !todo.isCompleted
                 ) {
                     Icon(
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = when{
+                            todo.isCompleted -> MaterialTheme.colorScheme.onTertiaryContainer
+                            else -> MaterialTheme.colorScheme.onPrimary
+                        },
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Todo"
                     )
@@ -112,7 +116,9 @@ fun TodoCard(
                         onEvent(TodoEvent.toggleCompleted(todo))
                         if (!todo.isCompleted) {
                             firestoreViewModel.updateUserRewardsPoints(TASK_COMPLETED_REWARD, currentUser.getSignedInUser()!!.userID.toString())
-                            firestoreViewModel.incrementRewardCount(currentUser.getSignedInUser()!!.userID.toString(), TASK_COMPLETED_REWARD_NAME)
+                            firestoreViewModel.viewModelScope.launch {
+                                firestoreViewModel.incrementRewardCount(currentUser.getSignedInUser()!!.userID.toString(), TASK_COMPLETED_REWARD_NAME)
+                            }
                             showToastTrigger.intValue += 1 // Increment to trigger the toast
                             onEvent(TodoEvent.ToggleLottieAnimation(true))
                             showLottieAnimation.value
@@ -122,8 +128,12 @@ fun TodoCard(
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.onPrimary,
                         uncheckedColor = MaterialTheme.colorScheme.onPrimary,
-                        checkmarkColor = MaterialTheme.colorScheme.primary
-                    )
+                        checkmarkColor = MaterialTheme.colorScheme.primary,
+                        disabledCheckedColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        disabledUncheckedColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        disabledIndeterminateColor = MaterialTheme.colorScheme.tertiaryContainer
+                    ),
+                    enabled = !todo.isCompleted
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
