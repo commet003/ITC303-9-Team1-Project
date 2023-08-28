@@ -84,7 +84,6 @@ fun LeaderboardScreen(
                 items(usersList.size){user ->
                     LeaderboardCard(user = usersList[user], rank = user + 1, currentUserId!!)
                 }
-
             }
         }
     }

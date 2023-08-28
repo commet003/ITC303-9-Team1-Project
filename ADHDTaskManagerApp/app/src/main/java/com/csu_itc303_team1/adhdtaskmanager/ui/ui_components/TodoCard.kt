@@ -56,10 +56,6 @@ fun TodoCard(
     }
 
 
-    //rewardViewModel.allRewards.observeAsState(listOf())
-    //val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
-
-
     val hours = remember {
         mutableIntStateOf(0)
     }
