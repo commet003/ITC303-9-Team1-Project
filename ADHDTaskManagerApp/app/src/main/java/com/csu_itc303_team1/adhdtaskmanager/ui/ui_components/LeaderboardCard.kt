@@ -82,7 +82,7 @@ fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
 
             Image(
                 painter = rememberImagePainter(
-                    data = user.profilePicture ?: DEFAULT_PROFILE_PICTURE,
+                    data = if(user.profilePicture != "null") user.profilePicture else DEFAULT_PROFILE_PICTURE,
                 ),
                 contentDescription = "User's Profile Picture",
                 alignment = Alignment.Center,
@@ -96,7 +96,7 @@ fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
 
 
             Text(
-                text = user.username ?: "",
+                text = if (user.username != "") user.username!! else user.userID?.slice(0..5)!!,
                 modifier = Modifier.weight(2f),
                 color = when {
                     (user.userID != currentUserId) -> MaterialTheme.colorScheme.onSecondaryContainer

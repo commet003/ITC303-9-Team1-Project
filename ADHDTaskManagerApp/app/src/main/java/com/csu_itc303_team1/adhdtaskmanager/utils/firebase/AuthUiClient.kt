@@ -35,10 +35,10 @@ class AuthUiClient(
             _isSignedIn = it.currentUser != null
             localFirestoreViewModel.viewModelScope.launch {
                 val dbUser = localFirestoreViewModel.checkUserExists(auth.currentUser?.uid.toString())
-                if (!dbUser && it.currentUser != null) {
+                if (dbUser && it.currentUser != null) {
                     Log.d("AuthUiClient", "Existing user logged in")
                     localFirestoreViewModel.updateLastLoginDate(auth.currentUser?.uid.toString())
-                }else if (it.currentUser != null && dbUser) {
+                }else if (it.currentUser != null && !dbUser) {
                     Log.d("AuthUiClient", "New user added to firestore")
                     _newUser = UserData(
                         userID = auth.currentUser?.uid.toString(),
