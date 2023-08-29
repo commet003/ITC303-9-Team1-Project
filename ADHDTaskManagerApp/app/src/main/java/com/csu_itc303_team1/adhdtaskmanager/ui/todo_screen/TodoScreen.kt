@@ -83,7 +83,7 @@ fun TodoScreen(
             Scaffold(
                 floatingActionButton = {
                     FloatingActionButton(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        containerColor = MaterialTheme.colorScheme.primary,
                         onClick = {
                             onEvent(TodoEvent.showDialog)
                             scope.launch {
@@ -95,7 +95,7 @@ fun TodoScreen(
                             tint = MaterialTheme.colorScheme.onPrimary,
                             imageVector = Icons.Default.Add,
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .background(MaterialTheme.colorScheme.primary)
                                 .height(32.dp)
                                 .width(32.dp),
                             contentDescription = "Add Todo"

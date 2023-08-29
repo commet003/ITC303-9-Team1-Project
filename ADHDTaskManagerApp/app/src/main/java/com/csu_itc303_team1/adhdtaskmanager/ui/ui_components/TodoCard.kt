@@ -68,7 +68,7 @@ fun TodoCard(
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Row(
                 modifier = Modifier
@@ -79,7 +79,7 @@ fun TodoCard(
             ) {
                 Text(
                     text = todo.title,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
                     fontSize = 22.sp,
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
@@ -93,8 +93,8 @@ fun TodoCard(
                 ) {
                     Icon(
                         tint = when{
-                            todo.isCompleted -> MaterialTheme.colorScheme.onTertiaryContainer
-                            else -> MaterialTheme.colorScheme.onPrimary
+                            todo.isCompleted -> MaterialTheme.colorScheme.onSurfaceVariant
+                            else -> MaterialTheme.colorScheme.onTertiaryContainer
                         },
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Todo"
@@ -122,18 +122,18 @@ fun TodoCard(
 
                     },
                     colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.onPrimary,
-                        uncheckedColor = MaterialTheme.colorScheme.onPrimary,
-                        checkmarkColor = MaterialTheme.colorScheme.primary,
-                        disabledCheckedColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        disabledUncheckedColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        disabledIndeterminateColor = MaterialTheme.colorScheme.tertiaryContainer
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = MaterialTheme.colorScheme.primary,
+                        checkmarkColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                        disabledUncheckedColor = MaterialTheme.colorScheme.primary,
+                        disabledIndeterminateColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     enabled = !todo.isCompleted
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
                     text = todo.description,
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 )
@@ -145,21 +145,21 @@ fun TodoCard(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = CenterVertically
             ) {
-                Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onTertiaryContainer)
                 Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onTertiaryContainer)
                 Spacer(Modifier.width(4.dp))
                 if (todo.dueTime.isNotEmpty()) {
                     if (todo.dueTime.slice(0..1).toInt() > 12) {
                         hours.intValue = todo.dueTime.slice(0..1).toInt() - 12
                         Text(
                             text = "${hours.intValue}:${todo.dueTime.slice(3..4)} PM",
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
                         Text(
                             text = "${todo.dueTime} AM",
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     } else {
                         Text(text = "")
@@ -174,7 +174,7 @@ fun TodoCard(
                     }
                 ) {
                     Icon(
-                        tint = MaterialTheme.colorScheme.onPrimary,
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Todo"
                     )
@@ -209,7 +209,7 @@ fun CustomToastMessage(
                 contentAlignment = Alignment.Center,
                 modifier = modifier
                     .wrapContentWidth(align = Alignment.CenterHorizontally) // Adjust width based on content
-                    .wrapContentHeight(align = Alignment.CenterVertically) // Adjust height based on content
+                    .wrapContentHeight(align = CenterVertically) // Adjust height based on content
                     .background(
                         Color(0xFF11143E), // Using the RGBA color you provided for the box background
                         shape = RoundedCornerShape(16.dp)

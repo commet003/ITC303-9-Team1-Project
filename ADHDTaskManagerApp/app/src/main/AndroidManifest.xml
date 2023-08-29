@@ -18,8 +18,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.ADHDTaskManager"
-        tools:targetApi="31">
+        tools:targetApi="tiramisu">
         <!--for viewing webpage-->
         <activity android:name=".ui.help_screen.WebViewActivity" />
 

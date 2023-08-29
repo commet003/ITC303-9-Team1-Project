@@ -82,7 +82,7 @@ fun ADHDTaskManagerTheme(
 
     val colors = if (!darkTheme) {
         systemUiController.setStatusBarColor(
-            color = LightColors.primaryContainer,
+            color = LightColors.background,
             darkIcons = true
         )
         systemUiController.setNavigationBarColor(
@@ -92,7 +92,7 @@ fun ADHDTaskManagerTheme(
         LightColors
     } else {
         systemUiController.setStatusBarColor(
-            color = DarkColors.primaryContainer,
+            color = DarkColors.background,
             darkIcons = false
         )
         systemUiController.setNavigationBarColor(

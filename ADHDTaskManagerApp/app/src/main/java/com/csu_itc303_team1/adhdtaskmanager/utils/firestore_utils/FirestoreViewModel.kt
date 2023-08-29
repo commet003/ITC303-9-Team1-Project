@@ -79,11 +79,11 @@ class FirestoreViewModel(
     }
 
 
-    fun addUserToFirestore(){
+    fun addUserToFirestore(user: UserData){
         Log.d("CurrentUser ID", _user.value.toString())
-            usersRef.document(_user.value?.userID.toString()).set(_user.value!!)
-                .addOnSuccessListener { documentReference ->
-                    Log.d(TAG, "DocumentSnapshot added with ID: $documentReference")
+            usersRef.document(user.userID.toString()).set(user)
+                .addOnSuccessListener {
+                    Log.d(TAG, "DocumentSnapshot added with ID: ${user.userID}")
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG, "Error adding document", e)

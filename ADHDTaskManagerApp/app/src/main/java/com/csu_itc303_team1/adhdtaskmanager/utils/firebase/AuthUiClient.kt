@@ -9,6 +9,7 @@ import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -23,6 +24,7 @@ class AuthUiClient(
     private val auth = Firebase.auth
     private var _isSignedIn = false
     private val localFirestoreViewModel = firestoreViewModel
+    private var _newUser: UserData? = null
 
 
     // Function to addAuthStateListener to the firebase auth
@@ -33,12 +35,21 @@ class AuthUiClient(
             _isSignedIn = it.currentUser != null
             localFirestoreViewModel.viewModelScope.launch {
                 val dbUser = localFirestoreViewModel.checkUserExists(auth.currentUser?.uid.toString())
-                if (dbUser && it.currentUser != null) {
+                if (!dbUser && it.currentUser != null) {
                     Log.d("AuthUiClient", "Existing user logged in")
                     localFirestoreViewModel.updateLastLoginDate(auth.currentUser?.uid.toString())
-                }else if (it.currentUser != null && !dbUser) {
+                }else if (it.currentUser != null && dbUser) {
                     Log.d("AuthUiClient", "New user added to firestore")
-                    localFirestoreViewModel.addUserToFirestore()
+                    _newUser = UserData(
+                        userID = auth.currentUser?.uid.toString(),
+                        username = auth.currentUser?.displayName.toString(),
+                        profilePicture = auth.currentUser?.photoUrl.toString(),
+                        rewardsPoints = 0,
+                        lastLogin = Timestamp.now(),
+                        loginStreak = 1,
+                        rewardsEarned = REWARDS_COUNTS.toMutableMap()
+                    )
+                    localFirestoreViewModel.addUserToFirestore(_newUser!!)
                 } else {
                     Log.d("AuthUiClient", "User is signed out")
                 }

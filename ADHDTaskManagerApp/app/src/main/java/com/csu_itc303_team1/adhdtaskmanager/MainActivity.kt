@@ -263,16 +263,15 @@ class MainActivity : ComponentActivity() {
                         if (isSignedIn.value) {
                             CenterAlignedTopAppBar(
                                 colors = TopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    containerColor = MaterialTheme.colorScheme.background,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.background,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                                    titleContentColor = MaterialTheme.colorScheme.primary,
+                                    actionIconContentColor = MaterialTheme.colorScheme.primary
                                 ),
                                 title = {
                                     Text(
                                         "ADHD Task Manager",
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -284,7 +283,6 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                             imageVector = Icons.Filled.Menu,
                                             contentDescription = "Menu"
                                         )
@@ -298,7 +296,6 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                             imageVector = Icons.Filled.Person,
                                             contentDescription = "Profile"
                                         )

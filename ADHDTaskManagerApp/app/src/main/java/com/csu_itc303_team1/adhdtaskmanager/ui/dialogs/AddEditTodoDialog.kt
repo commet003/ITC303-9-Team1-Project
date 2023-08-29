@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 
 import android.annotation.SuppressLint
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,6 +64,7 @@ import java.time.LocalTime
 import java.time.ZoneOffset
 
 
+@RequiresApi(34)
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,7 +147,7 @@ fun AddEditTodoDialog(
                         onEvent(TodoEvent.setTitle(it))
                     }
                 },
-                colors = TextFieldDefaults.textFieldColors(
+                colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
@@ -174,7 +176,7 @@ fun AddEditTodoDialog(
                         onEvent(TodoEvent.setDescription(it))
                     }
                 },
-                colors = TextFieldDefaults.textFieldColors(
+                colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
                 ),
@@ -193,17 +195,21 @@ fun AddEditTodoDialog(
                 modifier = Modifier
                     .width(130.dp)
                     .menuAnchor(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                ),
                 onClick = { }) {
                 Text(
                     text = prioritySelection.ifEmpty {
                         "Priority"
                     },
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                    tint = MaterialTheme.colorScheme.onSecondary,
                     imageVector = Icons.Filled.ArrowDropDown,
                     contentDescription = "Priority"
                 )
@@ -211,7 +217,7 @@ fun AddEditTodoDialog(
 
             ExposedDropdownMenu(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(MaterialTheme.colorScheme.secondary),
                 expanded = priorityExpandedMenu,
                 onDismissRequest = { priorityExpandedMenu = false }) {
                 Priority.values().forEach { priorityLevel ->
@@ -232,7 +238,7 @@ fun AddEditTodoDialog(
                         text = {
                             Text(
                                 text = priorityLevel.name,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onSecondary
                             )
                         }
                     )
@@ -319,14 +325,6 @@ fun AddEditTodoDialog(
             mutableIntStateOf(0)
         }
 
-        val amPMEdited = remember {
-            mutableStateOf("")
-        }
-
-        val pmHoursEdited = remember {
-            mutableIntStateOf(0)
-        }
-
 
 
         if (state.showDateSelector || state.showEditDateSelector) {
@@ -372,8 +370,8 @@ fun AddEditTodoDialog(
                     dismissButton = {
                         Button(
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                             ),
 
                             onClick = {
@@ -457,8 +455,8 @@ fun AddEditTodoDialog(
                     dismissButton = {
                         Button(
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                             ),
                             onClick = {
                                 if (state.showDialog) {
@@ -529,8 +527,8 @@ fun AddEditTodoDialog(
             ) {
                 Button(
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     onClick = {
                         if (state.showDialog) {
@@ -554,8 +552,8 @@ fun AddEditTodoDialog(
             ) {
                 Button(
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     onClick = {
                         if (state.showDialog) {
@@ -567,32 +565,26 @@ fun AddEditTodoDialog(
                     Text(text = "Time", fontWeight = FontWeight.Bold)
                 }
                 if (state.showDialog){
-                    if (timePickerState.hour > 12) {
+                    if (state.dueTime != "") {
                         amPM.value = "PM"
-                        pmHours.value = timePickerState.hour - 12
+                        pmHours.intValue = timePickerState.hour - 12
                         Text(
-                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
+                            text = ("%02d".format(pmHours.intValue) + ":" + "%02d".format(
                                 timePickerState.minute
                             ) + " ${amPM.value}")
                         )
-                    } else if (timePickerState.hour <= 12) {
-                        amPM.value = "AM"
-                        Text(text = state.dueTime + " ${amPM.value}")
                     } else {
                         Text(text = "")
                     }
                 } else {
                     if (editTimePickerState.hour > 12) {
                         amPM.value = "PM"
-                        pmHours.value = editTimePickerState.hour - 12
+                        pmHours.intValue = editTimePickerState.hour - 12
                         Text(
-                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
+                            text = ("%02d".format(pmHours.intValue) + ":" + "%02d".format(
                                 editTimePickerState.minute
                             ) + " ${amPM.value}")
                         )
-                    } else if (editTimePickerState.hour <= 12) {
-                        amPM.value = "AM"
-                        Text(text = state.dueTime + " ${amPM.value}")
                     } else {
                         Text(text = "")
                     }
@@ -607,8 +599,8 @@ fun AddEditTodoDialog(
         ) {
             Button(
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ),
                 onClick = {
                     if (state.showDialog){
@@ -630,8 +622,8 @@ fun AddEditTodoDialog(
             }
             Button(
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
                     if (state.title.isNotEmpty() && state.description.isNotEmpty()) {

@@ -140,7 +140,7 @@ fun PomodoroTimerScreen(
     }
 
     Row {
-        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
     }
 
 
@@ -216,12 +216,12 @@ fun PomodoroTimerScreen(
                 containerColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.primaryContainer
+                    MaterialTheme.colorScheme.secondary
                 },
                 contentColor = if (!isTimerRunning || currentTime <= 0L){
                     MaterialTheme.colorScheme.onPrimary
                 } else {
-                    MaterialTheme.colorScheme.background
+                    MaterialTheme.colorScheme.onSecondary
                 }
             )
         ) {
