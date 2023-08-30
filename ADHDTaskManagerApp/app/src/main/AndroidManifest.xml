@@ -2,45 +2,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
+    <!-- Your permissions remain unchanged -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-
-    <uses-sdk
-        android:minSdkVersion="..."
-        android:targetSdkVersion="..."/>
 
 
     <application
-        android:name=".utils.notifications.NotificationsApp"
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ADHDTaskManager"
         tools:targetApi="31">
-        <!--for viewing webpage-->
-        <activity android:name=".ui.help_screen.WebViewActivity" />
 
+        <!-- Set VideoSplashActivity as the launcher activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.ADHDTaskManager">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!-- For viewing webpage -->
+        <activity android:name=".ui.help_screen.WebViewActivity" />
+
+
+    </application>
 </manifest>

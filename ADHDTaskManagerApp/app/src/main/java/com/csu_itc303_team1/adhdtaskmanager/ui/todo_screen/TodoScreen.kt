@@ -1,281 +1,226 @@
-package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
+package com.csu_itc303_team1.adhdtaskmanager.data
 
-
-//noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.IntSize
-import androidx.core.view.drawToBitmap
-import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.draw
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.R
+import com.csu_itc303_team1.adhdtaskmanager.ui.components.TodoCard
+import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
+import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoStatusGroup
+import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoStatusHeader
+import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodosViewModel
+import java.time.Clock
+import java.time.Duration
+import java.time.Instant
 
-
-
-
-@SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TodoScreen(
-    state: TodoState,
-    onEvent: (TodoEvent) -> Unit,
-    rewardViewModel: RewardViewModel,
-    usersViewModel: UsersViewModel
+    viewModel: TodosViewModel,
+    onTodoClick: (todoId: Long) -> Unit,
+    onAddTodoClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
-
-    rewardViewModel.allRewards.observeAsState(listOf())
-
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Hidden,
-        skipHiddenState = false
+    val statusGroups by viewModel.statusGroups.collectAsState(emptyMap())
+    TodosContent(
+        statusGroups = statusGroups,
+        clock = viewModel.clock,
+        onStatusClick = { viewModel.toggleStatusExpanded(it) },
+        onStarClick = { viewModel.toggleTodoStarState(it) },
+        onTodoClick = onTodoClick,
+        onAddTodoClick = onAddTodoClick,
+        onArchiveClick = onArchiveClick,
+        onSettingsClick = onSettingsClick
     )
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = sheetState
-    )
-    val scope = rememberCoroutineScope()
+}
 
-    val showToast = remember { mutableStateOf(false) }
-
-
-
-    BottomSheetScaffold(
-        scaffoldState = bottomSheetScaffoldState,
-        sheetSwipeEnabled = false,
-        sheetDragHandle = {},
-        content = {
-            Scaffold(
-                floatingActionButton = {
-                    FloatingActionButton(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        onClick = {
-                            onEvent(TodoEvent.showDialog)
-                            scope.launch {
-                                sheetState.expand()
-                            }
-                        }
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@Composable
+private fun TodosContent(
+    statusGroups: Map<TodoStatus, TodoStatusGroup>,
+    clock: Clock,
+    onStatusClick: (status: TodoStatus) -> Unit,
+    onStarClick: (todoId: Long) -> Unit,
+    onTodoClick: (todoId: Long) -> Unit,
+    onAddTodoClick: () -> Unit,
+    onArchiveClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    val systemBars = WindowInsets.systemBars
+    var bottomBarHeight by remember { mutableStateOf(0) }
+    Scaffold(
+        modifier = Modifier.padding(systemBars.asPaddingValues()),
+        bottomBar = {
+            TodosBottomBar(
+                onArchiveClick = onArchiveClick,
+                onSettingsClick = onSettingsClick,
+                modifier = Modifier.onSizeChanged { size -> bottomBarHeight = size.height }
+            )
+        },
+        floatingActionButton = {
+            AddTodoButton(onClick = onAddTodoClick)
+        },
+        isFloatingActionButtonDocked = true
+    ) {
+        LazyColumn(
+            contentPadding = PaddingValues(
+                bottom = with(LocalDensity.current) { bottomBarHeight.toDp() + 4.dp }
+            ),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+        ) {
+            for ((status, group) in statusGroups) {
+                stickyHeader(key = "header-${status.key}") {
+                    TodoStatusHeader(
+                        status = status,
+                        count = group.summaries.size,
+                        expanded = group.expanded,
+                        onClick = { onStatusClick(status) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                items(items = group.summaries, key = { "todo-${it.id}" }) { summary ->
+                    AnimatedVisibility(
+                        visible = group.expanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically(),
                     ) {
-                        Icon(
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            imageVector = Icons.Default.Add,
+                        TodoCard(
+                            summary = summary,
+                            clock = clock,
+                            onStarClick = { onStarClick(summary.id) },
+                            onClick = { onTodoClick(summary.id) },
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .height(32.dp)
-                                .width(32.dp),
-                            contentDescription = "Add Todo"
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp)
                         )
                     }
                 }
-            ) { paddingValues ->
-                var expanded by remember { mutableStateOf(false) }
-
-                if (state.showEditTodoDialog){
-                    scope.launch {
-                        sheetState.expand()
-                    }
-                }
-
-                Column (
-                    verticalArrangement = Arrangement.SpaceAround
-                ){
-                    // TODO: This is where the task are filtered
-                    // If you only want the completed task to show, then you can set
-                    // sortType to SortType.BY_COMPLETED
-                    ExposedDropdownMenuBox(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = 10.dp),
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded}
-                    )
-                    {
-                        IconButton(
-                            modifier = Modifier
-                                .menuAnchor()
-                                .align(Alignment.CenterHorizontally)
-                            ,
-                            onClick = { }) {
-                            Icon(
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                imageVector = Icons.Filled.List,
-                                contentDescription = "Filter"
-                            )
-                        }
-
-                        ExposedDropdownMenu(
-                            modifier = Modifier
-                                .width(150.dp)
-                                .background(MaterialTheme.colorScheme.surface),
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }) {
-                            SortType.values().forEach { sortType ->
-                                DropdownMenuItem(
-                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
-                                    onClick = {
-                                        expanded = false
-                                        onEvent(TodoEvent.sortBy(sortType))
-                                    },
-                                    text = {
-                                        when (sortType.name) {
-                                            "BY_PRIORITY" -> {
-                                                Text(
-                                                    text = "By Priority",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_DATE_TIME" -> {
-                                                Text(
-                                                    text = "By Date",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_COMPLETED" -> {
-                                                Text(
-                                                    text = "By Completed",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_NOT_COMPLETED" -> {
-                                                Text(
-                                                    text = "By Not Completed",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-
-                    }
-
-                    LazyColumn(
-                        contentPadding = paddingValues,
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(1.dp)
-                    ) {
-
-                        items(state.todos) { todo ->
-                            if (todo.userID == state.userId) {
-
-                                TodoCard(
-                                    todo = todo,
-                                    todoState = state,
-                                    onEvent = onEvent,
-                                    index = state.todos.indexOf(todo),
-                                    rewardViewModel = rewardViewModel,
-                                    usersViewModel = usersViewModel,
-                                    showToast = showToast
-
-                                )
-                            }
-                        }
-                    }
-
-
-                }
-
-
-                lottieLoaderAnimation(isVisible = showToast.value)
-
-                CustomToastMessage(
-                    message = "Congrats on completing a task!",
-                    isVisible = showToast.value,
-                )
-
-
-
-
-            }
-        },
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            var priorityExpandedMenu by remember { mutableStateOf(false) }
-            var prioritySelection by remember { mutableStateOf("") }
-            var titleError by remember { mutableStateOf(false) }
-            var descriptionError by remember { mutableStateOf(false) }
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                if (state.showDialog || state.showEditTodoDialog) {
-                    AddEditTodoDialog(state = state, onEvent = onEvent, scope = scope, sheetState = sheetState)
-                }
             }
         }
-    )
-
+    }
 }
 
+@Composable
+private fun TodosBottomBar(
+    onArchiveClick: () -> Unit,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    val systemBars = WindowInsets.systemBars
+    BottomAppBar(
+        modifier = modifier,
+        contentPadding = systemBars.asPaddingValues(),
+        cutoutShape = CircleShape
+    ) {
+        IconButton(onClick = { menuExpanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.menu),
+            )
+        }
+        DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false }
+        ) {
+            DropdownMenuItem(onClick = onArchiveClick) {
+                Text(text = stringResource(R.string.archive))
+            }
+            DropdownMenuItem(onClick = onSettingsClick) {
+                Text(text = stringResource(R.string.settings))
+            }
+        }
+    }
+}
 
+@Composable
+private fun AddTodoButton(
+    onClick: () -> Unit
+) {
+    FloatingActionButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = stringResource(R.string.add_todo)
+        )
+    }
+}
 
-
-
-
+@Preview
+@Composable
+private fun PreviewTodosContent() {
+    ADHDTaskManagerTheme {
+        TodosContent(
+            statusGroups = mapOf(
+                TodoStatus.IN_PROGRESS to TodoStatusGroup(
+                    expanded = true,
+                    summaries = listOf(
+                        TodoSummary(
+                            id = 1L,
+                            title = "Create default illustrations for event types",
+                            status = TodoStatus.IN_PROGRESS,
+                            dueAt = Instant.now() + Duration.ofHours(73),
+                            orderInCategory = 1,
+                            isArchived = false,
+                            owner = User(
+                                id = 1L,
+                                username = "Daring Dove",
+                                avatar = Avatar.USER_PROFILE_PICTURE
+                            ),
+                            tags = listOf(
+                                Tag(id = 1L, label = "2.3 release", color = TagColor.BLUE),
+                                Tag(id = 4L, label = "UI/UX", color = TagColor.PURPLE),
+                            ),
+                            starred = true,
+                        )
+                    )
+                )
+            ),
+            clock = Clock.systemDefaultZone(),
+            onStatusClick = {},
+            onStarClick = {},
+            onTodoClick = {},
+            onAddTodoClick = {},
+            onArchiveClick = {},
+            onSettingsClick = {}
+        )
+    }
+}

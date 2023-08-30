@@ -6,7 +6,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColorScheme(
     primary = NavyBlueLight,
@@ -40,32 +39,26 @@ private val LightColorPalette = lightColorScheme(
     onErrorContainer = Color.White,
 )
 
+
+object ADHDTaskManagerTheme {
+
+    /**
+     * Extra theme colors.
+     */
+    val colors: AppColors
+        @Composable
+        get() = LocalAppColors.current
+}
+
 @Composable
 fun ADHDTaskManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val systemUiController = rememberSystemUiController()
 
     val colors = if (darkTheme) {
-        systemUiController.setStatusBarColor(
-            color = NavyBlueLight,
-            darkIcons = false
-        )
-        systemUiController.setNavigationBarColor(
-            color = BackgroundDark,
-            darkIcons = false
-        )
         DarkColorPalette
     } else {
-        systemUiController.setStatusBarColor(
-            color = NavyBlueDark,
-            darkIcons = false
-        )
-        systemUiController.setNavigationBarColor(
-            color = BackgroundLight,
-            darkIcons = true
-        )
         LightColorPalette
     }
 
