@@ -50,13 +50,7 @@ fun HelpScreen() {
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Welcome to the Help Page")
-                }
-            )
-        }
+
     ) {
         Column(
             modifier = Modifier

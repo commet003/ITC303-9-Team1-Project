@@ -1,8 +1,8 @@
-package com.csu_itc303_team1.adhdtaskmanager.data
-
+package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -10,12 +10,8 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -33,7 +29,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,17 +39,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.R
+import com.csu_itc303_team1.adhdtaskmanager.data.Avatar
+import com.csu_itc303_team1.adhdtaskmanager.data.Tag
+import com.csu_itc303_team1.adhdtaskmanager.data.TagColor
+import com.csu_itc303_team1.adhdtaskmanager.data.TodoStatus
+import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
+import com.csu_itc303_team1.adhdtaskmanager.data.User
 import com.csu_itc303_team1.adhdtaskmanager.ui.components.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
-import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoStatusGroup
-import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoStatusHeader
-import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodosViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.TopAppBars
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 
+
 @Composable
-fun TodoScreen(
+fun TodosScreen(
     viewModel: TodosViewModel,
     onTodoClick: (todoId: Long) -> Unit,
     onAddTodoClick: () -> Unit,
@@ -75,7 +75,7 @@ fun TodoScreen(
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
 private fun TodosContent(
     statusGroups: Map<TodoStatus, TodoStatusGroup>,
@@ -87,12 +87,10 @@ private fun TodosContent(
     onArchiveClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    val systemBars = WindowInsets.systemBars
-    var bottomBarHeight by remember { mutableIntStateOf(0) }
+    var bottomBarHeight by remember { mutableStateOf(0) }
     Scaffold(
-        modifier = Modifier
-            .padding(top = systemBars.asPaddingValues().calculateTopPadding() + 20.dp)
-            .windowInsetsPadding(systemBars),
+        modifier = Modifier,
+        topBar = {TopAppBars().ADHDTopAppBar()},
         bottomBar = {
             TodosBottomBar(
                 onArchiveClick = onArchiveClick,
@@ -121,7 +119,7 @@ private fun TodosContent(
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                items(items = group.summaries, key = { "todo-${it.id}" }) { summary ->
+                items(items = group.summaries, key = { "task-${it.id}" }) { summary ->
                     AnimatedVisibility(
                         visible = group.expanded,
                         enter = fadeIn() + expandVertically(),
@@ -150,9 +148,8 @@ private fun TodosBottomBar(
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
-    val systemBars = WindowInsets.systemBars
     BottomAppBar(
-        modifier = modifier.windowInsetsPadding(systemBars),
+        modifier = modifier,
         cutoutShape = CircleShape
     ) {
         IconButton(onClick = { menuExpanded = true }) {

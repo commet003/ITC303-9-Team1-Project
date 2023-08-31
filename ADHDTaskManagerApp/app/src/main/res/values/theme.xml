@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.ADHDTaskManager" parent="Theme.ADHDTaskManager.NoActionBar">
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+
+    </style>
+
+
+    <style name="Theme.ADHDTaskManager.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.ADHDTaskManager.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.ADHDTaskManager.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Theme.ProgressBar" parent="Theme.ADHDTaskManager.NoActionBar" />
+</resources>

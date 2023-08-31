@@ -1,10 +1,11 @@
-package com.csu_itc303_team1.adhdtaskmanager.ui.todo_detail
+package com.csu_itc303_team1.adhdtaskmanager.ui.edit_todo
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
@@ -17,11 +18,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.StarPurple500
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -30,22 +33,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
-import com.csu_itc303_team1.adhdtaskmanager.R.*
+import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.R
 
-@SuppressLint("StateFlowValueCalledInComposition")
+
 @Composable
-fun TodoDetailScreen(
-    viewModel: TodoDetailViewModel,
+fun TodoEditScreen(
+    viewModel: TodoEditViewModel,
+    onConfirmEditClick: () -> Unit,
     onBackClick: () -> Unit,
-    onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
-    onSettingsClick: () -> Unit,
+    onSettingsClick: () -> Unit
 ) {
-    TodoDetailContent(
+    val status by viewModel.status.collectAsState()
+    EditTodoContent(
         viewModel = viewModel,
-        onStatusClick = viewModel::toggleTodoStarState,
+        onStatusClick = { viewModel.updateState(status) },
         onBackClick = onBackClick,
-        onEditClick = {onEditClick()},
+        onConfirmClick = onConfirmEditClick,
         onArchiveClick = onArchiveClick,
         onSettingsClick = onSettingsClick,
     )
@@ -53,37 +58,51 @@ fun TodoDetailScreen(
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
-fun TodoDetailContent(
-    viewModel: TodoDetailViewModel,
+fun EditTodoContent(
+    viewModel: TodoEditViewModel,
     onStatusClick: () -> Unit,
     onBackClick: () -> Unit,
-    onEditClick: (todoId: Long) -> Unit,
+    onConfirmClick: () -> Unit,
     onArchiveClick: () -> Unit,
     onSettingsClick: () -> Unit,
-){
+    ){
+    val systemBars = WindowInsets.systemBars
     var bottomBarHeight by remember { mutableIntStateOf(0) }
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize(),
+            .padding(
+                top = systemBars
+                    .asPaddingValues()
+                    .calculateTopPadding() + 20.dp
+            )
+            .windowInsetsPadding(systemBars),
         bottomBar = {
-            TodoDetailBottomBar(
+            EditTodoBottomBar(
                 onArchiveClick = onArchiveClick,
                 onSettingsClick = onSettingsClick,
                 modifier = Modifier.onSizeChanged { size -> bottomBarHeight = size.height }
             )
         },
         floatingActionButton = {
-            TodoDetailButton { onEditClick(viewModel.todoId.value) }
+            EditTodoButton(onClick = onConfirmClick)
         },
         isFloatingActionButtonDocked = true
     ) {
         Column {
-            Text(text = "${viewModel.detail.value?.title}")
+            TextField(
+                value = viewModel.title.value,
+                onValueChange = viewModel.title::value::set,
+                singleLine = true,
+            )
 
-            Text(text = "${viewModel.detail.value?.description}")
+            TextField(
+                value = viewModel.description.value,
+                onValueChange = viewModel.description::value::set,
+                singleLine = false,
+            )
 
-            Text(text = "${viewModel.detail.value?.status}")
+            Text(text = viewModel.status.value.toString())
 
             Row{
                 Icon(
@@ -92,23 +111,23 @@ fun TodoDetailContent(
                 )
                 Text(text = "Due Date:")
             }
-            Text(text = "${viewModel.detail.value?.dueAt}")
+            Text(text = viewModel.dueAt.value.toString())
 
             Row {
-                Icon(
-                    imageVector = Icons.Default.Bookmark,
+Icon(
+                    imageVector = Icons.Default.StarPurple500,
                     contentDescription = "Tags",
                 )
                 Text(text = "Tags:")
             }
-            Text(text = "${viewModel.detail.value?.tags}")
+            Text(text = viewModel.tags.value.toString())
 
         }
     }
 }
 
 @Composable
-private fun TodoDetailBottomBar(
+private fun EditTodoBottomBar(
     onArchiveClick: () -> Unit,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -122,7 +141,7 @@ private fun TodoDetailBottomBar(
         IconButton(onClick = { menuExpanded = true }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = stringResource(string.menu),
+                contentDescription = stringResource(R.string.menu),
             )
         }
         DropdownMenu(
@@ -130,23 +149,24 @@ private fun TodoDetailBottomBar(
             onDismissRequest = { menuExpanded = false }
         ) {
             DropdownMenuItem(onClick = onArchiveClick) {
-                Text(text = stringResource(string.archive))
+                Text(text = stringResource(R.string.archive))
             }
             DropdownMenuItem(onClick = onSettingsClick) {
-                Text(text = stringResource(string.settings))
+                Text(text = stringResource(R.string.settings))
             }
         }
     }
 }
 
 @Composable
-private fun TodoDetailButton(
+private fun EditTodoButton(
     onClick: () -> Unit
 ) {
     FloatingActionButton(onClick = onClick) {
         Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Edit Todo"
+            imageVector = Icons.Default.Check,
+            contentDescription = stringResource(R.string.edit_todo)
         )
     }
 }
+

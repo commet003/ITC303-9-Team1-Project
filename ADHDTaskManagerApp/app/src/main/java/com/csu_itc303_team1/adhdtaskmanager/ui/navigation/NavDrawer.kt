@@ -1,158 +1,136 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.DrawerState
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalDrawer
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.csu_itc303_team1.adhdtaskmanager.R
-import com.csu_itc303_team1.adhdtaskmanager.TodoDestinations
-import com.csu_itc303_team1.adhdtaskmanager.TodoNavigationActions
-import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun AppModalDrawer(
     drawerState: DrawerState,
-    currentRoute: String,
-    navigationActions: TodoNavigationActions,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    content: @Composable () -> Unit
+    scope: CoroutineScope = rememberCoroutineScope(),
 ) {
-    ModalDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            AppDrawer(
-                currentRoute = currentRoute,
-                navigateToTodos = { navigationActions.navigateToTodos() },
-                closeDrawer = { coroutineScope.launch { drawerState.close() } }
-            )
-        }
-    ) {
-        content()
-    }
+    val selectedItem = remember { mutableStateOf(Screen.SignInScreen) }
+    val navController = rememberNavController()
+    AppDrawer(
+        scope = scope,
+        navController = navController,
+        selectedItem = selectedItem.value,
+        drawerState = drawerState
+    )
 }
 
 @Composable
 private fun AppDrawer(
-    currentRoute: String,
-    navigateToTodos: () -> Unit,
-    closeDrawer: () -> Unit,
+    scope: CoroutineScope,
+    navController: NavController,
+    selectedItem: Screen,
+    drawerState: DrawerState,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        DrawerHeader()
-        DrawerButton(
-//            painter = painterResource(id = R.drawable.ic_list),
-            label = stringResource(id = R.string.list_title),
-            isSelected = currentRoute == TodoDestinations.TODOS_ROUTE,
-            action = {
-                navigateToTodos()
-                closeDrawer()
+    ModalNavigationDrawer(
+        modifier = modifier,
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerHeader()
+            Screen.items.forEach { screen ->
+                DrawerItem(
+                    label = screen.title,
+                    itemIcon = screen.icon,
+                    screen = screen,
+                    selectedItem = selectedItem,
+                    action = {
+                        selectedItem.route = screen.route
+                        scope.launch {
+                            drawerState.close()
+                        }
+                        navController.navigate(screen.route)
+                    }
+                )
             }
-        )
+        }
+    ) {
+
     }
 }
 
 @Composable
 private fun DrawerHeader(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
-            .height(dimensionResource(id = R.dimen.header_height))
-            .padding(dimensionResource(id = R.dimen.header_padding))
-    ) {
-        /*Image(
-            painter = painterResource(id = R.drawable.logo_no_fill),
-            contentDescription =
-            stringResource(id = R.string.todos_header_image_content_description),
-            modifier = Modifier.width(dimensionResource(id = R.dimen.header_image_width))
-        )*/
-        Text(
-            text = stringResource(id = R.string.navigation_view_header_title),
-            color = MaterialTheme.colors.surface
-        )
-    }
+    NavigationDrawerItem(
+        modifier= modifier
+            .height(56.dp)
+            .fillMaxWidth(),
+        label = {
+            Text(text = "ADHD Task Manager")
+        },
+        icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = "ADHD Task Manager"
+            )
+        },
+        selected = false,
+        onClick = {
+
+        },
+    )
 }
 
 @Composable
-private fun DrawerButton(
-   // painter: Painter,
+private fun DrawerItem(
+    // painter: Painter,
     label: String,
-    isSelected: Boolean,
+    itemIcon: Int,
+    screen: Screen,
+    selectedItem: Screen,
     action: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val tintColor = if (isSelected) {
-        MaterialTheme.colors.secondary
-    } else {
-        MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-    }
-
-    TextButton(
+    NavigationDrawerItem(
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+            selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+            unselectedContainerColor = MaterialTheme.colorScheme.background,
+            unselectedIconColor = MaterialTheme.colorScheme.primary,
+            unselectedTextColor = MaterialTheme.colorScheme.primary
+        ),
+        icon = {
+            Icon(
+                painter = painterResource(itemIcon),
+                contentDescription = label,
+            )
+        },
+        label = {
+            Text(text = label)
+        },
+        selected = screen.route == selectedItem.route,
         onClick = action,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            /*Icon(
-                painter = painter,
-                contentDescription = null, // decorative
-                tint = tintColor
-            )*/
-            Spacer(Modifier.width(16.dp))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.body2,
-                color = tintColor
-            )
-        }
-    }
+        modifier = modifier.padding(
+            NavigationDrawerItemDefaults.ItemPadding
+        )
+    )
 }
 
-@Preview("Drawer contents")
-@Composable
-fun PreviewAppDrawer() {
-    ADHDTaskManagerTheme {
-        Surface {
-            AppDrawer(
-                currentRoute = TodoDestinations.TODOS_ROUTE,
-                navigateToTodos = {},
-                closeDrawer = {}
-            )
-        }
-    }
-}
+

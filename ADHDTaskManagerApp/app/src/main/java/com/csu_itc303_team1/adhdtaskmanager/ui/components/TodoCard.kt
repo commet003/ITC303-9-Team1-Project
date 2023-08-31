@@ -61,7 +61,7 @@ fun TodoCard(
                 // The owner.
                 Spacer(modifier = Modifier.height(2.dp))
                 // The due date.
-                TodoSummaryDueAt(dueAt = summary.dueAt, clock = clock)
+                TodoDueAt(dueAt = summary.dueAt, clock = clock)
                 Spacer(modifier = Modifier.height(4.dp))
                 // The tags.
                 TagGroup(
@@ -75,7 +75,7 @@ fun TodoCard(
 
 
 @Composable
-private fun TodoSummaryDueAt(dueAt: Instant, clock: Clock) {
+private fun TodoDueAt(dueAt: Instant, clock: Clock) {
     val resources = LocalContext.current.resources
     Text(
         text = DateTimeUtils.durationMessageOrDueDate(resources, dueAt, clock),
