@@ -1,6 +1,5 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,20 +11,16 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.csu_itc303_team1.adhdtaskmanager.R
-import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
 import com.csu_itc303_team1.adhdtaskmanager.data.Avatar
 import com.csu_itc303_team1.adhdtaskmanager.data.Tag
 import com.csu_itc303_team1.adhdtaskmanager.data.TagColor
 import com.csu_itc303_team1.adhdtaskmanager.data.TodoStatus
+import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
 import com.csu_itc303_team1.adhdtaskmanager.data.User
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.utils.DateTimeUtils
@@ -64,7 +59,6 @@ fun TodoCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 // The owner.
-                TodoSummaryOwner(owner = summary.owner)
                 Spacer(modifier = Modifier.height(2.dp))
                 // The due date.
                 TodoSummaryDueAt(dueAt = summary.dueAt, clock = clock)
@@ -79,17 +73,6 @@ fun TodoCard(
     }
 }
 
-@Composable
-private fun TodoSummaryOwner(owner: User) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Image(
-            painter = painterResource(owner.avatar.drawableResId),
-            contentDescription = stringResource(R.string.owner)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(text = owner.username)
-    }
-}
 
 @Composable
 private fun TodoSummaryDueAt(dueAt: Instant, clock: Clock) {

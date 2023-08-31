@@ -17,7 +17,6 @@ import java.time.Instant
             entity = User::class,
             parentColumns = ["id"]
         ),
-
     ],
     indices = [
         Index("creatorId"),
@@ -33,8 +32,9 @@ data class Todo(
     val createdAt: Instant = Instant.now(),
     val dueAt: Instant = Instant.now() + Duration.ofDays(7),
     val orderInCategory: Int,
-
-    @ColumnInfo(defaultValue = "0")
+    @ColumnInfo(
+        defaultValue = "0"
+    )
     val isArchived: Boolean = false
 )
 
@@ -44,6 +44,7 @@ enum class TodoStatus(val key: Int, val stringResId: Int) {
     COMPLETED(3, R.string.completed);
 
     companion object {
+        // TODO (b/163065333): find more efficient solution, since map may be high memory.
         private val map = values().associateBy(TodoStatus::key)
         fun fromKey(key: Int) = map[key]
     }
@@ -57,6 +58,7 @@ data class Tag(
     val color: TagColor
 )
 
+// Denotes the tag text and background color to be displayed
 enum class TagColor(val textColor: Int, val backgroundColor: Int) {
     BLUE(R.attr.blueTagTextColor, R.attr.blueTagBackgroundColor),
     GREEN(R.attr.greenTagTextColor, R.attr.greenTagBackgroundColor),
@@ -67,7 +69,8 @@ enum class TagColor(val textColor: Int, val backgroundColor: Int) {
 }
 
 enum class Avatar(val drawableResId: Int) {
-    USER_PROFILE_PICTURE(R.drawable.ic_user_profile_picture)
+    USER_PROFILE_PICTURE(R.drawable.ic_user_profile_picture),
+    DEFAULT_USER(R.drawable.ic_default_user)
 }
 
 @Entity(

@@ -2,18 +2,20 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
 import com.csu_itc303_team1.adhdtaskmanager.data.TodoStatus
+import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
 import com.csu_itc303_team1.adhdtaskmanager.data.User
 import com.csu_itc303_team1.adhdtaskmanager.usecase.GetOngoingTodoSummariesUseCase
 import com.csu_itc303_team1.adhdtaskmanager.usecase.ToggleTodoStarStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.Clock
 import javax.inject.Inject
 
-class TodosViewModel constructor(
+@HiltViewModel
+class TodosViewModel @Inject constructor(
     private val currentUser: User,
     val clock: Clock,
     getOngoingTodoSummariesUseCase: GetOngoingTodoSummariesUseCase,

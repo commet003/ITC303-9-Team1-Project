@@ -17,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.csu_itc303_team1.adhdtaskmanager.TodoDestinationsArgs.USER_MESSAGE_ARG
+import com.csu_itc303_team1.adhdtaskmanager.ui.Main
 import com.csu_itc303_team1.adhdtaskmanager.ui.navigation.AppModalDrawer
 import kotlinx.coroutines.CoroutineScope
 
@@ -46,7 +47,7 @@ fun NavGraph(
             )
         ) { entry ->
             AppModalDrawer(drawerState, currentRoute, navActions) {
-                //TodoScreen()
+                Main()
             }
         }
         composable(TodoDestinations.TODO_DETAIL_ROUTE) {

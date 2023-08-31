@@ -2,11 +2,11 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import com.csu_itc303_team1.adhdtaskmanager.TodoDestinationsArgs.TODO_ID_ARG
 import com.csu_itc303_team1.adhdtaskmanager.TodoDestinationsArgs.TITLE_ARG
+import com.csu_itc303_team1.adhdtaskmanager.TodoDestinationsArgs.TODO_ID_ARG
 import com.csu_itc303_team1.adhdtaskmanager.TodoDestinationsArgs.USER_MESSAGE_ARG
-import com.csu_itc303_team1.adhdtaskmanager.TodoScreens.TODOS_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.TodoScreens.ADD_EDIT_TODO_SCREEN
+import com.csu_itc303_team1.adhdtaskmanager.TodoScreens.TODOS_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.TodoScreens.TODO_DETAIL_SCREEN
 
 /**
@@ -27,9 +27,7 @@ object TodoDestinationsArgs {
     const val TITLE_ARG = "title"
 }
 
-/**
- * Destinations used in the [TodoActivity]
- */
+
 object TodoDestinations {
     const val TODOS_ROUTE = "$TODOS_SCREEN?$USER_MESSAGE_ARG={$USER_MESSAGE_ARG}"
     const val TODO_DETAIL_ROUTE = "$TODO_DETAIL_SCREEN/{$TODO_ID_ARG}"

@@ -1,8 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.data
 
+
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -73,7 +75,7 @@ fun TodoScreen(
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TodosContent(
     statusGroups: Map<TodoStatus, TodoStatusGroup>,
@@ -86,9 +88,11 @@ private fun TodosContent(
     onSettingsClick: () -> Unit
 ) {
     val systemBars = WindowInsets.systemBars
-    var bottomBarHeight by remember { mutableStateOf(0) }
+    var bottomBarHeight by remember { mutableIntStateOf(0) }
     Scaffold(
-        modifier = Modifier.padding(systemBars.asPaddingValues()),
+        modifier = Modifier
+            .padding(top = systemBars.asPaddingValues().calculateTopPadding() + 20.dp)
+            .windowInsetsPadding(systemBars),
         bottomBar = {
             TodosBottomBar(
                 onArchiveClick = onArchiveClick,
@@ -148,8 +152,7 @@ private fun TodosBottomBar(
     var menuExpanded by remember { mutableStateOf(false) }
     val systemBars = WindowInsets.systemBars
     BottomAppBar(
-        modifier = modifier,
-        contentPadding = systemBars.asPaddingValues(),
+        modifier = modifier.windowInsetsPadding(systemBars),
         cutoutShape = CircleShape
     ) {
         IconButton(onClick = { menuExpanded = true }) {
@@ -186,7 +189,7 @@ private fun AddTodoButton(
 
 @Preview
 @Composable
-private fun PreviewTodosContent() {
+private fun PreviewTasksContent() {
     ADHDTaskManagerTheme {
         TodosContent(
             statusGroups = mapOf(

@@ -46,7 +46,7 @@ object DateTimeUtils {
      * Returns a message about the time till the due date (example: "Due today", or
      * "Due 3 days ago"). Used to draw attention to items which are overdue or about to become due.
      */
-    fun durationMessage(
+    private fun durationMessage(
         resources: Resources,
         dueDate: Instant,
         clock: Clock

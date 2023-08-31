@@ -6,11 +6,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.csu_itc303_team1.adhdtaskmanager.data.TodoDetail
-import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
 import com.csu_itc303_team1.adhdtaskmanager.data.Tag
 import com.csu_itc303_team1.adhdtaskmanager.data.Todo
+import com.csu_itc303_team1.adhdtaskmanager.data.TodoDetail
 import com.csu_itc303_team1.adhdtaskmanager.data.TodoStatus
+import com.csu_itc303_team1.adhdtaskmanager.data.TodoSummary
 import com.csu_itc303_team1.adhdtaskmanager.data.TodoTag
 import com.csu_itc303_team1.adhdtaskmanager.data.User
 import com.csu_itc303_team1.adhdtaskmanager.data.UserTodo
@@ -18,8 +18,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDao {
-
-    // TODO :consider creating UserDao and moving some of the logic in this Dao there
     @Insert
     suspend fun insertUsers(users: List<User>)
 
@@ -27,13 +25,13 @@ interface TodoDao {
     suspend fun insertTags(tags: List<Tag>)
 
     @Insert
-    suspend fun insertTodos(todos: List<Todo>)
+    suspend fun insertTodos(tasks: List<Todo>)
 
     @Insert
     suspend fun insertTodoTags(todoTags: List<TodoTag>)
 
     @Insert
-    suspend fun insertUserTodos(userTodos: List<UserTodo>)
+    suspend fun insertUserTodos(userTasks: List<UserTodo>)
 
     @Delete
     suspend fun deleteUserTodos(userTodos: List<UserTodo>)
@@ -45,7 +43,7 @@ interface TodoDao {
     fun getUserById(id: Long): Flow<User?>
 
     @Transaction
-    @Query("SELECT * FROM TodoDetail  WHERE id = :id")
+    @Query("SELECT * FROM TodoDetail WHERE id = :id")
     fun findTodoDetailById(id: Long): Flow<TodoDetail?>
 
     @Transaction
@@ -100,7 +98,7 @@ interface TodoDao {
     suspend fun loadTags(): List<Tag>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTodo(todo: Todo): Long
+    suspend fun insertTodo(task: Todo): Long
 
     @Query("SELECT tagId FROM todo_tags WHERE todoId = :todoId")
     suspend fun loadTodoTagIds(todoId: Long): List<Long>
@@ -121,7 +119,7 @@ interface TodoDao {
     @Transaction
     suspend fun saveTodoDetail(detail: TodoDetail, topOrderInCategory: Boolean) {
         if (detail.title.isEmpty()) {
-            throw IllegalArgumentException("Task must include non-empty title.")
+            throw IllegalArgumentException("Todo must include non-empty title.")
         }
         val todo = Todo(
             id = detail.id,
