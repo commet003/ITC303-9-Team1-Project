@@ -29,7 +29,7 @@ interface TodoDao {
     fun sortByPriority(): Flow<List<Todo>>
 
     // Sort by dueDate and dueTime
-    @Query("SELECT * FROM Todo ORDER BY dueDate ASC, dueTime ASC")
+    @Query("SELECT * FROM Todo ORDER BY dueDate DESC, dueTime DESC")
     fun sortByDueDateAndTime(): Flow<List<Todo>>
 
     // Sort Todos by Due Date
@@ -41,7 +41,7 @@ interface TodoDao {
     //fun sortByDueTime(): Flow<List<Todo>>
 
     // Sort Todos by isCompleted
-    @Query("SELECT * FROM Todo WHERE isCompleted = 1 ORDER BY completionDate ASC")
+    @Query("SELECT * FROM Todo WHERE isCompleted = 1 ORDER BY completionDate DESC")
     fun sortByCompleted(): Flow<List<Todo>>
 
     // Sort Todos by not isCompleted

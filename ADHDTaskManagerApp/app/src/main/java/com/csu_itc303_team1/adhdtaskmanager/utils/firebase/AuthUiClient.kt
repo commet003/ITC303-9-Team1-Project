@@ -9,12 +9,12 @@ import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.sql.Timestamp
 import java.util.concurrent.CancellationException
 
 class AuthUiClient(
@@ -45,7 +45,7 @@ class AuthUiClient(
                         username = auth.currentUser?.displayName.toString(),
                         profilePicture = auth.currentUser?.photoUrl.toString(),
                         rewardsPoints = 0,
-                        lastLogin = Timestamp.now(),
+                        lastLogin = Timestamp.valueOf("2021-01-01 00:00:00"),
                         loginStreak = 1,
                         rewardsEarned = REWARDS_COUNTS.toMutableMap()
                     )
