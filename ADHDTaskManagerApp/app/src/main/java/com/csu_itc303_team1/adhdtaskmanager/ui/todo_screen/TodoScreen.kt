@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
@@ -50,6 +52,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(34)
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,8 +62,6 @@ fun TodoScreen(
     currentUser: AuthUiClient,
     onEvent: (TodoEvent) -> Unit
 ) {
-
-    //rewardViewModel.allRewards.observeAsState(listOf())
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
@@ -84,6 +85,7 @@ fun TodoScreen(
                 floatingActionButton = {
                     FloatingActionButton(
                         containerColor = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape,
                         onClick = {
                             onEvent(TodoEvent.showDialog)
                             scope.launch {

@@ -18,7 +18,7 @@ class TodoViewModel(
 ): ViewModel() {
 
     private val _state = MutableStateFlow(TodoState())
-    private val _sortType = MutableStateFlow(SortType.BY_DATE_TIME)
+    private val _sortType = MutableStateFlow(SortType.BY_NOT_COMPLETED)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _todos = _sortType

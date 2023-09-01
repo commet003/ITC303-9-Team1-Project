@@ -7,7 +7,6 @@ import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -133,7 +132,7 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @RequiresApi(34)
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 

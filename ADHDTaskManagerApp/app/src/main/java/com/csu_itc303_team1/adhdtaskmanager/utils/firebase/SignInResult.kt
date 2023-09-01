@@ -1,6 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 
-import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
 
 data class SignInResult(
     val data: UserData?,
@@ -12,7 +13,7 @@ data class UserData(
     val username: String? = null,
     val profilePicture: String? = null,
     val rewardsPoints: Int = 0,
-    val lastLogin: Timestamp? = null,
+    @ServerTimestamp var lastLogin: Date? = null,
     val loginStreak: Int? = null,
     val rewardsEarned: MutableMap<String, Int>? = null,
 )
