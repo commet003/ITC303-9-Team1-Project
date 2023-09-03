@@ -1,22 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
-    <style name="Theme.ADHDTaskManager" parent="Theme.ADHDTaskManager.NoActionBar">
-
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-
-
+    <!-- Base application theme. -->
+    <style name="Theme.ADHD" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/light_orange</item>
+        <item name="colorPrimaryVariant">@color/medium_orange</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/bright_orange</item>
+        <item name="colorSecondaryVariant">@color/bright_orange</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
     </style>
 
-
-    <style name="Theme.ADHDTaskManager.NoActionBar">
+    <style name="Theme.ADHD.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.ADHDTaskManager.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.ADHD.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.ADHDTaskManager.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="Theme.ProgressBar" parent="Theme.ADHDTaskManager.NoActionBar" />
+    <style name="Theme.ADHD.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
