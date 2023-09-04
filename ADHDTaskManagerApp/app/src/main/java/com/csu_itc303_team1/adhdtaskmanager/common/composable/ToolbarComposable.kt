@@ -48,16 +48,16 @@ fun ActionToolbar(
 @Composable
 private fun toolbarColor(darkTheme: Boolean = isSystemInDarkTheme()): TopAppBarColors {
     return if (darkTheme) TopAppBarColors(
-        containerColor = MaterialTheme.colorScheme.primary,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = Color.White,
         navigationIconContentColor = Color.White,
         actionIconContentColor = Color.White,
-        scrolledContainerColor = MaterialTheme.colorScheme.primary
+        scrolledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
     ) else TopAppBarColors(
-        containerColor = MaterialTheme.colorScheme.primary,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = Color.White,
         navigationIconContentColor = Color.White,
         actionIconContentColor = Color.White,
-        scrolledContainerColor = MaterialTheme.colorScheme.primary
+        scrolledContainerColor = MaterialTheme.colorScheme.onPrimaryContainer
     )
 }

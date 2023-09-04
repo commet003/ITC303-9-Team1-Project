@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,17 +40,17 @@ fun TasksScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.onAddClick(openScreen) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
                 shape = CircleShape,
                 modifier = modifier.padding(16.dp)
             ) {
                 Icon(Icons.Filled.Add, "Add")
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
-        val options by viewModel.options
 
         Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
             ActionToolbar(

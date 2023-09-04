@@ -104,7 +104,7 @@ private fun CardSelectors(
     }
 
     val categorySelection = Category.getCategoryByName(task.category).name
-    CardSelector(AppText.category, Category.getCategory(), categorySelection, Modifier.card()) {
+    CardSelector(AppText.category, Category.getCategories(), categorySelection, Modifier.card()) {
             newValue ->
         onCategoryChange(newValue)
     }

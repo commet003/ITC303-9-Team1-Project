@@ -16,10 +16,17 @@ class SettingsViewModel @Inject constructor(
     private val accountService: AccountService,
     private val storageService: StorageService
 ) : MainViewModel(logService) {
-    val uiState = accountService.currentUser.map { SettingsUiState(it.isAnonymous) }
+    val uiState = accountService.currentUser.map {
+        SettingsUiState(
+            it.isAnonymous,
+            isSignedIn()
+            )
+    }
 
     fun onLoginClick(openScreen: (String) -> Unit) = openScreen(LOGIN_SCREEN)
 
+    // Is signed in
+    private fun isSignedIn() = accountService.hasUser
 
     fun onLinkAccountClick(openScreen: (String) -> Unit){
         launchCatching {

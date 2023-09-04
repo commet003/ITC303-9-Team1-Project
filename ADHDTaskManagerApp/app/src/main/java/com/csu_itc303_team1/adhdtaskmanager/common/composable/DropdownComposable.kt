@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.common.composable
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,9 +59,7 @@ fun DropdownContextMenu(
                         isExpanded = false
                         onActionClick(selectionOption)
                     },
-                text = {
-                    Text(text = selectionOption)
-                }
+                    text = { Text(text = selectionOption) }
                 )
             }
         }
@@ -82,32 +81,36 @@ fun DropdownSelector(
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         modifier = modifier,
-        onExpandedChange = { isExpanded = !isExpanded }
-    ) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            value = selection,
-            onValueChange = {},
-            label = { Text(stringResource(label)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isExpanded) },
-            colors = dropdownColors()
-        )
+        onExpandedChange = {
+            isExpanded = !isExpanded
+            Log.d("Dropdown Change", "isExpanded: $isExpanded")
+        },
+        content = {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                value = selection,
+                onValueChange = {},
+                label = { Text(stringResource(label)) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(isExpanded) },
+                colors = dropdownColors()
+            )
 
-        ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
-            options.forEach { selectionOption ->
-                DropdownMenuItem(
-                    onClick = {
-                        onNewValue(selectionOption)
-                        isExpanded = false
-                    },
-                text =  {
-                    Text(text = selectionOption)
+            ExposedDropdownMenu(
+                expanded = isExpanded,
+                onDismissRequest = { isExpanded = false }) {
+                options.forEach { selectionOption ->
+                    DropdownMenuItem(
+                        onClick = {
+                            onNewValue(selectionOption)
+                            isExpanded = false
+                        },
+                        text = { Text(text = selectionOption) }
+                    )
                 }
-                )
             }
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,13 +118,14 @@ fun DropdownSelector(
 @ExperimentalMaterialApi
 private fun dropdownColors(): TextFieldColors {
     return ExposedDropdownMenuDefaults.textFieldColors(
-        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+        focusedContainerColor = MaterialTheme.colorScheme.surface,
+        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+        disabledContainerColor = MaterialTheme.colorScheme.surface,
         focusedIndicatorColor = Color.Transparent,
         unfocusedIndicatorColor = Color.Transparent,
         unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
         focusedTrailingIconColor = MaterialTheme.colorScheme.onSurface,
-        focusedLabelColor = MaterialTheme.colorScheme.primary,
-        unfocusedLabelColor = MaterialTheme.colorScheme.primary
+        focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface
     )
 }

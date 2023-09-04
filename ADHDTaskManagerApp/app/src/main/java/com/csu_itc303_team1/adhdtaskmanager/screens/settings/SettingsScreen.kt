@@ -37,7 +37,8 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState(initial = SettingsUiState(false))
+    val uiState by viewModel.uiState.collectAsState(
+        initial = SettingsUiState(false, true))
 
     Column(
         modifier = modifier.fillMaxWidth().fillMaxHeight().verticalScroll(rememberScrollState()),
@@ -47,7 +48,7 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.spacer())
 
-        if (uiState.isAnonymousAccount) {
+        if (uiState.isSignedIn.not()) {
             RegularCardEditor(AppText.login_title, AppIcon.ic_sign_in, "", Modifier.card()) {
                 viewModel.onLoginClick(openScreen)
             }
@@ -55,7 +56,7 @@ fun SettingsScreen(
             RegularCardEditor(AppText.link_account, AppIcon.ic_create_account, "", Modifier.card()) {
                 viewModel.onLinkAccountClick(openScreen)
             }
-        } else {
+        } else if (uiState.isSignedIn) {
             SignOutCard { viewModel.onSignOutClick(restartApp) }
             DeleteMyAccountCard { viewModel.onDeleteMyAccountClick(restartApp) }
         }

@@ -18,9 +18,9 @@ enum class Category(val categoryName: String?, var color: Color?) {
             return Other
         }
 
-        fun getCategory(): List<String> {
+        fun getCategories(): List<String> {
             val categories = mutableListOf<String>()
-            values().forEach { category -> categories.add(category.categoryName!!) }
+            values().forEach { category -> categories.add(category.categoryName.toString()) }
             return categories
         }
     }

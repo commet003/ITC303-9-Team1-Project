@@ -1,12 +1,14 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,7 +39,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,13 +63,26 @@ internal fun TaskItem(
 ) {
     val context = LocalContext.current
     var show by remember { mutableStateOf(true) }
-    val currentItem by rememberUpdatedState(task)
+    var toastText by remember { mutableStateOf("") }
     val dismissState = rememberDismissState(
         confirmValueChange = {
-            if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
-                show = false
-                true
-            } else false
+            when(it) {
+                DismissValue.DismissedToEnd -> {
+                    onActionClick("Complete task")
+                    toastText = "Task Completed"
+                    show = false
+                    true
+                }
+                DismissValue.DismissedToStart -> {
+                    onActionClick("Delete task")
+                    toastText = "Task Deleted"
+                    show = false
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
         },
         positionalThreshold =  { 150.dp.value },
     )
@@ -100,8 +114,6 @@ internal fun TaskItem(
             Toast.makeText(context, "Task Deleted", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 }
 
 
@@ -118,19 +130,42 @@ fun TaskCard(
             .padding(all = 8.dp)
             .height(74.dp)
             .clickable { onActionClick("Edit task") },
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
     ) {
-        Row {
+        Log.d("isDarkMode", isSystemInDarkTheme().toString())
+        Row(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
             CardRibbon(colorInt = Category.getCategoryByName(task.category).color?.toArgb())
             Spacer(Modifier.width(8.dp))
-            Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
+            Column(modifier = Modifier.fillMaxHeight()
+                .background(MaterialTheme.colorScheme.surface)
+                , verticalArrangement = Arrangement.Center) {
                 Text(
                     text = task.title,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
                 RelativeDateText(task = task)
             }
+            Spacer(Modifier.weight(1f))
+            Column(
+                modifier = Modifier.fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.surface),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = task.priority,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    )
+                Spacer(Modifier.height(8.dp))
+            }
+            Spacer(Modifier.width(8.dp))
         }
     }
 }
@@ -139,6 +174,7 @@ fun TaskCard(
 internal fun RelativeDateText(task: Task) {
     Text(
         text = getDueDateAndTime(task),
+        color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.bodySmall,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
@@ -180,15 +216,21 @@ fun DismissBackground(dismissState: DismissState) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        if (direction == DismissDirection.EndToStart) Icon(
-            Icons.Default.Delete,
-            contentDescription = "delete"
-        )
+        if (direction == DismissDirection.StartToEnd) {
+            Icon(
+                Icons.Default.CheckCircle,
+                tint = Color.Black,
+                contentDescription = "Complete Task"
+            )
+        }
         Spacer(modifier = Modifier)
-        if (direction == DismissDirection.StartToEnd) Icon(
-            // make sure add baseline_archive_24 resource to drawable folder
-            Icons.Default.CheckCircle,
-            contentDescription = "Complete"
-        )
+        if (direction == DismissDirection.EndToStart) {
+            Icon(
+                Icons.Default.Delete,
+                tint = Color.Black,
+
+                contentDescription = "Delete Task"
+            )
+        }
     }
 }

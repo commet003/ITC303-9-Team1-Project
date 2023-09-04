@@ -21,7 +21,7 @@ internal fun CardRibbon(colorInt: Int?, modifier: Modifier = Modifier) {
 
     Spacer(
         modifier
-            .width(18.dp)
+            .width(22.dp)
             .fillMaxHeight()
             .padding(end = 8.dp)
             .background(ribbonColor),

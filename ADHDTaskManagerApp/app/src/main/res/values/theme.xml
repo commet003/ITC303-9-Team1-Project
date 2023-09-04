@@ -1,18 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.ADHD" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/light_orange</item>
-        <item name="colorPrimaryVariant">@color/medium_orange</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/bright_orange</item>
-        <item name="colorSecondaryVariant">@color/bright_orange</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
-        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+
+    <!-- Allows us to override platform level specific attributes in their
+         respective values-vXX folder. -->
+    <style name="Theme.ADHD" parent="Theme.Material3.DayNight">
+        <item name="android:statusBarColor">@color/black30</item>
+    </style>
+
+    <!-- The actual theme we use. This varies for light theme (here),
+         and values-night for dark theme. -->
+    <style name="Theme.ADHD.NoActionBar." parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/blue500</item>
+        <item name="colorPrimaryDark">@color/blue800</item>
+        <item name="colorAccent">@color/yellow700</item>
     </style>
 
     <style name="Theme.ADHD.NoActionBar">
@@ -20,7 +19,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.ADHD.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.ADHD.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
-    <style name="Theme.ADHD.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.ADHD.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
 </resources>
