@@ -1,14 +1,16 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service.impl
 
+import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.perf.ktx.trace
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : AccountService {
@@ -23,23 +25,38 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         get() = callbackFlow {
             val listener =
                 FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser?.let { User(it.uid, it.isAnonymous) } ?: User())
+                    this.trySend(auth.currentUser?.let { User(it.uid, it.isAnonymous
+                    ) } ?: User())
                 }
             auth.addAuthStateListener(listener)
             awaitClose { auth.removeAuthStateListener(listener) }
         }
 
-    override suspend fun authenticateWithGoogle(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).await()
+    override suspend fun authenticateWithGoogle() {
+        /* TODO: Implement Google Sign-In */
     }
 
     override suspend fun createAnonymousAccount() {
-        auth.signInAnonymously().await()
+        try {
+            auth.signInAnonymously().await().user
+            if (auth.currentUser != null)  {
+                Log.d("AccountServiceImpl", "createAnonymousAccount: ${auth.currentUser!!.uid}")
+
+            } else {
+                Log.d("AccountServiceImpl", "createAnonymousAccount: null")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            if (e is CancellationException) throw e
+        }
     }
 
-    override suspend fun linkAccount(email: String, password: String): Unit =
+    override suspend fun linkAccount(): Unit =
         trace(LINK_ACCOUNT_TRACE) {
-            val credential = EmailAuthProvider.getCredential(email, password)
+            val credential = GoogleAuthProvider.getCredential(
+                auth.currentUser!!.uid,
+                null
+            )
             auth.currentUser!!.linkWithCredential(credential).await()
         }
 

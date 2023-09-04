@@ -25,7 +25,7 @@ class MessagingService : FirebaseMessagingService() {
     private fun sendNotification(message: RemoteMessage.Notification) {
         // If you want the notifications to appear when your app is in foreground
 
-        val intent = Intent(this, MakeItSoActivity::class.java).apply {
+        val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
 

@@ -2,6 +2,8 @@ package com.csu_itc303_team1.adhdtaskmanager.common.snackbar
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
+
 
 sealed class SnackbarMessage {
     class StringSnackbar(val message: String) : SnackbarMessage()

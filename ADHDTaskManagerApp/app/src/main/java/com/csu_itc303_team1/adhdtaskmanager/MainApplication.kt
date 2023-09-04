@@ -1,18 +1,20 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
+import android.Manifest
 import android.content.res.Resources
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScaffoldState
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
@@ -26,7 +28,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.csu_itc303_team1.adhdtaskmanager.common.composable.PermissionDialog
+import com.csu_itc303_team1.adhdtaskmanager.common.composable.RationaleDialog
 import com.csu_itc303_team1.adhdtaskmanager.common.snackbar.SnackbarManager
+import com.csu_itc303_team1.adhdtaskmanager.screens.edit_task.EditTaskScreen
+import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginScreen
+import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsScreen
+import com.csu_itc303_team1.adhdtaskmanager.screens.splash.SplashScreen
+import com.csu_itc303_team1.adhdtaskmanager.screens.tasks.TasksScreen
 import com.csu_itc303_team1.adhdtaskmanager.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -50,7 +60,7 @@ fun MainApplication() {
             Scaffold(
                 snackbarHost = {
                     SnackbarHost(
-                        hostState = it,
+                        hostState = remember { SnackbarHostState() },
                         modifier = Modifier.padding(8.dp),
                         snackbar = { snackbarData ->
                             Snackbar(snackbarData, contentColor = MaterialTheme.colorScheme.onPrimary)
@@ -106,7 +116,9 @@ fun resources(): Resources {
 @ExperimentalMaterialApi
 fun NavGraphBuilder.navGraph(appState: AppState) {
     composable(SPLASH_SCREEN) {
-        SplashScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
+        SplashScreen(
+            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }
+        )
     }
 
     composable(SETTINGS_SCREEN) {
@@ -120,7 +132,10 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
         LoginScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
     }
 
-    composable(TASKS_SCREEN) { TasksScreen(openScreen = { route -> appState.navigate(route) }) }
+    composable(TASKS_SCREEN) {
+        TasksScreen(
+            openScreen = { route -> appState.navigate(route) })
+    }
 
     composable(
         route = "$EDIT_TASK_SCREEN$TASK_ID_ARG",
