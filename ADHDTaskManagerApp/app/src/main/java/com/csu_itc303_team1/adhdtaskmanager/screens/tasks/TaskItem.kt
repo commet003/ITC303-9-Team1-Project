@@ -64,17 +64,18 @@ internal fun TaskItem(
     val context = LocalContext.current
     var show by remember { mutableStateOf(true) }
     var toastText by remember { mutableStateOf("") }
+    var actionOption by remember { mutableStateOf("") }
     val dismissState = rememberDismissState(
         confirmValueChange = {
             when(it) {
                 DismissValue.DismissedToEnd -> {
-                    onActionClick("Complete task")
+                    actionOption = "Complete task"
                     toastText = "Task Completed"
                     show = false
                     true
                 }
                 DismissValue.DismissedToStart -> {
-                    onActionClick("Delete task")
+                    actionOption = "Delete task"
                     toastText = "Task Deleted"
                     show = false
                     true
@@ -110,8 +111,8 @@ internal fun TaskItem(
     LaunchedEffect(show) {
         if (!show) {
             delay(800)
-            onActionClick("Delete task")
-            Toast.makeText(context, "Task Deleted", Toast.LENGTH_SHORT).show()
+            onActionClick(actionOption)
+            Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
         }
     }
 }
