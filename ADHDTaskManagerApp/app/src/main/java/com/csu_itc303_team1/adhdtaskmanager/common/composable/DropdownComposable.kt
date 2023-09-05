@@ -2,7 +2,6 @@ package com.csu_itc303_team1.adhdtaskmanager.common.composable
 
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -83,10 +82,7 @@ fun DropdownSelector(
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
-        modifier = modifier.clickable{
-            isExpanded = !isExpanded
-            Log.d("Dropdown Change", "isExpanded: $isExpanded")
-        },
+        modifier = modifier,
         onExpandedChange = {
             isExpanded = !isExpanded
             Log.d("Dropdown Change", "isExpanded: $isExpanded")
@@ -118,6 +114,8 @@ fun DropdownSelector(
         }
     )
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

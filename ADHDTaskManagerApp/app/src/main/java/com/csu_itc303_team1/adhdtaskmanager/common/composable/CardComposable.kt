@@ -93,12 +93,13 @@ fun CardSelector(
     modifier: Modifier,
     onNewValue: (String) -> Unit
 ) {
+
     Card(colors = CardColors(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         disabledContainerColor = MaterialTheme.colorScheme.surface,
         disabledContentColor = MaterialTheme.colorScheme.onSurface,
     ), modifier = modifier) {
-        DropdownSelector(label, options, selection, Modifier.dropdownSelector(), onNewValue)
+        DropdownSelector(label, options, selection, Modifier.dropdownSelector(), onNewValue = onNewValue)
     }
 }

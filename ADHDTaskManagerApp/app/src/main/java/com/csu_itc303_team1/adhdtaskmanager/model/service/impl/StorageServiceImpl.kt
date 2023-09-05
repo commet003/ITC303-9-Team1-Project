@@ -36,7 +36,7 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
 
     override suspend fun update(task: Task): Unit =
         trace(UPDATE_TASK_TRACE) {
-            firestore.collection(TASKS_COLLECTION).document(task.id).set(task).await()
+            firestore.collection(TASKS_COLLECTION).document(task.id.toString()).set(task).await()
         }
 
     override suspend fun delete(taskId: String) {

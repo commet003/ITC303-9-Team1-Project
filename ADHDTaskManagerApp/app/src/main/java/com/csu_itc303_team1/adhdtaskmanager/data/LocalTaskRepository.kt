@@ -1,11 +1,13 @@
 package com.csu_itc303_team1.adhdtaskmanager.data
 
+import android.util.Log
 import javax.inject.Inject
 
-class DbRepository @Inject constructor(
+class LocalTaskRepository @Inject constructor(
     private val taskDao: TaskDao,
 ): LocalTaskDataSource {
     override suspend fun saveTask(task: LocalTask){
+        Log.d("LocalTaskRepository", "saveTask: $task")
         taskDao.upsertTask(task)
     }
     override suspend fun updateTask(task: LocalTask){

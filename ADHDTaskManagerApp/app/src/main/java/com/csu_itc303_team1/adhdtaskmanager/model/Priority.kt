@@ -1,10 +1,12 @@
 package com.csu_itc303_team1.adhdtaskmanager.model
 
-enum class Priority(val priorityName: String?, val value: Int) {
-    None(priorityName = "None" , value = 0),
-    Low(priorityName = "Low" ,value = 1),
-    Medium(priorityName = "Medium" , value = 2),
-    High(priorityName = "High" ,value = 3);
+import android.util.Log
+
+enum class Priority(val value: Int) {
+    None(value = 0),
+    Low(value = 1),
+    Medium(value = 2),
+    High(value = 3);
 
     companion object {
         fun getByName(name: String?): Priority {
@@ -15,7 +17,9 @@ enum class Priority(val priorityName: String?, val value: Int) {
 
         fun getOptions(): List<String> {
             val options = mutableListOf<String>()
-            values().forEach { priority -> options.add(priority.name) }
+            values().forEach { priority ->
+                Log.d("Priority", priority.name)
+                options.add(priority.name) }
             return options
         }
     }

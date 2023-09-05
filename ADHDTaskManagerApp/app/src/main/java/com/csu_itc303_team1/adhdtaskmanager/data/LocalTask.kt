@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "task_table")
 data class LocalTask(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: String = "",
     @ColumnInfo(name = "task_title") var title: String = "",
     @ColumnInfo(name = "task_description")var description: String = "",
     @ColumnInfo(name = "task_priority")var priority: String = "",

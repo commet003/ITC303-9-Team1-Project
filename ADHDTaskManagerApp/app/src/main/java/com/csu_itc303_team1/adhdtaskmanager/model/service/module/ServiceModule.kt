@@ -1,7 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service.module
 
-import com.csu_itc303_team1.adhdtaskmanager.data.DbRepository
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskDataSource
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
@@ -22,7 +22,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class ServiceModule {
 
     @Binds
-    abstract fun bindLocalTaskDatabase(impl: DbRepository): LocalTaskDataSource
+    abstract fun bindLocalTaskDatabase(impl: LocalTaskRepository): LocalTaskDataSource
 
     @Binds
     abstract fun provideAccountService(impl: AccountServiceImpl): AccountService
