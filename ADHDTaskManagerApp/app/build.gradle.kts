@@ -75,9 +75,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
-    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
-    implementation("com.google.dagger:hilt-android:2.47")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+    implementation("com.google.dagger:hilt-android:2.48")
     ksp("com.google.dagger:hilt-compiler:2.47")
 
     // Material 3 Components
@@ -85,7 +85,19 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class:1.2.0-alpha06")
 
 
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+    // Live Data
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+
+    // Datastore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.2.0")) // Import the BoM for the Firebase platform
@@ -114,15 +126,15 @@ dependencies {
 
 
     // Air BNB Lottie
-    implementation("com.airbnb.android:lottie-compose:4.1.0")
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
 
 
     //Test
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.0")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.47")
-    androidTestImplementation("com.google.truth:truth:1.1.3")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
+    androidTestImplementation("com.google.truth:truth:1.1.5")
     kspAndroidTest("com.google.dagger:hilt-compiler:2.47")
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.0")
 }

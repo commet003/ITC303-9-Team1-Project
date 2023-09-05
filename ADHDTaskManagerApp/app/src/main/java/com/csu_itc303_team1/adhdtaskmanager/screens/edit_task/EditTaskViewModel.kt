@@ -36,6 +36,9 @@ class EditTaskViewModel @Inject constructor(
         }
     }
 
+    // Local task functions
+
+
     fun onTitleChange(newValue: String) {
         task.value = task.value.copy(title = newValue)
     }

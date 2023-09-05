@@ -45,7 +45,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.CoroutineScope
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @ExperimentalMaterialApi
 fun MainApplication() {
@@ -113,6 +113,7 @@ fun resources(): Resources {
     return LocalContext.current.resources
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterialApi
 fun NavGraphBuilder.navGraph(appState: AppState) {
     composable(SPLASH_SCREEN) {

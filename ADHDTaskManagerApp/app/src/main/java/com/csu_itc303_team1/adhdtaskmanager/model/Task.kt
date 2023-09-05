@@ -5,8 +5,8 @@ import com.google.firebase.firestore.DocumentId
 data class Task(
     @DocumentId val id: String = "",
     val title: String = "",
-    val priority: String = "Low",
-    val category: String = "Home",
+    val priority: String = "",
+    val category: String = "None",
     val dueDate: String = "",
     val dueTime: String = "",
     val description: String = "",
