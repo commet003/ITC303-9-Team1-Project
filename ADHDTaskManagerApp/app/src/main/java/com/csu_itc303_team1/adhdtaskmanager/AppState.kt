@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.content.res.Resources
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
 import com.csu_itc303_team1.adhdtaskmanager.common.snackbar.SnackbarManager
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 
 @Stable
 class AppState(
+    private val drawerState: DrawerState,
     val scaffoldState: ScaffoldState,
     val navController: NavHostController,
     private val snackbarManager: SnackbarManager,
@@ -25,6 +27,18 @@ class AppState(
                 scaffoldState.snackbarHostState.showSnackbar(text)
             }
         }
+    }
+
+    suspend fun toggleDrawerState() {
+        if (drawerState.isOpen) {
+            drawerState.close()
+        } else {
+            drawerState.open()
+        }
+    }
+
+    fun getDrawerState(): DrawerState {
+        return drawerState
     }
 
     fun popUp() {

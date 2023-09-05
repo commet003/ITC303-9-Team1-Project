@@ -9,12 +9,15 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
@@ -96,14 +99,18 @@ fun RequestNotificationPermissionDialog() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberAppState(
+    drawerState: DrawerState = rememberDrawerState(
+        initialValue = DrawerValue.Closed,
+        confirmStateChange = { true }
+    ),
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     navController: NavHostController = rememberNavController(),
     snackbarManager: SnackbarManager = SnackbarManager,
     resources: Resources = resources(),
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) =
-    remember(scaffoldState, navController, snackbarManager, resources, coroutineScope) {
-        AppState(scaffoldState, navController, snackbarManager, resources, coroutineScope)
+    remember(scaffoldState, navController, snackbarManager, resources, coroutineScope, drawerState) {
+        AppState(drawerState, scaffoldState, navController, snackbarManager, resources, coroutineScope)
     }
 
 @Composable
