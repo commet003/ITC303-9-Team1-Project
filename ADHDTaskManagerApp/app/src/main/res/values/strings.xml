@@ -17,9 +17,9 @@
 
     <!-- EditTaskScreen -->
     <string name="edit_task">Edit your task</string>
+    <string name="add_task">Create a new task</string>
     <string name="title">Title</string>
     <string name="description">Description</string>
-    <string name="url">URL</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="flag">Flag</string>

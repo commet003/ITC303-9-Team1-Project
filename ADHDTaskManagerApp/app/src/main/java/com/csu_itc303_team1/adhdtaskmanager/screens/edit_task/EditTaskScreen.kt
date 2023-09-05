@@ -52,7 +52,7 @@ fun EditTaskScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ActionToolbar(
-            title = AppText.edit_task,
+            title = if(task.id.isNotEmpty()) AppText.edit_task else AppText.add_task,
             modifier = Modifier.toolbarActions(),
             endActionIcon = AppIcon.ic_check,
             endAction = { viewModel.onDoneClick(popUpScreen) }
@@ -63,7 +63,6 @@ fun EditTaskScreen(
         val fieldModifier = Modifier.fieldModifier()
         BasicField(AppText.title, task.title, viewModel::onTitleChange, fieldModifier)
         BasicField(AppText.description, task.description, viewModel::onDescriptionChange, fieldModifier)
-        //BasicField(AppText.url, task.url, viewModel::onUrlChange, fieldModifier)
 
         Spacer(modifier = Modifier.spacer())
         CardEditors(task, viewModel::onDateChange, viewModel::onTimeChange)

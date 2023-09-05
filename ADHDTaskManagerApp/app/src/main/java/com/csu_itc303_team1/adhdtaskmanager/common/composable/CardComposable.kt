@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.common.composable
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,6 +65,10 @@ private fun CardEditor(
             disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             disabledContentColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface
+        ),
         modifier = modifier,
         onClick = onEditClick
     ) {
@@ -94,12 +99,19 @@ fun CardSelector(
     onNewValue: (String) -> Unit
 ) {
 
-    Card(colors = CardColors(
+    Card(
+        colors = CardColors(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
         disabledContainerColor = MaterialTheme.colorScheme.surface,
         disabledContentColor = MaterialTheme.colorScheme.onSurface,
-    ), modifier = modifier) {
+    ),
+        modifier = modifier,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
         DropdownSelector(label, options, selection, Modifier.dropdownSelector(), onNewValue = onNewValue)
     }
 }

@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -24,11 +25,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -124,8 +125,13 @@ fun TaskCard(
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
-    ElevatedCard(
+    Card(
         elevation = CardDefaults.elevatedCardElevation(4.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = Category.getCategoryByName(task.category).color?.toArgb()?.let { Color(it) } ?: MaterialTheme.colorScheme.onSurface
+        ),
+        shape = MaterialTheme.shapes.medium,
         modifier = modifier
             .fillMaxWidth()
             .padding(all = 8.dp)

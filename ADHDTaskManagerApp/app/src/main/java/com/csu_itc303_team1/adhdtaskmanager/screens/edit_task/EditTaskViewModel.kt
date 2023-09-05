@@ -7,10 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.idFromParameter
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
-import com.csu_itc303_team1.adhdtaskmanager.model.Category
-import com.csu_itc303_team1.adhdtaskmanager.model.Priority
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
-import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
@@ -22,19 +19,16 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 
-
 @HiltViewModel
 class EditTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     logService: LogService,
     private val localTaskRepository: LocalTaskRepository,
-    private val configurationService: ConfigurationService,
     private val storageService: StorageService,
 ) : MainViewModel(logService) {
-    val task = mutableStateOf(Task())
-    private val priorities = mutableStateOf<List<String>>(listOf())
-    private val categories = mutableStateOf<List<String>>(listOf())
 
+
+    val task = mutableStateOf(Task())
 
     init {
         val taskId = savedStateHandle.get<String>(TASK_ID)
@@ -45,15 +39,6 @@ class EditTaskViewModel @Inject constructor(
         }
     }
 
-    fun loadTaskPriorities() {
-        val hasEditOption = configurationService.isShowTaskEditButtonConfig
-        priorities.value = Priority.getOptions()
-    }
-
-    fun loadTaskCategories() {
-        val hasEditOption = configurationService.isShowTaskEditButtonConfig
-        categories.value = Category.getCategories()
-    }
 
 
     fun onTitleChange(newValue: String) {
