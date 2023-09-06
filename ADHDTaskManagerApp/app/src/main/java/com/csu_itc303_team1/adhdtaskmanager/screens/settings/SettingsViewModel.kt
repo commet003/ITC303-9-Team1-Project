@@ -26,7 +26,7 @@ class SettingsViewModel @Inject constructor(
     fun onLoginClick(openScreen: (String) -> Unit) = openScreen(LOGIN_SCREEN)
 
     // Is signed in
-    private fun isSignedIn() = accountService.hasUser
+    fun isSignedIn() = accountService.hasUser
 
     fun onLinkAccountClick(openScreen: (String) -> Unit){
         launchCatching {

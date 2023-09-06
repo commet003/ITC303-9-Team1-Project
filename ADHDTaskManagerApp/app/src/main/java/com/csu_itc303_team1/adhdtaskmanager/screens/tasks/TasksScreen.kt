@@ -25,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.ActionToolbar
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.smallSpacer
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.toolbarActions
-import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon
 import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
@@ -56,8 +55,9 @@ fun TasksScreen(
             ActionToolbar(
                 title = AppText.tasks,
                 modifier = Modifier.toolbarActions(),
-                endActionIcon = AppIcon.ic_settings,
-                endAction = { viewModel.onSettingsClick(openScreen) }
+                onNavClick = {
+
+                }
             )
 
             Spacer(modifier = Modifier.smallSpacer())
