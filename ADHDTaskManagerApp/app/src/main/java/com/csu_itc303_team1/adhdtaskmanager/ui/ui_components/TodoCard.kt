@@ -31,6 +31,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.csu_itc303_team1.adhdtaskmanager.utils.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.utils.ext.hasDueTime
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Category
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
@@ -44,7 +45,7 @@ import kotlinx.coroutines.delay
 internal fun TodoItem(
     todo: Todo,
     showToast: MutableState<Boolean>,
-    usersViewModel: UsersViewModel,
+    firestoreViewModel: FirestoreViewModel,
     onEvent: (TodoEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {

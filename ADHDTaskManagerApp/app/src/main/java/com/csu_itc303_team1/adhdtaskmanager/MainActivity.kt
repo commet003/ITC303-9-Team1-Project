@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
@@ -74,12 +73,10 @@ import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
@@ -95,9 +92,10 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewM
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
-import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -106,11 +104,9 @@ import net.sqlcipher.database.SupportFactory
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-
-
     private val settingsViewModel by viewModels<SettingsViewModel>()
     private val firestoreViewModel by viewModels<FirestoreViewModel>()
-    //private val firestoreDatabase = Firebase.firestore.app
+    private val firestoreDatabase = Firebase.firestore.app
 
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
@@ -121,37 +117,27 @@ class MainActivity : ComponentActivity() {
             "todo.db"
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
-    @SuppressLint("StaticFieldLeak")
+
+
     private lateinit var navController: NavHostController
 
 
     private val googleAuthUiClient by lazy {
-    AuthUiClient(
-        firestoreViewModel = firestoreViewModel,
-        oneTapClient = Identity.getSignInClient(applicationContext)
-    )
-}
+        AuthUiClient(
+            firestoreViewModel = firestoreViewModel,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
 
     // Boolean value to check if the user is signed in or not
     private val isSignedIn by lazy {
         mutableStateOf(false)
     }
 
-
-    private var defaultProfileImageUrl: String? = null
-
-    fun fetchDefaultProfileImage() {
-        val storageReference = FirebaseStorage.getInstance().reference
-        val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")
-
-        defaultProfileImageRef.downloadUrl.addOnSuccessListener { uri ->
-            defaultProfileImageUrl = uri.toString()
-        }
-    }
-
     @RequiresApi(34)
     @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "InflateParams")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -165,16 +151,17 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+        lifecycleScope.launch {
+            googleAuthUiClient.addAuthStateListener {
+                isSignedIn.value = it
+            }
 
+            delay(6000)
+                // Define contentView here
+                val contentView = findViewById<ViewGroup>(android.R.id.content)
 
-        googleAuthUiClient.addAuthStateListener {
-            isSignedIn.value = it
-            if (it) { // if signed in
-        // Define contentView here
-                    val contentView = findViewById<ViewGroup>(android.R.id.content)
-
-                    // Capture and blur screenshot
-                    val screenshot = takeScreenshot(contentView)
+                // Capture and blur screenshot
+                captureScreenshotWhenReady(contentView) { screenshot ->
                     val blurredScreenshot = blurBitmap(screenshot, applicationContext)
 
                     // Display blurred screenshot as a background
@@ -187,16 +174,19 @@ class MainActivity : ComponentActivity() {
                     contentView.addView(blurredBackground, params)
 
                     // Inflate the custom toast layout
-                    val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val layoutInflater =
+                        getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                     val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
 
-                    val customToastMessage = customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
-                    customToastMessage.text = "Welcome back! Be sure to check out the leaderboard for the latest standings"
+                    val customToastMessage =
+                        customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
+                    customToastMessage.text =
+                        "Welcome back! Be sure to check out the leaderboard for the latest standings"
 
                     // Find the LottieAnimationView and start the animation
-                    val lottieAnimation = customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
+                    val lottieAnimation =
+                        customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
                     lottieAnimation.playAnimation()
-
 
                     // Create a PopupWindow with custom view
                     val customPopup = PopupWindow(
@@ -207,7 +197,6 @@ class MainActivity : ComponentActivity() {
                     )
                     customPopup.animationStyle = android.R.style.Animation_Toast
                     if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-
                         customPopup.showAtLocation(
                             findViewById(android.R.id.content),
                             Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
@@ -221,12 +210,11 @@ class MainActivity : ComponentActivity() {
                         customPopup.dismiss()
                         // Remove or hide blurred background when done
                         contentView.removeView(blurredBackground)
-
                     }, 6000) // Dismiss popup after 6 seconds
                 }
-            }
+        }
 
-        fetchDefaultProfileImage()
+
 
 
 
@@ -268,11 +256,13 @@ class MainActivity : ComponentActivity() {
                 }
 
 
+                // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
+                //rewardViewModel.allRewards.observeAsState(listOf())
 
 
 
@@ -284,15 +274,16 @@ class MainActivity : ComponentActivity() {
                         if (isSignedIn.value) {
                             CenterAlignedTopAppBar(
                                 colors = TopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.background,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.background,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
-                                    titleContentColor = MaterialTheme.colorScheme.primary,
-                                    actionIconContentColor = MaterialTheme.colorScheme.primary
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                                 ),
                                 title = {
                                     Text(
                                         "ADHD Task Manager",
+                                        color = MaterialTheme.colorScheme.onPrimary,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -304,6 +295,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Menu,
                                             contentDescription = "Menu"
                                         )
@@ -317,6 +309,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
+                                            tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Person,
                                             contentDescription = "Profile"
                                         )
@@ -518,14 +511,15 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         TodoScreen(
                                             state = state,
-                                            currentUser = googleAuthUiClient,
                                             firestoreViewModel = firestoreViewModel,
                                             onEvent = todoEvent
                                         )
                                     }
 
                                     // Settings Screen
-                                    composable(route = Screen.SettingsScreen.route) {
+                                    composable(
+                                        route = Screen.SettingsScreen.route
+                                    ) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
@@ -533,7 +527,9 @@ class MainActivity : ComponentActivity() {
                                             context = applicationContext,
                                             scope = scope
                                         )
+
                                     }
+
                                     // Leaderboard Screen
                                     composable(
                                         route = Screen.LeaderboardScreen.route
@@ -631,7 +627,6 @@ class MainActivity : ComponentActivity() {
                                             verticalArrangement = Arrangement.SpaceAround
                                         ){
                                             PomodoroTimerScreen(
-                                                settingsViewModel = settingsViewModel, // Pass the instance here
                                                 initialWorkTime = 1500L * 1000L,
                                                 initialBreakTime = 300L * 1000L,
                                                 handleColor = MaterialTheme.colorScheme.primary,
@@ -639,7 +634,6 @@ class MainActivity : ComponentActivity() {
                                                 activeBarColor = MaterialTheme.colorScheme.primary,
                                                 context = applicationContext,
                                                 activity = this@MainActivity,
-                                                modifier = Modifier.size(300.dp)
                                             )
                                         }
                                     }
@@ -649,30 +643,30 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            //rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
 
     override fun onStart() {
         super.onStart()
 
-            firestoreViewModel.getResponse(object : FirebaseCallback {
-                override fun onResponse(response: Response) {
-                    Log.d("LeaderboardScreen", "onResponse called")
-                    response.leaderboardUsers?.let { users ->
-                        users.forEach{ user ->
-                            if (!Final.finalDataList.contains(user)) {
-                                Final.addToList(user)
-                            }
-                            user.username?.let { Log.i(ContentValues.TAG, it) }
-
+        firestoreViewModel.getResponse(object : FirebaseCallback {
+            override fun onResponse(response: Response) {
+                Log.d("LeaderboardScreen", "onResponse called")
+                response.leaderboardUsers?.let { users ->
+                    users.forEach{ user ->
+                        if (!Final.finalDataList.contains(user)) {
+                            Final.addToList(user)
                         }
-                    }
-                    response.exception?.message?.let {
-                        Log.e(ContentValues.TAG, it)
+                        user.username?.let { Log.i(ContentValues.TAG, it) }
+
                     }
                 }
+                response.exception?.message?.let {
+                    Log.e(ContentValues.TAG, it)
+                }
             }
-            )
+        })
     }
 
     private fun showFocusNotification() {

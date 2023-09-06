@@ -25,51 +25,66 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewM
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun LeaderboardScreen() {
-
-    // You should define or fetch this default image URL from a constant or Firebase Storage
-    val defaultImageUrl = "https://firebasestorage.googleapis.com/v0/b/adhdtaskmanager-d532d.appspot.com/o/default-user-profile-picture%2FUntitled.png?alt=media&token=0461fb17-8ef2-4192-9c9d-25dfacfd7420"
+fun LeaderboardScreen(
+    firestoreViewModel: FirestoreViewModel
+) {
 
     // get list of users and sort it by points
-    val usersList = Final.finalDataList
-    val sortedList = usersList.sortedWith(compareByDescending { it.points })
+    val usersList = Final.finalDataList.sortedWith(compareByDescending { it.rewardsPoints })
+    val currentUserId = firestoreViewModel.user.value?.userID
 
-    Row(modifier = Modifier.padding(12.dp)) {
-        Text(
-            text = "Rank",
-            modifier = Modifier.weight(1f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-        // Added space for the Mascot header here
-        Spacer(modifier = Modifier.width(94.dp))
-        Text(
-            text = "Name",
-            modifier = Modifier.weight(2f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-        Text(
-            text = "Country",
-            modifier = Modifier.weight(2f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-        Text(
-            text = "Points",
-            modifier = Modifier.weight(1f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-    }
-    Spacer(modifier = Modifier.height(20.dp))
-
-    LazyColumn(
-        modifier = Modifier,
-        contentPadding = PaddingValues(0.dp, 35.dp, 0.dp)
+    Surface(
+        modifier = Modifier
+            .fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        items(items = sortedList) { element ->
-            LeaderboardCard(user = element, rank = sortedList.indexOf(element) + 1, defaultProfileImageUrl = defaultImageUrl)
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            Row(
+                modifier = Modifier.padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(0.2f))
+                Text(
+                    text = "Rank",
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 18.sp
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = "Name",
+                    modifier = Modifier.weight(2f),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 18.sp
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = "Points",
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 18.sp
+                )
+                Spacer(modifier = Modifier.weight(0.2f))
+            }
+            LazyColumn(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background),
+                contentPadding = PaddingValues(top = 10.dp, bottom = 10.dp)
+            ) {
+                items(usersList.size){user ->
+                    LeaderboardCard(user = usersList[user], rank = user + 1, currentUserId!!)
+                }
+            }
         }
     }
 }

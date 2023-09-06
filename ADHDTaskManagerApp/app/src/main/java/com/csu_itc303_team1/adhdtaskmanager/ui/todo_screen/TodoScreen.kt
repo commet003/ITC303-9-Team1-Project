@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoItem
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
@@ -52,13 +54,14 @@ import kotlinx.coroutines.launch
 
 
 
+@RequiresApi(34)
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
-    usersViewModel: UsersViewModel
+    firestoreViewModel: FirestoreViewModel
 ) {
 
 
@@ -197,7 +200,7 @@ fun TodoScreen(
                             TodoItem(
                                 todo = todo,
                                 onEvent = onEvent,
-                                usersViewModel = usersViewModel,
+                                firestoreViewModel = firestoreViewModel,
                                 showToast = showToast
                             )
                         }
