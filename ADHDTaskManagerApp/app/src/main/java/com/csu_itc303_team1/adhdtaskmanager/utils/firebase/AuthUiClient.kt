@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
