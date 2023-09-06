@@ -55,9 +55,7 @@ fun TasksScreen(
             ActionToolbar(
                 title = AppText.tasks,
                 modifier = Modifier.toolbarActions(),
-                onNavClick = {
-
-                }
+                endAction =
             )
 
             Spacer(modifier = Modifier.smallSpacer())

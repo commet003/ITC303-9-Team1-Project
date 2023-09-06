@@ -78,6 +78,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation("com.google.dagger:hilt-android:2.48")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
     ksp("com.google.dagger:hilt-compiler:2.47")
 
     // Material 3 Components
