@@ -3,7 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
@@ -42,26 +42,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LottieLoaderAnimation
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoItem
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.launch
 
 
-@RequiresApi(34)
+
+
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
-    firestoreViewModel: FirestoreViewModel,
-    currentUser: AuthUiClient,
-    onEvent: (TodoEvent) -> Unit
+    onEvent: (TodoEvent) -> Unit,
+    usersViewModel: UsersViewModel
 ) {
+
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
@@ -84,20 +83,20 @@ fun TodoScreen(
             Scaffold(
                 floatingActionButton = {
                     FloatingActionButton(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
                         onClick = {
                             onEvent(TodoEvent.showDialog)
                             scope.launch {
                                 sheetState.expand()
                             }
-                        }
+                        },
+                        shape = CircleShape
                     ) {
                         Icon(
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             imageVector = Icons.Default.Add,
                             modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primary)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
                                 .height(32.dp)
                                 .width(32.dp),
                             contentDescription = "Add Todo"
@@ -146,36 +145,36 @@ fun TodoScreen(
                                 .background(MaterialTheme.colorScheme.surface),
                             expanded = expanded,
                             onDismissRequest = { expanded = false }) {
-                            SortType.values().forEach { sortType ->
+                            SortOrder.values().forEach { sortOrder ->
                                 DropdownMenuItem(
                                     modifier = Modifier.clip(MaterialTheme.shapes.medium),
                                     onClick = {
                                         expanded = false
-                                        onEvent(TodoEvent.sortBy(sortType))
+                                        onEvent(TodoEvent.sortBy(sortOrder))
                                     },
                                     text = {
-                                        when (sortType.name) {
+                                        when (sortOrder.name) {
+                                            "BY_DEADLINE" -> {
+                                                Text(
+                                                    text = "By Date",
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
                                             "BY_PRIORITY" -> {
                                                 Text(
                                                     text = "By Priority",
                                                     color = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
-                                            "BY_DATE_TIME" -> {
+                                            "BY_DEADLINE_AND_PRIORITY" -> {
                                                 Text(
-                                                    text = "By Date",
+                                                    text = "By Date and Priority",
                                                     color = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
-                                            "BY_COMPLETED" -> {
+                                            "BY_CATEGORY" -> {
                                                 Text(
-                                                    text = "By Completed",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_NOT_COMPLETED" -> {
-                                                Text(
-                                                    text = "By Not Completed",
+                                                    text = "By Category",
                                                     color = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
@@ -195,16 +194,12 @@ fun TodoScreen(
                     ) {
 
                         items(state.todos) { todo ->
-                            if (todo.userID == state.userId) {
-
-                                TodoCard(
-                                    todo = todo,
-                                    currentUser = currentUser,
-                                    firestoreViewModel = firestoreViewModel,
-                                    onEvent = onEvent,
-                                    showToast = showToast
-                                )
-                            }
+                            TodoItem(
+                                todo = todo,
+                                onEvent = onEvent,
+                                usersViewModel = usersViewModel,
+                                showToast = showToast
+                            )
                         }
                     }
 
@@ -212,7 +207,7 @@ fun TodoScreen(
                 }
 
 
-                LottieLoaderAnimation(isVisible = showToast.value)
+                lottieLoaderAnimation(isVisible = showToast.value)
 
                 CustomToastMessage(
                     message = "Congrats on completing a task!",
@@ -239,3 +234,9 @@ fun TodoScreen(
     )
 
 }
+
+
+
+
+
+

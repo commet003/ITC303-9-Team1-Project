@@ -8,33 +8,42 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
+    <!-- Your permissions remain unchanged -->
 
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:name=".utils.notifications.NotificationsApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/new_logo_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.ADHDTaskManager"
         tools:targetApi="tiramisu">
-        <!--for viewing webpage-->
-        <activity android:name=".ui.help_screen.WebViewActivity" />
 
+        <!-- Set VideoSplashActivity as the launcher activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ADHDTaskManager"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="@string/title_activity_video_splash"
             android:theme="@style/Theme.ADHDTaskManager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!-- For viewing webpage -->
+        <activity android:name=".ui.help_screen.WebViewActivity" />
+
+        <!-- Remove the intent-filter from MainActivity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.ADHDTaskManager">
+        </activity>
+
+    </application>
 </manifest>

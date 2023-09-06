@@ -1,11 +1,11 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.theme
+
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -71,39 +71,38 @@ private val DarkColors = darkColorScheme(
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
-
 @Composable
 fun ADHDTaskManagerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     val systemUiController = rememberSystemUiController()
 
-
-    val colors = if (!darkTheme) {
+    val colors = if (darkTheme) {
         systemUiController.setStatusBarColor(
-            color = LightColors.background,
-            darkIcons = true
-        )
-        systemUiController.setNavigationBarColor(
-            color = LightColors.background,
-            darkIcons = true
-        )
-        LightColors
-    } else {
-        systemUiController.setStatusBarColor(
-            color = DarkColors.background,
+            color = md_theme_dark_primary,
             darkIcons = false
         )
         systemUiController.setNavigationBarColor(
-            color = DarkColors.background,
+            color = md_theme_dark_background,
             darkIcons = false
         )
         DarkColors
+    } else {
+        systemUiController.setStatusBarColor(
+            color = md_theme_light_primary,
+            darkIcons = false
+        )
+        systemUiController.setNavigationBarColor(
+            color = md_theme_light_background,
+            darkIcons = true
+        )
+        LightColors
     }
 
     MaterialTheme(
         colorScheme = colors,
+        typography = Typography,
         content = content
     )
 }

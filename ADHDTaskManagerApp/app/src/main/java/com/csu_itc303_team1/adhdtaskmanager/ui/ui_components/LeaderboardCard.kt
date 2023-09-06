@@ -2,6 +2,9 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.ui_components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+// Import CardElevation
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -102,8 +106,6 @@ fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
                     (user.userID != currentUserId) -> MaterialTheme.colorScheme.onSecondaryContainer
                     else -> MaterialTheme.colorScheme.onTertiaryContainer
                 },
-                fontSize = 18.sp,  // Adjusted font size
-                fontStyle = FontStyle.Italic // Added a cursive style for a playful look
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -118,9 +120,15 @@ fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
                 fontSize = 18.sp,  // Adjusted font size
                 textAlign = TextAlign.Center
             )
-
+            Text(
+                text = user.rewardsPoints.toString(),
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 18.sp,  // Adjusted font size
+                textAlign = TextAlign.End
+            )
             Spacer(modifier = Modifier.weight(0.2f))
-
         }
     }
 }
+

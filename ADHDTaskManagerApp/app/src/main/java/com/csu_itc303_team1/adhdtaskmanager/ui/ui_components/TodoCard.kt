@@ -1,183 +1,192 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.ui_components
 
-import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewModelScope
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionResult
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD
-import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD_NAME
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.ext.hasDueDate
+import com.csu_itc303_team1.adhdtaskmanager.utils.ext.hasDueTime
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Category
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 
-@SuppressLint("RememberReturnType")
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun TodoCard(
+internal fun TodoItem(
     todo: Todo,
-    currentUser: AuthUiClient,
-    firestoreViewModel: FirestoreViewModel,
+    showToast: MutableState<Boolean>,
+    usersViewModel: UsersViewModel,
     onEvent: (TodoEvent) -> Unit,
-    showToast: MutableState<Boolean>
+    modifier: Modifier = Modifier,
 ) {
-
-    val showToastTrigger = remember { mutableIntStateOf(0) } // For triggering the toast
+    val showToastTrigger = remember { mutableStateOf(0) } // For triggering the toast
     val showLottieAnimation = remember { mutableStateOf(false) }
 
-
-    LaunchedEffect(showToastTrigger.intValue) {
-        if (showToastTrigger.intValue > 0) {
+    LaunchedEffect(showToastTrigger.value) {
+        if (showToastTrigger.value > 0) {
             showToast.value = true
             delay(3000) // 3 seconds
             showToast.value = false
-            showToastTrigger.intValue = 0 // Reset the trigger
         }
     }
-
-
-    val hours = remember {
-        mutableIntStateOf(0)
-    }
-
-    var offsetX by remember { mutableStateOf(0f) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp)
-            .height(160.dp)
-            .offset { IntOffset(offsetX.roundToInt(), 0) }
-            .clickable {
-                onEvent(TodoEvent.toggleIsClicked(todo))
-                onEvent(TodoEvent.showEditTodoDialog)
-            }
-            .draggable(
-                orientation = Orientation.Horizontal,
-                state = rememberDraggableState { dx ->
-                    offsetX += dx
-                    if (dx > 150.dp.value) {
-                        onEvent(TodoEvent.deleteTodo(todo))
-                    } else if (dx < -150.dp.value) {
-                        onEvent(TodoEvent.toggleCompleted(todo))
-                        if (!todo.isCompleted) {
-                            firestoreViewModel.updateUserRewardsPoints(
-                                TASK_COMPLETED_REWARD,
-                                currentUser.getSignedInUser()!!.userID.toString()
-                            )
-                            firestoreViewModel.viewModelScope.launch {
-                                firestoreViewModel.incrementRewardCount(
-                                    currentUser.getSignedInUser()!!.userID.toString(),
-                                    TASK_COMPLETED_REWARD_NAME
-                                )
-                            }
-                            showToastTrigger.intValue += 1 // Increment to trigger the toast
-                            onEvent(TodoEvent.ToggleLottieAnimation(true))
-                            showLottieAnimation.value
-                        }
-                    }
-                },
-                onDragStopped = {
-                    offsetX = 0f
+    val context = LocalContext.current
+    var show by remember { mutableStateOf(true) }
+    var toastText by remember { mutableStateOf("") }
+    val dismissState = rememberDismissState(
+        confirmValueChange = {
+            when(it) {
+                DismissValue.DismissedToEnd -> {
+                    onEvent(TodoEvent.toggleCompleted(
+                        todo = todo
+                    ))
+                    toastText = "Task Completed"
+                    show = false
+                    showToastTrigger.value += 1 // Increment to trigger the toast
+                    onEvent(TodoEvent.ToggleLottieAnimation(true))
+                    showLottieAnimation.value
+                    true
                 }
-            ),
-        shape = RoundedCornerShape(16.dp)
+                DismissValue.DismissedToStart -> {
+                    onEvent(TodoEvent.deleteTodo(
+                        todo = todo
+                    ))
+                    toastText = "Task Deleted"
+                    show = false
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        },
+        positionalThreshold =  { 200.dp.value },
+    )
+    AnimatedVisibility(
+        show,
+        exit = fadeOut(spring())
     ) {
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.tertiaryContainer),
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, top = 10.dp)
-                    .height(25.dp),
-                verticalAlignment = CenterVertically,
-            ) {
-                Text(
-                    text = todo.title,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    fontSize = 22.sp,
-                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+        SwipeToDismiss(
+            state = dismissState,
+            modifier = Modifier,
+            background = {
+                DismissBackground(dismissState)
+            },
+            dismissContent = {
+                TodoCard(
+                    todo = todo,
+                    onEvent = onEvent,
+                    modifier = modifier
                 )
-            }
-            Row(
-                modifier = Modifier.height(60.dp)
-                    .padding(start = 15.dp, top = 8.dp),
-                verticalAlignment = CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    text = todo.description,
-                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .padding(start = 15.dp, top = 8.dp)
-                    .fillMaxHeight(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = CenterVertically
-            ) {
-                Text(text = todo.priority.name, color = MaterialTheme.colorScheme.onTertiaryContainer)
-                Spacer(Modifier.width(4.dp))
-                Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onTertiaryContainer)
-                Spacer(Modifier.width(4.dp))
-                if (todo.dueTime.isNotEmpty()) {
-                    if (todo.dueTime.slice(0..1).toInt() > 12) {
-                        hours.intValue = todo.dueTime.slice(0..1).toInt() - 12
-                        Text(
-                            text = "${hours.intValue}:${todo.dueTime.slice(3..4)} PM",
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
-                        Text(
-                            text = "${todo.dueTime} AM",
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    } else {
-                        Text(text = "")
-                    }
-                } else {
-                    Text(text = "")
-                }
-            }
+            },
+            directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
+        )
+    }
+    lottieLoaderAnimation(isVisible = showToast.value)
+
+    LaunchedEffect(show) {
+        if (!show) {
+            delay(800)
+            Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
         }
     }
-
-
-    LottieLoaderAnimation(isVisible = showToast.value)
 }
 
-
+@Composable
+fun TodoCard(
+    todo: Todo,
+    onEvent: (TodoEvent) -> Unit,
+    modifier: Modifier = Modifier,
+){
+    Card(
+        elevation = CardDefaults.elevatedCardElevation(4.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = Category.getCategoryByName(todo.category).color?.toArgb()?.let { Color(it) } ?: MaterialTheme.colorScheme.onSurface
+        ),
+        shape = MaterialTheme.shapes.medium,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(all = 8.dp)
+            .height(74.dp)
+            .clickable {
+                onEvent(TodoEvent.toggleIsClicked(todo))
+                onEvent(TodoEvent.showEditTodoDialog) },
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+    ) {
+        Row(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+            CardRibbon(colorInt = Category.getCategoryByName(todo.category).color?.toArgb())
+            Spacer(Modifier.width(8.dp))
+            Column(modifier = Modifier
+                .fillMaxHeight()
+                .background(MaterialTheme.colorScheme.surface)
+                , verticalArrangement = Arrangement.Center) {
+                Text(
+                    text = todo.title,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodyLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+                RelativeDateText(todo = todo)
+            }
+            Spacer(Modifier.weight(1f))
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.surface),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = when(todo.priority) {
+                        1 -> "Low"
+                        2 -> "Medium"
+                        3 -> "High"
+                        else -> "None"
+                                               },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+            Spacer(Modifier.width(8.dp))
+        }
+    }
+}
 
 // Custom Toast Composable
-
 @Composable
 fun CustomToastMessage(
     message: String,
@@ -196,7 +205,7 @@ fun CustomToastMessage(
                 contentAlignment = Alignment.Center,
                 modifier = modifier
                     .wrapContentWidth(align = Alignment.CenterHorizontally) // Adjust width based on content
-                    .wrapContentHeight(align = CenterVertically) // Adjust height based on content
+                    .wrapContentHeight(align = Alignment.CenterVertically) // Adjust height based on content
                     .background(
                         Color(0xFF11143E), // Using the RGBA color you provided for the box background
                         shape = RoundedCornerShape(16.dp)
@@ -221,7 +230,7 @@ fun CustomToastMessage(
 
 
 @Composable
-fun LottieLoaderAnimation(isVisible: Boolean) {
+fun lottieLoaderAnimation(isVisible: Boolean) {
     if (isVisible) {
         val comositeResult: LottieCompositionResult = rememberLottieComposition(
             spec = LottieCompositionSpec.RawRes(com.csu_itc303_team1.adhdtaskmanager.R.raw.animation_llc3c1bg)
@@ -241,3 +250,89 @@ fun LottieLoaderAnimation(isVisible: Boolean) {
         )
     }
 }
+
+@Composable
+internal fun RelativeDateText(todo: Todo) {
+    Text(
+        text = getDueDateAndTime(todo),
+        color = MaterialTheme.colorScheme.onSurface,
+        style = MaterialTheme.typography.bodySmall,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+    )
+}
+
+
+private fun getDueDateAndTime(todo: Todo): String {
+    val stringBuilder = StringBuilder("")
+
+    if (todo.hasDueDate()) {
+        stringBuilder.append(todo.dueDate)
+        stringBuilder.append(" ")
+    }
+
+    if (todo.hasDueTime()) {
+        stringBuilder.append("at ")
+        stringBuilder.append(todo.dueTime)
+    }
+
+    return stringBuilder.toString()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DismissBackground(dismissState: DismissState) {
+    val color = when (dismissState.dismissDirection) {
+        DismissDirection.StartToEnd -> Color(0xFF1DE9B6)
+        DismissDirection.EndToStart -> Color(0xFFFF1744)
+        null -> Color.Transparent
+    }
+    val direction = dismissState.dismissDirection
+
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(12.dp, 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        if (direction == DismissDirection.StartToEnd) {
+            Icon(
+                Icons.Default.CheckCircle,
+                tint = Color.Black,
+                contentDescription = "Complete Task"
+            )
+        }
+        Spacer(modifier = Modifier)
+        if (direction == DismissDirection.EndToStart) {
+            Icon(
+                Icons.Default.Delete,
+                tint = Color.Black,
+
+                contentDescription = "Delete Task"
+            )
+        }
+    }
+}
+
+
+@Composable
+internal fun CardRibbon(colorInt: Int?, modifier: Modifier = Modifier) {
+    val ribbonColor = if (colorInt != null) {
+        Color(colorInt)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
+    Spacer(
+        modifier
+            .width(22.dp)
+            .fillMaxHeight()
+            .padding(end = 8.dp)
+            .background(ribbonColor),
+    )
+}
+
+
+

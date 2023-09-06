@@ -51,9 +51,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.utils.ext.card
+import com.csu_itc303_team1.adhdtaskmanager.utils.ext.dropdownSelector
+import com.csu_itc303_team1.adhdtaskmanager.utils.ext.smallSpacer
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Category
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
@@ -88,7 +93,8 @@ fun AddEditTodoDialog(
 
         state.title = thisTodo?.title ?: ""
         state.description = thisTodo?.description ?: ""
-        state.priority = thisTodo?.priority ?: Priority.LOW
+        state.priority = (thisTodo?.priority ?: Priority.None.value) as Int
+        state.category = thisTodo?.category ?: ""
         state.dueDate = (thisTodo?.dueDate ?: LocalDate.now()).toString()
         state.dueTime = (thisTodo?.dueTime ?: LocalTime.now()).toString()
     }
@@ -171,16 +177,17 @@ fun AddEditTodoDialog(
     }
 
     var priorityExpandedMenu by remember { mutableStateOf(false) }
-    var prioritySelection by remember { mutableStateOf("") }
+    var categoryExpandedMenu by remember { mutableStateOf(false) }
+    var prioritySelection by remember { mutableIntStateOf(0) }
+    var categorySelection by remember { mutableStateOf("") }
     if (state.showEditTodoDialog) {
-        prioritySelection = thisTodo?.priority?.name ?: ""
+        prioritySelection = thisTodo?.priority ?: 0
+        categorySelection = thisTodo?.category ?: ""
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(top = 10.dp, bottom = 10.dp),
+        modifier = modifier
+            .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -188,7 +195,7 @@ fun AddEditTodoDialog(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -204,111 +211,353 @@ fun AddEditTodoDialog(
             )
         }
 
-
-
-        Column(
+        TextField(
             modifier = Modifier
+                .border(
+                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                    shape = MaterialTheme.shapes.medium
+                )
+                .fillMaxWidth(0.9f),
+            singleLine = true,
+            value = if (state.showDialog){
+                state.title
+            }else {
+                thisTodo?.title ?: ""
+            }
+            ,
+            onValueChange = {
+                if (state.showDialog){
+                    onEvent(TodoEvent.setTitle(it))
+                } else if (state.showEditTodoDialog){
+                    thisTodo?.title = it
+                    onEvent(TodoEvent.setTitle(it))
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
+            shape = MaterialTheme.shapes.medium,
+            isError = state.titleError,
+            label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
+        )
+        TextField(
+            modifier = Modifier
+                .border(
+                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                    shape = MaterialTheme.shapes.medium
+                )
+                .fillMaxWidth(0.9f),
+            singleLine = false,
+            maxLines = 4,
+            value = if (state.showDialog) {
+                state.description
+            } else {
+                thisTodo?.description ?: ""
+            },
+            onValueChange = {
+                if (state.showDialog){
+                    onEvent(TodoEvent.setDescription(it))
+                } else if (state.showEditTodoDialog){
+                    thisTodo?.description = it
+                    onEvent(TodoEvent.setDescription(it))
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
+            shape = MaterialTheme.shapes.medium,
+            isError = state.descriptionError,
+            label = { Text("Provide a brief description") } // This line adds a hint to the TextField
+        )
+
+
+        // Date Picker && Time Picker
+        val pickedDate by remember {            // date variable stored to remember
+            mutableStateOf(LocalDateTime.now())
+        }
+
+        val editedPickedDate by remember { // date variable stored to remember
+            mutableStateOf(LocalDateTime.now())
+        }
+
+        val dateFormatter: DatePickerFormatter = remember {
+            object : DatePickerFormatter {
+                override fun formatDate(
+                    dateMillis: Long?,
+                    locale: CalendarLocale,
+                    forContentDescription: Boolean
+                ): String? {
+                    return dateMillis?.let {
+                        val date = LocalDateTime.ofEpochSecond(
+                            it / 1000,
+                            0,
+                            ZoneOffset.UTC
+                        )
+                        date.toString()
+                    }
+                }
+
+                override fun formatMonthYear(
+                    monthMillis: Long?,
+                    locale: CalendarLocale
+                ): String? {
+                    // Format month and year
+                    return monthMillis?.let {
+                        val date = LocalDateTime.ofEpochSecond(
+                            it / 1000,
+                            0,
+                            ZoneOffset.UTC
+                        )
+                        date.toString()
+                    }
+                }
+            }
+        }
+
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = pickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+            yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
+            initialDisplayMode = DisplayMode.Picker,
+            initialDisplayedMonthMillis = null
+        )
+
+        val editDatePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = editedPickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+            yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
+            initialDisplayMode = DisplayMode.Picker,
+            initialDisplayedMonthMillis = null
+        )
+
+        val timePickerState = rememberTimePickerState(
+            initialHour = LocalTime.now().hour,
+            initialMinute = LocalTime.now().minute,
+            is24Hour = false
+        )
+
+        val editTimePickerState = rememberTimePickerState(
+            initialHour = LocalTime.now().hour,
+            initialMinute = LocalTime.now().minute,
+            is24Hour = false
+        )
+
+
+        if (state.showDateSelector || state.showEditDateSelector) {
+            Column {
+                DatePickerDialog(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.CenterHorizontally),
+                    onDismissRequest = { onEvent(TodoEvent.hideDateSelector) },
+                    confirmButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                if (state.showDialog){
+                                    dateFormatter.formatDate(
+                                        datePickerState.selectedDateMillis,
+                                        CalendarLocale.getDefault()
+                                    )
+                                        ?.let { TodoEvent.setDueDate(it.dropLast(6)) }
+                                        ?.let { onEvent(it) }
+                                    onEvent(TodoEvent.hideDateSelector)
+                                }else if (state.showEditTodoDialog){
+                                    TodoEvent.setDueDate(
+                                        dateFormatter.formatDate(
+                                            editDatePickerState.selectedDateMillis,
+                                            CalendarLocale.getDefault()
+                                        )?.dropLast(6) ?: ""
+                                    )
+                                    thisTodo?.dueDate = dateFormatter.formatDate(
+                                        editDatePickerState.selectedDateMillis,
+                                        CalendarLocale.getDefault()
+                                    )?.dropLast(6) ?: ""
+                                    onEvent(TodoEvent.hideEditDateSelector)
+                                }
+
+                            }) {
+                            Text(text = "Confirm")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+
+                            onClick = {
+                                if (state.showDialog) {
+                                    onEvent(TodoEvent.hideDateSelector)
+                                } else if (state.showEditTodoDialog){
+                                    onEvent(TodoEvent.hideEditDateSelector)
+                                }
+                            }) {
+                            Text(text = "Cancel")
+                        }
+                    },
+                    shape = MaterialTheme.shapes.large,
+                    content = {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            DatePicker(
+                                state = if (state.showDialog){
+                                    datePickerState
+                                } else if (state.showEditTodoDialog){
+                                    editDatePickerState
+                                } else {
+                                    datePickerState
+                                },
+                                showModeToggle = false,
+                                title = null
+                            )
+                        }
+                    },
+                )
+            }
+        }
+
+        if (state.showTimeSelector || state.showEditTimeSelector) {
+            Column {
+                // Time Picker Dialog
+                DatePickerDialog(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    onDismissRequest = {
+                        if(state.showDialog) {
+                            onEvent(TodoEvent.hideTimeSelector)
+                        } else {
+                            onEvent(TodoEvent.hideEditTimeSelector)
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                if (state.showDialog) {
+                                    onEvent(
+                                        TodoEvent.setDueTime(
+                                            ("%02d".format(timePickerState.hour)
+                                                    + ":" + "%02d".format(timePickerState.minute))
+                                        )
+                                    )
+                                    onEvent(TodoEvent.hideTimeSelector)
+                                } else{
+                                    onEvent(
+                                        TodoEvent.setDueTime(
+                                            ("%02d".format(editTimePickerState.hour)
+                                                    + ":" + "%02d".format(editTimePickerState.minute))
+                                        )
+                                    )
+
+                                    thisTodo?.dueTime = ("%02d".format(editTimePickerState.hour)
+                                            + ":" + "%02d".format(editTimePickerState.minute))
+
+                                    onEvent(TodoEvent.hideEditTimeSelector)
+                                }
+
+                            }) {
+                            Text(text = "Confirm")
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                if (state.showDialog) {
+                                    onEvent(TodoEvent.hideTimeSelector)
+                                } else{
+                                    onEvent(TodoEvent.hideEditTimeSelector)
+                                }
+                            }) {
+                            Text(text = "Cancel")
+                        }
+                    },
+                    shape = MaterialTheme.shapes.large,
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 25.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            TimePicker(
+                                colors = TimePickerDefaults.colors(
+                                    clockDialColor = MaterialTheme.colorScheme.background,
+                                    clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    clockDialUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                    selectorColor = MaterialTheme.colorScheme.primary,
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    periodSelectorBorderColor = MaterialTheme.colorScheme.onPrimary,
+                                    periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                                    periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                                    timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground
+                                ),
+                                state =
+                                if (state.showDialog) {
+                                    timePickerState
+                                } else{
+                                    editTimePickerState
+                                },
+                                layoutType = TimePickerLayoutType.Vertical
+                            )
+                        }
+                    },
+                )
+            }
+
+        }
+
+        // On Button Click it opens the Time Dialog Screen,
+        // the text displays default or whatever is chosen
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier
+                .padding(10.dp)
                 .fillMaxWidth()
-                .height(300.dp),
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextField(
-                modifier = Modifier
-                    .height(65.dp)
-                    .border(
-                        BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .fillMaxWidth(0.9f),
-                singleLine = true,
-                value = if (state.showDialog) {
-                    state.title
-                } else {
-                    thisTodo?.title ?: ""
-                },
-                onValueChange = {
-                    if (state.showDialog) {
-                        onEvent(TodoEvent.setTitle(it))
-                    } else if (state.showEditTodoDialog) {
-                        thisTodo?.title = it
-                        onEvent(TodoEvent.setTitle(it))
-                    }
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                shape = MaterialTheme.shapes.medium,
-                isError = state.titleError,
-                label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
-            )
-            TextField(
-                modifier = Modifier
-                    .height(65.dp)
-                    .border(
-                        BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .fillMaxWidth(0.9f),
-                singleLine = false,
-                maxLines = 4,
-                value = if (state.showDialog) {
-                    state.description
-                } else {
-                    thisTodo?.description ?: ""
-                },
-                onValueChange = {
-                    if (state.showDialog) {
-                        onEvent(TodoEvent.setDescription(it))
-                    } else if (state.showEditTodoDialog) {
-                        thisTodo?.description = it
-                        onEvent(TodoEvent.setDescription(it))
-                    }
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                shape = MaterialTheme.shapes.medium,
-                isError = state.descriptionError,
-                label = { Text("Provide a brief description") } // This line adds a hint to the TextField
-            )
 
-
-            Row(
-                modifier = Modifier
-                    .padding(top = 10.dp, start = 20.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ){
-
+            Column(
+                modifier.fillMaxWidth()
+            ) {
                 ExposedDropdownMenuBox(
+                    modifier = Modifier.dropdownSelector().card(),
                     expanded = priorityExpandedMenu,
                     onExpandedChange = { priorityExpandedMenu = !priorityExpandedMenu }
                 )
                 {
                     Button(
                         modifier = Modifier
-                            .height(45.dp)
-                            .width(120.dp)
                             .menuAnchor(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        ),
                         onClick = { }) {
+                        Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = prioritySelection.ifEmpty {
-                                "Priority"
-                            },
-                            color = MaterialTheme.colorScheme.onSecondary,
-                            fontWeight = FontWeight.Bold
+                            text = if (prioritySelection == 0) "Priority" else Priority.values()[prioritySelection].name,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Icon(
-                            tint = MaterialTheme.colorScheme.onSecondary,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             imageVector = Icons.Filled.ArrowDropDown,
                             contentDescription = "Priority"
                         )
@@ -316,8 +565,7 @@ fun AddEditTodoDialog(
 
                     ExposedDropdownMenu(
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.secondary)
-                            .clip(RoundedCornerShape(12.dp)),
+                            .background(MaterialTheme.colorScheme.primary),
                         expanded = priorityExpandedMenu,
                         onDismissRequest = { priorityExpandedMenu = false }) {
                         Priority.values().forEach { priorityLevel ->
@@ -326,11 +574,11 @@ fun AddEditTodoDialog(
                                 onClick = {
                                     if (state.showDialog) {
                                         priorityExpandedMenu = false
-                                        prioritySelection = priorityLevel.name
+                                        prioritySelection = priorityLevel.value
                                         onEvent(TodoEvent.setPriority(priorityLevel))
                                     } else if (state.showEditTodoDialog) {
                                         priorityExpandedMenu = false
-                                        thisTodo?.priority = priorityLevel
+                                        thisTodo?.priority = priorityLevel.value
                                         onEvent(TodoEvent.setPriority(priorityLevel))
                                     }
 
@@ -338,347 +586,115 @@ fun AddEditTodoDialog(
                                 text = {
                                     Text(
                                         text = priorityLevel.name,
-                                        color = MaterialTheme.colorScheme.onSecondary
+                                        color = MaterialTheme.colorScheme.onPrimary
                                     )
                                 }
                             )
                         }
                     }
                 }
-            }
 
 
-            Row(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Button(
-                    modifier = Modifier
-                        .height(45.dp)
-                        .width(120.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
-                    onClick = {
-                        if (state.showDialog) {
-                            onEvent(TodoEvent.showTimeSelector)
-                        } else {
-                            onEvent(TodoEvent.showEditTimeSelector)
-                        }
-                    }) {
-                    Text(text = "Due Time", fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.width(15.dp))
-                if (state.showDialog) {
-                    when (timePickerState.is24hour) {
-                        (timePickerState.hour > 12) -> {
-                            amPM.value = "PM"
-                            pmHours.intValue = timePickerState.hour.minus(12)
+                Column(
+                    modifier.fillMaxWidth()
+                ) {
+                    ExposedDropdownMenuBox(
+                        modifier = Modifier.dropdownSelector().card(),
+                        expanded = categoryExpandedMenu,
+                        onExpandedChange = { categoryExpandedMenu = !categoryExpandedMenu }
+                    )
+                    {
+                        Button(
+                            modifier = Modifier
+                                .menuAnchor(),
+                            onClick = { }) {
+                            Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = ("%02d".format(pmHours.intValue.absoluteValue) + ":" + "%02d".format(
-                                    timePickerState.minute
-                                ) + " ${amPM.value}")
+                                text = if (categorySelection.isBlank()) "Category" else Category.getCategoryByName(
+                                    categorySelection
+                                ).name,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.weight(0.9f))
+                            Icon(
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Category"
                             )
                         }
 
-                        (timePickerState.hour == 12) -> {
-                            amPM.value = "PM"
-                            Text(
-                                text = ("%02d".format(timePickerState.hour.absoluteValue) + ":" + "%02d".format(
-                                    timePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
+                        ExposedDropdownMenu(
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.primary),
+                            expanded = categoryExpandedMenu,
+                            onDismissRequest = { categoryExpandedMenu = false }) {
+                            Category.values().forEach { categoryLevel ->
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    onClick = {
+                                        if (state.showDialog) {
+                                            categoryExpandedMenu = false
+                                            categorySelection = categoryLevel.name
+                                            onEvent(TodoEvent.setCategory(categoryLevel))
+                                        } else if (state.showEditTodoDialog) {
+                                            categoryExpandedMenu = false
+                                            thisTodo?.category = categoryLevel.name
+                                            onEvent(TodoEvent.setCategory(categoryLevel))
+                                        }
 
-                        (timePickerState.hour == 0) -> {
-                            amPM.value = "AM"
-                            Text(
-                                text = ("00" + ":" + "%02d".format(
-                                    timePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
-
-                        (timePickerState.hour < 0) -> {
-                            amPM.value = "AM"
-                            Text(
-                                text = ("%02d".format(timePickerState.hour.absoluteValue) + ":" + "%02d".format(
-                                    timePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
-
-                        else -> {
-                            Text(text = "")
-                        }
-                    }
-                } else if (state.showEditTodoDialog) {
-                    when (editTimePickerState.is24hour) {
-                        (editTimePickerState.hour > 12) -> {
-                            amPM.value = "PM"
-                            pmHours.intValue = editTimePickerState.hour.minus(12)
-                            Text(
-                                text = ("%02d".format(pmHours.intValue.absoluteValue) + ":" + "%02d".format(
-                                    editTimePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
-
-                        (editTimePickerState.hour == 12) -> {
-                            amPM.value = "PM"
-                            Text(
-                                text = ("%02d".format(editTimePickerState.hour.absoluteValue) + ":" + "%02d".format(
-                                    editTimePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
-
-                        (editTimePickerState.hour == 0) -> {
-                            amPM.value = "AM"
-                            Text(
-                                text = ("00" + ":" + "%02d".format(
-                                    editTimePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
-
-                        (editTimePickerState.hour < 0) -> {
-                            amPM.value = "AM"
-                            Text(
-                                text = ("%02d".format(editTimePickerState.hour.absoluteValue) + ":" + "%02d".format(
-                                    editTimePickerState.minute
-                                ) + " ${amPM.value}")
-                            )
-                        }
-
-                        else -> {
-                            Text(text = "")
-                        }
-                    }
-                } else {
-                    Text(text = "")
-                }
-            }
-
-            // A New Row containing Two Columns. One for Date, and one for Time
-            Row(
-                modifier = Modifier
-                    .padding(start = 20.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    modifier = Modifier
-                        .height(45.dp)
-                        .width(120.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
-                    onClick = {
-                        if (state.showDialog) {
-                            onEvent(TodoEvent.showDateSelector)
-                        } else {
-                            onEvent(TodoEvent.showEditDateSelector)
-                        }
-                    }
-                )
-                {
-                    Text(text = "Due Date", fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.width(15.dp))
-                Text(text = state.dueDate)
-            }
-
-
-
-            if (state.showDateSelector || state.showEditDateSelector) {
-                Column {
-                    DatePickerDialog(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.CenterHorizontally),
-                        onDismissRequest = { onEvent(TodoEvent.hideDateSelector) },
-                        confirmButton = {
-                            Button(
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                ),
-                                onClick = {
-                                    if (state.showDialog) {
-                                        dateFormatter.formatDate(
-                                            datePickerState.selectedDateMillis,
-                                            CalendarLocale.getDefault()
-                                        )
-                                            ?.let { TodoEvent.setDueDate(it.dropLast(6)) }
-                                            ?.let { onEvent(it) }
-                                        onEvent(TodoEvent.hideDateSelector)
-                                    } else if (state.showEditTodoDialog) {
-                                        TodoEvent.setDueDate(
-                                            dateFormatter.formatDate(
-                                                editDatePickerState.selectedDateMillis,
-                                                CalendarLocale.getDefault()
-                                            )?.dropLast(6) ?: ""
-                                        )
-                                        thisTodo?.dueDate = dateFormatter.formatDate(
-                                            editDatePickerState.selectedDateMillis,
-                                            CalendarLocale.getDefault()
-                                        )?.dropLast(6) ?: ""
-                                        onEvent(TodoEvent.hideEditDateSelector)
-                                    }
-
-                                }) {
-                                Text(text = "Confirm")
-                            }
-                        },
-                        dismissButton = {
-                            Button(
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                ),
-
-                                onClick = {
-                                    if (state.showDialog) {
-                                        onEvent(TodoEvent.hideDateSelector)
-                                    } else if (state.showEditTodoDialog) {
-                                        onEvent(TodoEvent.hideEditDateSelector)
-                                    }
-                                }) {
-                                Text(text = "Cancel")
-                            }
-                        },
-                        shape = MaterialTheme.shapes.large,
-                        content = {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                DatePicker(
-                                    state = if (state.showDialog) {
-                                        datePickerState
-                                    } else if (state.showEditTodoDialog) {
-                                        editDatePickerState
-                                    } else {
-                                        datePickerState
                                     },
-                                    showModeToggle = false,
-                                    title = null
+                                    text = {
+                                        Text(
+                                            text = categoryLevel.name,
+                                            color = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    }
                                 )
                             }
-                        },
-                    )
-                }
-            }
+                        }
+                    }
 
-            if (state.showTimeSelector || state.showEditTimeSelector) {
-                Column {
-                    // Time Picker Dialog
-                    DatePickerDialog(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        onDismissRequest = {
+
+
+                    Button(
+                        modifier = Modifier.dropdownSelector().card(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        onClick = {
                             if (state.showDialog) {
-                                onEvent(TodoEvent.hideTimeSelector)
+                                onEvent(TodoEvent.showTimeSelector)
                             } else {
-                                onEvent(TodoEvent.hideEditTimeSelector)
+                                onEvent(TodoEvent.showEditTimeSelector)
                             }
-                        },
-                        confirmButton = {
-                            Button(
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                ),
-                                onClick = {
-                                    if (state.showDialog) {
-                                        onEvent(
-                                            TodoEvent.setDueTime(
-                                                ("%02d".format(timePickerState.hour)
-                                                        + ":" + "%02d".format(timePickerState.minute))
-                                            )
-                                        )
-                                        onEvent(TodoEvent.hideTimeSelector)
-                                    } else {
-                                        onEvent(
-                                            TodoEvent.setDueTime(
-                                                ("%02d".format(editTimePickerState.hour)
-                                                        + ":" + "%02d".format(editTimePickerState.minute))
-                                            )
-                                        )
-
-                                        thisTodo?.dueTime = ("%02d".format(editTimePickerState.hour)
-                                                + ":" + "%02d".format(editTimePickerState.minute))
-
-                                        onEvent(TodoEvent.hideEditTimeSelector)
-                                    }
-
-                                }) {
-                                Text(text = "Confirm")
+                        }) {
+                        Text(text = "Time", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        modifier = Modifier.dropdownSelector().card(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        onClick = {
+                            if (state.showDialog) {
+                                onEvent(TodoEvent.showDateSelector)
+                            } else {
+                                onEvent(TodoEvent.showEditDateSelector)
                             }
-                        },
-                        dismissButton = {
-                            Button(
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                ),
-                                onClick = {
-                                    if (state.showDialog) {
-                                        onEvent(TodoEvent.hideTimeSelector)
-                                    } else {
-                                        onEvent(TodoEvent.hideEditTimeSelector)
-                                    }
-                                }) {
-                                Text(text = "Cancel")
-                            }
-                        },
-                        shape = MaterialTheme.shapes.large,
-                        content = {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 25.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                TimePicker(
-                                    colors = TimePickerDefaults.colors(
-                                        clockDialColor = MaterialTheme.colorScheme.background,
-                                        clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
-                                        selectorColor = MaterialTheme.colorScheme.primary,
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        periodSelectorBorderColor = MaterialTheme.colorScheme.onPrimary,
-                                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
-                                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
-                                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground,
-                                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
-                                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
-                                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onBackground
-                                    ),
-                                    state =
-                                    if (state.showDialog) {
-                                        timePickerState
-                                    } else {
-                                        editTimePickerState
-                                    },
-                                    layoutType = TimePickerLayoutType.Vertical
-                                )
-                            }
-                        },
+                        }
                     )
+                    {
+                        Text(text = "Date", fontWeight = FontWeight.Bold)
+                    }
                 }
-
             }
         }
+        Modifier.smallSpacer()
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,

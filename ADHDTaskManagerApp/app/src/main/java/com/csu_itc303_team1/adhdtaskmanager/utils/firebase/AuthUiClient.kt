@@ -166,14 +166,18 @@ class AuthUiClient(
     }
 
     // Update anonymous users profile username
+// Update anonymous users profile username
     suspend fun updateUsername(username: String): SignInResult {
         return try {
             val user = auth.currentUser
+
             user?.updateProfile(
                 com.google.firebase.auth.UserProfileChangeRequest.Builder()
                     .setDisplayName(username)
                     .build()
             )?.await()
+            
+
             SignInResult(
                 data = user?.run {
                     UserData(

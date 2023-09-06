@@ -19,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 // Switch Row
 
@@ -30,11 +32,17 @@ fun SwitchRow(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     enabled: Boolean = true,
+    titleColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified,  // Default value if not provided
+    titleFontWeight: androidx.compose.ui.text.font.FontWeight = androidx.compose.ui.text.font.FontWeight.Normal,  // Default value if not provided
+    descColor: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Unspecified,
+    titleFontSize: TextUnit = MaterialTheme.typography.bodyMedium.fontSize
+
+
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
 
@@ -47,15 +55,19 @@ fun SwitchRow(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = titleFontSize),
                 maxLines = 1,
-                modifier = Modifier.alpha(contentAlpha)
+                modifier = Modifier.alpha(contentAlpha),
+                color = titleColor,
+                fontWeight = titleFontWeight
             )
+
 
             Text(
                 text = desc,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.alpha(contentAlpha)
+                modifier = Modifier.alpha(contentAlpha),
+                color = descColor  // Apply the color
             )
         }
 

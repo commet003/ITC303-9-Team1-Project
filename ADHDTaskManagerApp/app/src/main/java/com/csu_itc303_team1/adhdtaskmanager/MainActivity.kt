@@ -74,10 +74,12 @@ import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
@@ -85,6 +87,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
@@ -94,6 +97,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -101,6 +105,8 @@ import net.sqlcipher.database.SupportFactory
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
+
+
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
     private val firestoreViewModel by viewModels<FirestoreViewModel>()
@@ -115,27 +121,37 @@ class MainActivity : ComponentActivity() {
             "todo.db"
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
-
-
+    @SuppressLint("StaticFieldLeak")
     private lateinit var navController: NavHostController
 
 
     private val googleAuthUiClient by lazy {
-        AuthUiClient(
-            firestoreViewModel = firestoreViewModel,
-            oneTapClient = Identity.getSignInClient(applicationContext)
-        )
-    }
+    AuthUiClient(
+        firestoreViewModel = firestoreViewModel,
+        oneTapClient = Identity.getSignInClient(applicationContext)
+    )
+}
 
     // Boolean value to check if the user is signed in or not
     private val isSignedIn by lazy {
         mutableStateOf(false)
     }
 
+
+    private var defaultProfileImageUrl: String? = null
+
+    fun fetchDefaultProfileImage() {
+        val storageReference = FirebaseStorage.getInstance().reference
+        val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")
+
+        defaultProfileImageRef.downloadUrl.addOnSuccessListener { uri ->
+            defaultProfileImageUrl = uri.toString()
+        }
+    }
+
     @RequiresApi(34)
     @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -149,13 +165,12 @@ class MainActivity : ComponentActivity() {
             }
         )
 
-        lifecycleScope.launch {
-            googleAuthUiClient.addAuthStateListener {
-                isSignedIn.value = it
 
-                if (it) { // if signed in
 
-                    // Define contentView here
+        googleAuthUiClient.addAuthStateListener {
+            isSignedIn.value = it
+            if (it) { // if signed in
+        // Define contentView here
                     val contentView = findViewById<ViewGroup>(android.R.id.content)
 
                     // Capture and blur screenshot
@@ -182,6 +197,7 @@ class MainActivity : ComponentActivity() {
                     val lottieAnimation = customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
                     lottieAnimation.playAnimation()
 
+
                     // Create a PopupWindow with custom view
                     val customPopup = PopupWindow(
                         customToastRoot,
@@ -191,7 +207,13 @@ class MainActivity : ComponentActivity() {
                     )
                     customPopup.animationStyle = android.R.style.Animation_Toast
                     if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                        customPopup.showAtLocation(findViewById(android.R.id.content), Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 0)
+
+                        customPopup.showAtLocation(
+                            findViewById(android.R.id.content),
+                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                            0,
+                            0
+                        )
                     }
 
                     // Use a Handler to control the duration of the PopupWindow
@@ -199,12 +221,12 @@ class MainActivity : ComponentActivity() {
                         customPopup.dismiss()
                         // Remove or hide blurred background when done
                         contentView.removeView(blurredBackground)
-                    }, 5000) // Dismiss popup after 6 seconds
+
+                    }, 6000) // Dismiss popup after 6 seconds
                 }
             }
-        }
 
-
+        fetchDefaultProfileImage()
 
 
 
@@ -503,9 +525,7 @@ class MainActivity : ComponentActivity() {
                                     }
 
                                     // Settings Screen
-                                    composable(
-                                        route = Screen.SettingsScreen.route
-                                    ) {
+                                    composable(route = Screen.SettingsScreen.route) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
@@ -513,9 +533,7 @@ class MainActivity : ComponentActivity() {
                                             context = applicationContext,
                                             scope = scope
                                         )
-
                                     }
-
                                     // Leaderboard Screen
                                     composable(
                                         route = Screen.LeaderboardScreen.route
@@ -613,6 +631,7 @@ class MainActivity : ComponentActivity() {
                                             verticalArrangement = Arrangement.SpaceAround
                                         ){
                                             PomodoroTimerScreen(
+                                                settingsViewModel = settingsViewModel, // Pass the instance here
                                                 initialWorkTime = 1500L * 1000L,
                                                 initialBreakTime = 300L * 1000L,
                                                 handleColor = MaterialTheme.colorScheme.primary,

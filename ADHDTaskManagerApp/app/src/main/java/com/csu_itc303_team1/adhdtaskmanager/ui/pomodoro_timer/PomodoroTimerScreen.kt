@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.isDoNotDisturbEnabled
 import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
 import kotlinx.coroutines.delay
@@ -44,6 +46,7 @@ import kotlin.math.sin
 
 @Composable
 fun PomodoroTimerScreen(
+    settingsViewModel: SettingsViewModel,
     initialWorkTime: Long,
     initialBreakTime: Long,
     handleColor: Color,
@@ -55,23 +58,31 @@ fun PomodoroTimerScreen(
     context: Context,
     activity: Activity
 ) {
+    val workTime = settingsViewModel.workTimerValue.value?.let {
+        it.toLong() * 60000 // Convert minutes to milliseconds
+    } ?: initialWorkTime
+
+    val breakTime = settingsViewModel.breakTimerValue.value?.let {
+        it.toLong() * 60000 // Convert minutes to milliseconds
+    } ?: initialBreakTime
+
+    // Rest of your existing code remains the same...
     var size by remember { mutableStateOf(IntSize.Zero) }
     var progress by remember { mutableFloatStateOf(initialValue) }
     var currentTime by remember { mutableLongStateOf(0L) }
     var timerRoundsCount by remember { mutableIntStateOf(4) }
     var isTimerRunning by remember { mutableStateOf(false) }
-    var isWorkTime by remember { mutableStateOf(false) }
-    var isBreakTime by remember { mutableStateOf(true) }
+    var isWorkTime by remember { mutableStateOf(true) }  // Set this to true
+    var isBreakTime by remember { mutableStateOf(false) } // Set this to false
     var seconds by remember { mutableIntStateOf(0) }
-    val workTime by remember { mutableLongStateOf(initialWorkTime) }
-    val breakTime by remember { mutableLongStateOf(initialBreakTime) }
-    //var workTimeInput by remember { mutableStateOf("") }
-    //var breakTimeInput by remember { mutableStateOf("") }
+    var workTimeInput by remember { mutableStateOf("") }
+    var breakTimeInput by remember { mutableStateOf("") }
+
 
     /*TextField(
         value = workTimeInput,
         onValueChange = {
-            if(it.all { char -> char.isDigit() }) {
+            if (it.all { char -> char.isDigit() }) {
                 workTimeInput = it
             }
         },
@@ -82,20 +93,15 @@ fun PomodoroTimerScreen(
     TextField(
         value = breakTimeInput,
         onValueChange = {
-            if(it.all { char -> char.isDigit() }) {
+            if (it.all { char -> char.isDigit() }) {
                 breakTimeInput = it
             }
         },
         modifier = Modifier.padding(all = 16.dp),
         label = { Text("Enter break time in minutes", color = Color(0, 50, 140)) } // Navy blue text
-    )
+    )*/
 
-    if (workTimeInput.isNotEmpty()) {
-        workTime = workTimeInput.toLong() * 60000 // convert minutes to milliseconds
-    }
-    if (breakTimeInput.isNotEmpty()) {
-        breakTime = breakTimeInput.toLong() * 60000 // convert minutes to milliseconds
-    }*/
+
 
     LaunchedEffect(key1 = isTimerRunning, key2 = currentTime) {
         if (currentTime > 0 && isTimerRunning) {
@@ -130,7 +136,6 @@ fun PomodoroTimerScreen(
             }
         }
     }
-
     LaunchedEffect(key1 = isTimerRunning, key2 = isBreakTime) {
         if (isTimerRunning && isDoNotDisturbEnabled(context) && !isBreakTime) {
             toggleDoNotDisturb(context, activity)
@@ -138,6 +143,7 @@ fun PomodoroTimerScreen(
             toggleDoNotDisturb(context, activity)
         }
     }
+
 
     Row {
         Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
