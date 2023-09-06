@@ -22,10 +22,10 @@ import java.time.format.DateTimeFormatter
 fun CompletedTaskCard(todo: Todo) {
 
     // If completion date = "" then make parsedDate Minimum Date
-    val parsedDate: LocalDateTime = if (todo.completedDate == ""){
+    val parsedDate: LocalDateTime = if (todo.completionDate == ""){
         LocalDateTime.MIN
     } else {
-        LocalDateTime.parse(todo.completedDate, DateTimeFormatter.ISO_DATE_TIME)
+        LocalDateTime.parse(todo.completionDate, DateTimeFormatter.ISO_DATE_TIME)
 
     }
 
@@ -70,12 +70,7 @@ fun CompletedTaskCard(todo: Todo) {
                 modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = when(todo.priority) {
-                    1 -> "Low"
-                    2 -> "Medium"
-                    3 -> "High"
-                    else -> "None"
-                },)
+                Text(text = todo.priority.name)
                 Spacer(Modifier.width(4.dp))
                 Text(text = todo.dueDate)
                 Spacer(Modifier.width(4.dp))

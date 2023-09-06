@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -48,14 +49,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.csu_itc303_team1.adhdtaskmanager.utils.ext.card
-import com.csu_itc303_team1.adhdtaskmanager.utils.ext.dropdownSelector
-import com.csu_itc303_team1.adhdtaskmanager.utils.ext.smallSpacer
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Category
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
@@ -88,32 +84,25 @@ fun AddEditTodoDialog(
 
         state.title = thisTodo?.title ?: ""
         state.description = thisTodo?.description ?: ""
-        state.priority = (thisTodo?.priority ?: Priority.None.value) as Int
-        state.category = thisTodo?.category ?: ""
+        state.priority = thisTodo?.priority ?: Priority.LOW
         state.dueDate = (thisTodo?.dueDate ?: LocalDate.now()).toString()
         state.dueTime = (thisTodo?.dueTime ?: LocalTime.now()).toString()
     }
 
 
     var priorityExpandedMenu by remember { mutableStateOf(false) }
-    var categoryExpandedMenu by remember { mutableStateOf(false) }
-    var prioritySelection by remember { mutableIntStateOf(0) }
-    var categorySelection by remember { mutableStateOf("") }
+    var prioritySelection by remember { mutableStateOf("") }
     if (state.showEditTodoDialog) {
-        prioritySelection = thisTodo?.priority ?: 0
-        categorySelection = thisTodo?.category ?: ""
+        prioritySelection = thisTodo?.priority?.name ?: ""
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -129,66 +118,128 @@ fun AddEditTodoDialog(
             )
         }
 
-        TextField(
-            modifier = Modifier
-                .border(
+
+
+        Column(
+            modifier = modifier.height(200.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            TextField(
+                modifier = Modifier.border(
                     BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
                     shape = MaterialTheme.shapes.medium
                 )
-                .fillMaxWidth(0.9f),
-            singleLine = true,
-            value = if (state.showDialog){
-                state.title
-            }else {
-                thisTodo?.title ?: ""
+                    .width(280.dp),
+                singleLine = true,
+                value = if (state.showDialog){
+                    state.title
+                }else {
+                    thisTodo?.title ?: ""
+                }
+                ,
+                onValueChange = {
+                    if (state.showDialog){
+                        onEvent(TodoEvent.setTitle(it))
+                    } else if (state.showEditTodoDialog){
+                        thisTodo?.title = it
+                        onEvent(TodoEvent.setTitle(it))
+                    }
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+                shape = MaterialTheme.shapes.medium,
+                isError = state.titleError,
+                label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
+            )
+            TextField(
+                modifier = Modifier.border(
+                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                    shape = MaterialTheme.shapes.medium
+                )
+                    .width(280.dp),
+                singleLine = false,
+                maxLines = 4,
+                value = if (state.showDialog) {
+                    state.description
+                } else {
+                    thisTodo?.description ?: ""
+                },
+                onValueChange = {
+                    if (state.showDialog){
+                        onEvent(TodoEvent.setDescription(it))
+                    } else if (state.showEditTodoDialog){
+                        thisTodo?.description = it
+                        onEvent(TodoEvent.setDescription(it))
+                    }
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
+                shape = MaterialTheme.shapes.medium,
+                isError = state.descriptionError,
+                label = { Text("Provide a brief description") } // This line adds a hint to the TextField
+            )
+        }
+
+        ExposedDropdownMenuBox(
+            expanded = priorityExpandedMenu,
+            onExpandedChange = { priorityExpandedMenu = !priorityExpandedMenu }
+        )
+        {
+            Button(
+                modifier = Modifier
+                    .width(130.dp)
+                    .menuAnchor(),
+                onClick = { }) {
+                Text(
+                    text = prioritySelection.ifEmpty {
+                        "Priority"
+                    },
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Priority"
+                )
             }
-            ,
-            onValueChange = {
-                if (state.showDialog){
-                    onEvent(TodoEvent.setTitle(it))
-                } else if (state.showEditTodoDialog){
-                    thisTodo?.title = it
-                    onEvent(TodoEvent.setTitle(it))
+
+            ExposedDropdownMenu(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary),
+                expanded = priorityExpandedMenu,
+                onDismissRequest = { priorityExpandedMenu = false }) {
+                Priority.values().forEach { priorityLevel ->
+                    DropdownMenuItem(
+                        modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                        onClick = {
+                            if (state.showDialog){
+                                priorityExpandedMenu = false
+                                prioritySelection = priorityLevel.name
+                                onEvent(TodoEvent.setPriority(priorityLevel))
+                            } else if (state.showEditTodoDialog){
+                                priorityExpandedMenu = false
+                                thisTodo?.priority = priorityLevel
+                                onEvent(TodoEvent.setPriority(priorityLevel))
+                            }
+
+                        },
+                        text = {
+                            Text(
+                                text = priorityLevel.name,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    )
                 }
-            },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            shape = MaterialTheme.shapes.medium,
-            isError = state.titleError,
-            label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
-        )
-        TextField(
-            modifier = Modifier
-                .border(
-                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-                    shape = MaterialTheme.shapes.medium
-                )
-                .fillMaxWidth(0.9f),
-            singleLine = false,
-            maxLines = 4,
-            value = if (state.showDialog) {
-                state.description
-            } else {
-                thisTodo?.description ?: ""
-            },
-            onValueChange = {
-                if (state.showDialog){
-                    onEvent(TodoEvent.setDescription(it))
-                } else if (state.showEditTodoDialog){
-                    thisTodo?.description = it
-                    onEvent(TodoEvent.setDescription(it))
-                }
-            },
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-            ),
-            shape = MaterialTheme.shapes.medium,
-            isError = state.descriptionError,
-            label = { Text("Provide a brief description") } // This line adds a hint to the TextField
-        )
+            }
+        }
+
 
 
         // Date Picker && Time Picker
@@ -259,6 +310,23 @@ fun AddEditTodoDialog(
             initialMinute = LocalTime.now().minute,
             is24Hour = false
         )
+
+        val amPM = remember {
+            mutableStateOf("")
+        }
+
+        val pmHours = remember {
+            mutableIntStateOf(0)
+        }
+
+        val amPMEdited = remember {
+            mutableStateOf("")
+        }
+
+        val pmHoursEdited = remember {
+            mutableIntStateOf(0)
+        }
+
 
 
         if (state.showDateSelector || state.showEditDateSelector) {
@@ -352,7 +420,7 @@ fun AddEditTodoDialog(
                         } else {
                             onEvent(TodoEvent.hideEditTimeSelector)
                         }
-                    },
+                                       },
                     confirmButton = {
                         Button(
                             colors = ButtonDefaults.buttonColors(
@@ -443,176 +511,95 @@ fun AddEditTodoDialog(
 
         }
 
-        // On Button Click it opens the Time Dialog Screen,
-        // the text displays default or whatever is chosen
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()
-        ) {
 
+        // A New Row containing Two Columns. One for Date, and one for Time
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // On Button Click it opens the date Dialog Screen,
+            // the text displays default or whatever is chosen
             Column(
-                modifier.fillMaxWidth()
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.padding(10.dp)
             ) {
-                ExposedDropdownMenuBox(
-                    modifier = Modifier.dropdownSelector().card(),
-                    expanded = priorityExpandedMenu,
-                    onExpandedChange = { priorityExpandedMenu = !priorityExpandedMenu }
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = {
+                        if (state.showDialog) {
+                            onEvent(TodoEvent.showDateSelector)
+                        } else {
+                            onEvent(TodoEvent.showEditDateSelector)
+                        }
+                    }
                 )
                 {
-                    Button(
-                        modifier = Modifier
-                            .menuAnchor(),
-                        onClick = { }) {
-                        Spacer(modifier = Modifier.weight(1f))
+                    Text(text = "Date", fontWeight = FontWeight.Bold)
+                }
+                Text(text = state.dueDate)
+            }
+            // On Button Click it opens the Time Dialog Screen,
+            // the text displays default or whatever is chosen
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = {
+                        if (state.showDialog) {
+                            onEvent(TodoEvent.showTimeSelector)
+                        } else {
+                            onEvent(TodoEvent.showEditTimeSelector)
+                        }
+                    }) {
+                    Text(text = "Time", fontWeight = FontWeight.Bold)
+                }
+                if (state.showDialog){
+                    if (timePickerState.hour > 12) {
+                        amPM.value = "PM"
+                        pmHours.value = timePickerState.hour - 12
                         Text(
-                            text = if (prioritySelection == 0) "Priority" else Priority.values()[prioritySelection].name,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
+                                timePickerState.minute
+                            ) + " ${amPM.value}")
                         )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Priority"
-                        )
+                    } else if (timePickerState.hour <= 12) {
+                        amPM.value = "AM"
+                        Text(text = state.dueTime + " ${amPM.value}")
+                    } else {
+                        Text(text = "")
                     }
-
-                    ExposedDropdownMenu(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.primary),
-                        expanded = priorityExpandedMenu,
-                        onDismissRequest = { priorityExpandedMenu = false }) {
-                        Priority.values().forEach { priorityLevel ->
-                            DropdownMenuItem(
-                                modifier = Modifier.clip(MaterialTheme.shapes.medium),
-                                onClick = {
-                                    if (state.showDialog) {
-                                        priorityExpandedMenu = false
-                                        prioritySelection = priorityLevel.value
-                                        onEvent(TodoEvent.setPriority(priorityLevel))
-                                    } else if (state.showEditTodoDialog) {
-                                        priorityExpandedMenu = false
-                                        thisTodo?.priority = priorityLevel.value
-                                        onEvent(TodoEvent.setPriority(priorityLevel))
-                                    }
-
-                                },
-                                text = {
-                                    Text(
-                                        text = priorityLevel.name,
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                }
-                            )
-                        }
+                } else {
+                    if (editTimePickerState.hour > 12) {
+                        amPM.value = "PM"
+                        pmHours.value = editTimePickerState.hour - 12
+                        Text(
+                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
+                                editTimePickerState.minute
+                            ) + " ${amPM.value}")
+                        )
+                    } else if (editTimePickerState.hour <= 12) {
+                        amPM.value = "AM"
+                        Text(text = state.dueTime + " ${amPM.value}")
+                    } else {
+                        Text(text = "")
                     }
                 }
 
-
-                Column(
-                    modifier.fillMaxWidth()
-                ) {
-                    ExposedDropdownMenuBox(
-                        modifier = Modifier.dropdownSelector().card(),
-                        expanded = categoryExpandedMenu,
-                        onExpandedChange = { categoryExpandedMenu = !categoryExpandedMenu }
-                    )
-                    {
-                        Button(
-                            modifier = Modifier
-                                .menuAnchor(),
-                            onClick = { }) {
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = if (categorySelection.isBlank()) "Category" else Category.getCategoryByName(
-                                    categorySelection
-                                ).name,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.weight(0.9f))
-                            Icon(
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                imageVector = Icons.Filled.ArrowDropDown,
-                                contentDescription = "Category"
-                            )
-                        }
-
-                        ExposedDropdownMenu(
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primary),
-                            expanded = categoryExpandedMenu,
-                            onDismissRequest = { categoryExpandedMenu = false }) {
-                            Category.values().forEach { categoryLevel ->
-                                DropdownMenuItem(
-                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
-                                    onClick = {
-                                        if (state.showDialog) {
-                                            categoryExpandedMenu = false
-                                            categorySelection = categoryLevel.name
-                                            onEvent(TodoEvent.setCategory(categoryLevel))
-                                        } else if (state.showEditTodoDialog) {
-                                            categoryExpandedMenu = false
-                                            thisTodo?.category = categoryLevel.name
-                                            onEvent(TodoEvent.setCategory(categoryLevel))
-                                        }
-
-                                    },
-                                    text = {
-                                        Text(
-                                            text = categoryLevel.name,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-
-
-                    Button(
-                        modifier = Modifier.dropdownSelector().card(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        onClick = {
-                            if (state.showDialog) {
-                                onEvent(TodoEvent.showTimeSelector)
-                            } else {
-                                onEvent(TodoEvent.showEditTimeSelector)
-                            }
-                        }) {
-                        Text(text = "Time", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Button(
-                        modifier = Modifier.dropdownSelector().card(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        onClick = {
-                            if (state.showDialog) {
-                                onEvent(TodoEvent.showDateSelector)
-                            } else {
-                                onEvent(TodoEvent.showEditDateSelector)
-                            }
-                        }
-                    )
-                    {
-                        Text(text = "Date", fontWeight = FontWeight.Bold)
-                    }
-                }
             }
         }
-        Modifier.smallSpacer()
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,

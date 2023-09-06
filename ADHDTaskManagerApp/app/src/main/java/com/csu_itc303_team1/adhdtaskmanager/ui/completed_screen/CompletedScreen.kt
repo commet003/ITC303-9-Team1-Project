@@ -18,7 +18,7 @@ fun CompletedScreen(state: TodoState) {
         contentPadding = PaddingValues(0.dp, 20.dp, 0.dp)
     ) {
         items(state.todos, {it.id}) { todo ->
-            if (todo.userId == state.userId && todo.completed){
+            if (todo.userID == state.userId && todo.isCompleted){
                 CompletedTaskCard(todo)
             }
         }
