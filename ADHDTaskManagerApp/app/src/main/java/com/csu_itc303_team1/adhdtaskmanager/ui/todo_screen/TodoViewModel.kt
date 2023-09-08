@@ -18,25 +18,58 @@ class TodoViewModel(
 ): ViewModel() {
 
     private val _state = MutableStateFlow(TodoState())
+    private var _sortOrder = MutableStateFlow(SortOrder.BY_DEADLINE)
+    val todos = todoDao.getAllTodos()
+
+
+    fun filterSortTodos(
+        todos: List<Todo>,
+        showCompleted: Boolean,
+        showUncompleted: Boolean = true,
+        sortOrder: SortOrder
+    ): List<Todo> {
+        // filter the tasks
+        val filteredTodos = if (showCompleted) {
+            todos
+        } else if(!showUncompleted) {
+            todos.filter { it.completed }
+        } else {
+            todos.filter { !it.completed }
+        }
+        // sort the tasks
+        return when (sortOrder) {
+            SortOrder.NONE -> filteredTodos
+            SortOrder.BY_DEADLINE -> filteredTodos.sortedWith(
+                compareBy<Todo>{ it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
+            )
+            SortOrder.BY_PRIORITY -> filteredTodos.sortedBy { it.priority }.asReversed()
+            SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTodos.sortedWith(
+                compareBy<Todo>{ it.priority }.reversed()
+                    .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy { it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
+
+            )
+            SortOrder.BY_CATEGORY -> filteredTodos.sortedBy { it.category }
+            SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTodos.sortedWith(
+                compareBy<Todo>{ it.category }
+                    .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
+            )
+        }
+    }
+
+    val state = _state
     private val _sortType = MutableStateFlow(SortType.BY_DATE_TIME)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val _todos = _sortType
-        .flatMapLatest { sortType ->
-            when (sortType) {
-                SortType.BY_DATE_TIME -> todoDao.sortByDueDateAndTime()
-                SortType.BY_PRIORITY -> todoDao.sortByPriority()
-                SortType.BY_COMPLETED -> todoDao.sortByCompleted()
-                SortType.BY_NOT_COMPLETED -> todoDao.sortByNotCompleted()
-            }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
-    val state = combine(_state, _sortType, _todos) { state, sortType, todos ->
-        state.copy(
-            todos = todos,
-            sortType = sortType
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TodoState())
 
     fun onEvent(event: TodoEvent) {
         when (event) {
@@ -216,7 +249,12 @@ class TodoViewModel(
             }
 
             is TodoEvent.sortBy -> {
-                _sortType.value = event.sortType
+                _sortOrder.value = event.sortOrder
+                filterSortTodos(
+                    todos = _state.value.todos,
+                    showCompleted = false,
+                    sortOrder = _sortOrder.value
+                )
             }
 
             TodoEvent.hideEditTodoDialog -> {
@@ -287,7 +325,10 @@ class TodoViewModel(
             TodoEvent.resetTodos -> {
                 viewModelScope.launch {
                     todoDao.getAllTodos().collect {
-                        state.value.todos = it
+                        _state.value.todos = filterSortTodos(
+                            todos = it,
+                            showCompleted = false,
+                            sortOrder = _sortOrder.value)
                     }
                 }
             }

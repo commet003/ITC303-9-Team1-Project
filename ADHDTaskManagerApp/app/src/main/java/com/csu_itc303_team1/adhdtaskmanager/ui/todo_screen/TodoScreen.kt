@@ -3,9 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
-import androidx.compose.foundation.Image
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,6 +24,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -43,12 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
@@ -78,17 +76,17 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 
 
 
+@RequiresApi(34)
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
-    rewardViewModel: RewardViewModel,
-    usersViewModel: UsersViewModel
+    todoViewModel: TodoViewModel,
+    firestoreViewModel: FirestoreViewModel
 ) {
 
-    rewardViewModel.allRewards.observeAsState(listOf())
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Hidden,
@@ -100,6 +98,10 @@ fun TodoScreen(
     val scope = rememberCoroutineScope()
 
     val showToast = remember { mutableStateOf(false) }
+    var sortOrder = remember {SortOrder.NONE}
+    val todos = todoViewModel.todos.collectAsStateWithLifecycle(emptyList())
+
+
 
 
 
@@ -172,66 +174,130 @@ fun TodoScreen(
                                 .background(MaterialTheme.colorScheme.surface),
                             expanded = expanded,
                             onDismissRequest = { expanded = false }) {
+
                             SortType.values().forEach { sortType ->
                                 DropdownMenuItem(
                                     modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    colors = MenuItemColors(
+                                            textColor = MaterialTheme.colorScheme.onSurface,
+                                            leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                            trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                            disabledTextColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        ),
+                                    enabled = sortOrder != SortOrder.NONE,
                                     onClick = {
                                         expanded = false
-                                        onEvent(TodoEvent.sortBy(sortType))
+                                        sortOrder = SortOrder.NONE
                                     },
-                                    text = {
-                                        when (sortType.name) {
-                                            "BY_PRIORITY" -> {
-                                                Text(
-                                                    text = "By Priority",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_DATE_TIME" -> {
-                                                Text(
-                                                    text = "By Date",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_COMPLETED" -> {
-                                                Text(
-                                                    text = "By Completed",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                            "BY_NOT_COMPLETED" -> {
-                                                Text(
-                                                    text = "By Not Completed",
-                                                    color = MaterialTheme.colorScheme.onSurface
-                                                )
-                                            }
-                                        }
-                                    }
+                                    text = { Text("None") }
+                                )
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    colors = MenuItemColors(
+                                        textColor = MaterialTheme.colorScheme.onSurface,
+                                        leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledTextColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    ),
+                                    enabled = sortOrder != SortOrder.BY_DEADLINE,
+                                    onClick = {
+                                        expanded = false
+                                        sortOrder = SortOrder.BY_DEADLINE
+                                    },
+                                    text = { Text("Deadline") }
+                                )
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    colors = MenuItemColors(
+                                        textColor = MaterialTheme.colorScheme.onSurface,
+                                        leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledTextColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    ),
+                                    enabled = sortOrder != SortOrder.BY_PRIORITY,
+                                    onClick = {
+                                        expanded = false
+                                        sortOrder = SortOrder.BY_PRIORITY
+                                    },
+                                    text = { Text("Priority") }
+                                )
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    colors = MenuItemColors(
+                                        textColor = MaterialTheme.colorScheme.onSurface,
+                                        leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledTextColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    ),
+                                    enabled = sortOrder != SortOrder.BY_DEADLINE_AND_PRIORITY,
+                                    onClick = {
+                                        expanded = false
+                                        sortOrder = SortOrder.BY_DEADLINE_AND_PRIORITY
+                                    },
+                                    text = { Text("Deadline and Priority") }
+                                )
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    colors = MenuItemColors(
+                                        textColor = MaterialTheme.colorScheme.onSurface,
+                                        leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledTextColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    ),
+                                    enabled = sortOrder != SortOrder.BY_CATEGORY,
+                                    onClick = {
+                                        expanded = false
+                                        sortOrder = SortOrder.BY_CATEGORY
+                                    },
+                                    text = { Text("Category") }
+                                )
+                                DropdownMenuItem(
+                                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                                    colors = MenuItemColors(
+                                        textColor = MaterialTheme.colorScheme.onSurface,
+                                        leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                        disabledTextColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    ),
+                                    enabled = sortOrder != SortOrder.BY_DEADLINE_AND_CATEGORY,
+                                    onClick = {
+                                        expanded = false
+                                        sortOrder = SortOrder.BY_DEADLINE_AND_CATEGORY
+                                    },
+                                    text = { Text("Deadline and Category") }
                                 )
                             }
-                        }
-
-
                     }
+
 
                     LazyColumn(
                         contentPadding = paddingValues,
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-
-                        items(state.todos) { todo ->
-                            if (todo.userID == state.userId) {
-
-                                TodoCard(
-                                    todo = todo,
-                                    todoState = state,
+                        todoViewModel.filterSortTodos(
+                            todos = todos.value,
+                            showCompleted = false,
+                            sortOrder = sortOrder
+                        ).forEach {
+                            item {
+                                TodoItem(
+                                    todo = it,
+                                    showToast = showToast,
                                     onEvent = onEvent,
-                                    index = state.todos.indexOf(todo),
-                                    rewardViewModel = rewardViewModel,
-                                    usersViewModel = usersViewModel,
-                                    showToast = showToast
-
+                                    firestoreViewModel = firestoreViewModel,
                                 )
                             }
                         }
@@ -255,11 +321,6 @@ fun TodoScreen(
         },
         sheetPeekHeight = 0.dp,
         sheetContent = {
-            var priorityExpandedMenu by remember { mutableStateOf(false) }
-            var prioritySelection by remember { mutableStateOf("") }
-            var titleError by remember { mutableStateOf(false) }
-            var descriptionError by remember { mutableStateOf(false) }
-
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceEvenly,

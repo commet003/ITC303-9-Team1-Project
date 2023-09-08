@@ -4,10 +4,10 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
-import android.content.pm.PackageManager
-import androidx.activity.viewModels
+import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -25,12 +25,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,18 +37,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -60,12 +56,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.PermissionDialog
+import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.RationaleDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.usersList
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
@@ -76,13 +71,14 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -92,34 +88,25 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.widget.TextView
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupWindow
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
-import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.InternalCoroutinesApi
 
 
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
-    // Instantiate the UsersViewModel
-    private val usersViewModel by viewModels<UsersViewModel>()
-
-    private val settingsViewModel by viewModels<SettingsViewModel> {
-        SettingsViewModelFactory(application, usersViewModel)
-    }
-
-
-
+    private val settingsViewModel by viewModels<SettingsViewModel>()
+    private val firestoreViewModel by viewModels<FirestoreViewModel>()
 
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
@@ -131,29 +118,14 @@ class MainActivity : ComponentActivity() {
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
-    private val rewardViewModel by viewModels<RewardViewModel>(
-        factoryProducer = {
-            object: ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RewardViewModel(application) as T
-                }
-            }
-        }
-    )
 
     private lateinit var navController: NavHostController
-    private lateinit var leadViewModel: LeaderboardViewModel
-    private lateinit var userViewModel: UsersViewModel
-    private val usersRepo by lazy {
-        UsersRepo()
-    }
 
 
     private val googleAuthUiClient by lazy {
         AuthUiClient(
-            context = applicationContext,
-            oneTapClient = Identity.getSignInClient(applicationContext),
-            usersRepo = usersRepo
+            firestoreViewModel = firestoreViewModel,
+            oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
 
@@ -162,9 +134,14 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(false)
     }
 
+    @RequiresApi(34)
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
+
 
     private var defaultProfileImageUrl: String? = null
 
+    @RequiresApi(34)
     fun fetchDefaultProfileImage() {
         val storageReference = FirebaseStorage.getInstance().reference
         val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")
@@ -180,6 +157,7 @@ class MainActivity : ComponentActivity() {
     )
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -193,10 +171,10 @@ class MainActivity : ComponentActivity() {
             }
         )
 
-
-        googleAuthUiClient.addAuthStateListener {
-            isSignedIn.value = it
-            if (it) { // if signed in
+        lifecycleScope.launch {
+            googleAuthUiClient.addAuthStateListener {
+                isSignedIn.value = it
+            }
 
                 // Define contentView here
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
@@ -253,52 +231,27 @@ class MainActivity : ComponentActivity() {
                         contentView.removeView(blurredBackground)
                     }, 6000) // Dismiss popup after 6 seconds
                 }
-            }
         }
 
-        fetchDefaultProfileImage()
+
+
 
 
         setContent {
 
 
-            val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(initial = false)
+            //val isDarkTheme by settingsViewModel.isDarkTheme.collectAsState()
             val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
-            // Retrieve's Leaderboard data onCreate
-            leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
-            userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
-            // Puts it into a readable format
-            getResponseUsingCallback()
 
 
-            ADHDTaskManagerTheme(darkTheme = isDarkTheme) {
+
+            ADHDTaskManagerTheme(darkTheme = isSystemInDarkTheme()) {
 
 
-                /**
-                 * This is where the Pomodoro Timer Notification is created
-                 */
 
-                val context = LocalContext.current
-                var hasNotificationPermission by remember {
-                    mutableStateOf(ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED)
-                }
+                RequestNotificationPermissionDialog()
 
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        hasNotificationPermission = isGranted
-                    }
-                )
-
-                LaunchedEffect(key1 = hasNotificationPermission) {
-                    if (!hasNotificationPermission) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
 
 
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
@@ -307,7 +260,7 @@ class MainActivity : ComponentActivity() {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
                 val scope = rememberCoroutineScope()
                 navController = rememberNavController()
-                rewardViewModel.allRewards.observeAsState(listOf())
+                //rewardViewModel.allRewards.observeAsState(listOf())
 
 
 
@@ -320,7 +273,7 @@ class MainActivity : ComponentActivity() {
                             CenterAlignedTopAppBar(
                                 colors = TopAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.primary,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
                                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
                                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
                                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
@@ -343,20 +296,6 @@ class MainActivity : ComponentActivity() {
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Menu,
                                             contentDescription = "Menu"
-                                        )
-                                    }
-                                },
-                                actions = {
-                                    IconButton(onClick = {
-                                        if (hasNotificationPermission){
-                                            showFocusNotification()
-                                            showBreakNotification()
-                                        }
-                                    }) {
-                                        Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            imageVector = Icons.Filled.Person,
-                                            contentDescription = "Profile"
                                         )
                                     }
                                 }
@@ -524,7 +463,7 @@ class MainActivity : ComponentActivity() {
                                 val state by viewModel.state.collectAsState()
                                 if (isSignedIn.value) {
                                     state.userId =
-                                        googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                        googleAuthUiClient.getSignedInUser()?.userID ?: ""
                                 }
                                 //val rewardState by rewardViewModel.collectAsState()
                                 val todoEvent = viewModel::onEvent
@@ -556,40 +495,47 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         TodoScreen(
                                             state = state,
-                                            onEvent = todoEvent,
-                                            rewardViewModel = rewardViewModel,
-                                            usersViewModel = userViewModel
+                                            firestoreViewModel = firestoreViewModel,
+                                            todoViewModel = viewModel,
+                                            onEvent = todoEvent
                                         )
                                     }
 
                                     // Settings Screen
-                                    composable(route = Screen.SettingsScreen.route) {
+                                    composable(
+                                        route = Screen.SettingsScreen.route
+                                    ) {
                                         SettingsScreen(
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
+                                            firestoreViewModel = firestoreViewModel,
                                             context = applicationContext,
                                             scope = scope
                                         )
+
                                     }
+
                                     // Leaderboard Screen
                                     composable(
                                         route = Screen.LeaderboardScreen.route
                                     ) {
-                                        LeaderboardScreen()
+                                        LeaderboardScreen(
+                                            firestoreViewModel = firestoreViewModel
+                                        )
                                     }
 
                                     // Rewards Screen
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel)
+                                        RewardsScreen(googleAuthUiClient, firestoreViewModel)
                                     }
 
                                     // Completed Task Screen
                                     composable(
                                         route = Screen.CompletedScreen.route
                                     ) {
-                                        CompletedScreen(state)
+                                        CompletedScreen(viewModel)
                                     }
 
                                     // Sign In Screen
@@ -601,7 +547,6 @@ class MainActivity : ComponentActivity() {
                                         LaunchedEffect(key1 = Unit) {
                                             if (googleAuthUiClient.getSignedInUser() != null) {
                                                 navController.navigate("todo_screen")
-                                                userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
                                                 println("launched effect 1. user exists, I have run the code")
                                             }
                                         }
@@ -617,19 +562,6 @@ class MainActivity : ComponentActivity() {
 
                                                 navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
-                                                val exist =
-                                                    googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                        userViewModel.checkUserExists(
-                                                            it1
-                                                        )
-                                                    }
-                                                if (exist == false) {
-                                                    userViewModel.convertToUserFromAuth(
-                                                        googleAuthUiClient
-                                                    )
-                                                    userViewModel.addUserToFirebase()
-                                                    println("I'm trying to add another user again.")
-                                                }
                                             }
                                         }
 
@@ -680,7 +612,6 @@ class MainActivity : ComponentActivity() {
                                             verticalArrangement = Arrangement.SpaceAround
                                         ){
                                             PomodoroTimerScreen(
-                                                settingsViewModel = settingsViewModel, // Pass the instance here
                                                 initialWorkTime = 1500L * 1000L,
                                                 initialBreakTime = 300L * 1000L,
                                                 handleColor = MaterialTheme.colorScheme.primary,
@@ -688,7 +619,6 @@ class MainActivity : ComponentActivity() {
                                                 activeBarColor = MaterialTheme.colorScheme.primary,
                                                 context = applicationContext,
                                                 activity = this@MainActivity,
-                                                modifier = Modifier.size(300.dp)
                                             )
                                         }
                                     }
@@ -698,7 +628,45 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            rewardViewModel.allRewards.observeAsState(listOf())
+            //rewardViewModel.allRewards.observeAsState(listOf())
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        firestoreViewModel.getResponse(object : FirebaseCallback {
+            override fun onResponse(response: Response) {
+                Log.d("LeaderboardScreen", "onResponse called")
+                response.leaderboardUsers?.let { users ->
+                    users.forEach{ user ->
+                        if (!Final.finalDataList.contains(user)) {
+                            Final.addToList(user)
+                        }
+                        user.username?.let { Log.i(ContentValues.TAG, it) }
+
+                    }
+                }
+                response.exception?.message?.let {
+                    Log.e(ContentValues.TAG, it)
+                }
+            }
+        })
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @OptIn(ExperimentalPermissionsApi::class)
+    @Composable
+    fun RequestNotificationPermissionDialog() {
+        val permissionState = rememberMultiplePermissionsState( listOf(
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.ACCESS_NOTIFICATION_POLICY
+        )
+            )
+
+        if (!permissionState.allPermissionsGranted) {
+            if (permissionState.shouldShowRationale) RationaleDialog()
+            else PermissionDialog { permissionState.launchMultiplePermissionRequest() }
         }
     }
 
@@ -727,14 +695,4 @@ class MainActivity : ComponentActivity() {
             .build()
         notificationManager.notify(2, notification)
     }
-
-    // creates Arraylist of users from the Firestore database
-    private fun getResponseUsingCallback() {
-        leadViewModel.getResponseUsingCallback((object : FirebaseCallback {
-            override fun onResponse(response: Response) {
-                usersList(response)
-            }
-        }))
-    }
-
 }

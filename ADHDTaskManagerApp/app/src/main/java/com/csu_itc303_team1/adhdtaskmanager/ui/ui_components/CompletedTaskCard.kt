@@ -25,8 +25,7 @@ fun CompletedTaskCard(todo: Todo) {
     val parsedDate: LocalDateTime = if (todo.completionDate == ""){
         LocalDateTime.MIN
     } else {
-        LocalDateTime.parse(todo.completionDate, DateTimeFormatter.ISO_DATE_TIME)
-
+        LocalDateTime.parse(todo.completedDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     }
 
     val formattedDate = parsedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm a"))
@@ -59,7 +58,7 @@ fun CompletedTaskCard(todo: Todo) {
             ) {
                 Text(
                     text = todo.description,
-                   )
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Completed On:"
