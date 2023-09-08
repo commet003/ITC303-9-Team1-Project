@@ -203,7 +203,7 @@ fun TodoCard(
                         2 -> "Medium"
                         3 -> "High"
                         else -> "None"
-                                               },
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -321,18 +321,20 @@ fun checkIfDueTimeIsAmPm(dueTime: String): String{
     var newTime = ""
     val hour = time[0].toInt()
     val minute = time[1].toInt()
+
+
     if (hour > 12){
         val newHour = hour - 12
-        newTime = "$newHour:$minute PM"
+        newTime = "%02d".format(newHour) + ":" + "%02d".format(minute) + " PM"
     }
     else if (hour == 12){
-         newTime = "$hour:$minute PM"
+        newTime = "%02d".format(hour) + ":" + "%02d".format(minute) + " PM"
     }
     else if (hour == 0){
-         newTime = "12:$minute AM"
+        newTime = "12:" + "%02d".format(minute) + " AM"
     }
     else {
-         newTime = "$hour:$minute AM"
+        newTime = "%02d".format(hour) + ":" + "%02d".format(minute) + " AM"
     }
     return newTime
 }
@@ -385,12 +387,9 @@ internal fun CardRibbon(colorInt: Int?, modifier: Modifier = Modifier) {
 
     Spacer(
         modifier
-            .width(22.dp)
+            .width(20.dp)
             .fillMaxHeight()
             .padding(end = 8.dp)
             .background(ribbonColor),
     )
 }
-
-
-

@@ -1,6 +1,5 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -27,7 +26,6 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
     currentUser: AuthUiClient,
     firestoreViewModel: FirestoreViewModel,
-    context: Context,
     scope: CoroutineScope
 ) {
 

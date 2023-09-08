@@ -5,9 +5,20 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.ContentValues
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -46,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -63,12 +75,15 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScr
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
@@ -82,24 +97,6 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.LayoutInflater
-import android.widget.TextView
-import android.view.Gravity
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupWindow
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.lifecycle.Lifecycle
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
-import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.InternalCoroutinesApi
 
 
 @Suppress("UNCHECKED_CAST")
@@ -135,27 +132,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(34)
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-
-
-
-    private var defaultProfileImageUrl: String? = null
-
-    @RequiresApi(34)
-    fun fetchDefaultProfileImage() {
-        val storageReference = FirebaseStorage.getInstance().reference
-        val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")
-
-        defaultProfileImageRef.downloadUrl.addOnSuccessListener { uri ->
-            defaultProfileImageUrl = uri.toString()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
-        InternalCoroutinesApi::class
-    )
-
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,61 +153,61 @@ class MainActivity : ComponentActivity() {
                 isSignedIn.value = it
             }
 
-                // Define contentView here
-                val contentView = findViewById<ViewGroup>(android.R.id.content)
+            // Define contentView here
+            val contentView = findViewById<ViewGroup>(android.R.id.content)
 
-                // Capture and blur screenshot
-                captureScreenshotWhenReady(contentView) { screenshot ->
-                    val blurredScreenshot = blurBitmap(screenshot, applicationContext)
+            // Capture and blur screenshot
+            captureScreenshotWhenReady(contentView) { screenshot ->
+                val blurredScreenshot = blurBitmap(screenshot, applicationContext)
 
-                    // Display blurred screenshot as a background
-                    val blurredBackground = ImageView(applicationContext)
-                    blurredBackground.setImageBitmap(blurredScreenshot)
-                    val params = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
+                // Display blurred screenshot as a background
+                val blurredBackground = ImageView(applicationContext)
+                blurredBackground.setImageBitmap(blurredScreenshot)
+                val params = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                contentView.addView(blurredBackground, params)
+
+                // Inflate the custom toast layout
+                val layoutInflater =
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
+
+                val customToastMessage =
+                    customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
+                customToastMessage.text =
+                    "Welcome back! Be sure to check out the leaderboard for the latest standings"
+
+                // Find the LottieAnimationView and start the animation
+                val lottieAnimation =
+                    customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
+                lottieAnimation.playAnimation()
+
+                // Create a PopupWindow with custom view
+                val customPopup = PopupWindow(
+                    customToastRoot,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    false
+                )
+                customPopup.animationStyle = android.R.style.Animation_Toast
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    customPopup.showAtLocation(
+                        findViewById(android.R.id.content),
+                        Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                        0,
+                        0
                     )
-                    contentView.addView(blurredBackground, params)
-
-                    // Inflate the custom toast layout
-                    val layoutInflater =
-                        getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
-
-                    val customToastMessage =
-                        customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
-                    customToastMessage.text =
-                        "Welcome back! Be sure to check out the leaderboard for the latest standings"
-
-                    // Find the LottieAnimationView and start the animation
-                    val lottieAnimation =
-                        customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
-                    lottieAnimation.playAnimation()
-
-                    // Create a PopupWindow with custom view
-                    val customPopup = PopupWindow(
-                        customToastRoot,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        false
-                    )
-                    customPopup.animationStyle = android.R.style.Animation_Toast
-                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                        customPopup.showAtLocation(
-                            findViewById(android.R.id.content),
-                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-                            0,
-                            0
-                        )
-                    }
-
-                    // Use a Handler to control the duration of the PopupWindow
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        customPopup.dismiss()
-                        // Remove or hide blurred background when done
-                        contentView.removeView(blurredBackground)
-                    }, 6000) // Dismiss popup after 6 seconds
                 }
+
+                // Use a Handler to control the duration of the PopupWindow
+                Handler(Looper.getMainLooper()).postDelayed({
+                    customPopup.dismiss()
+                    // Remove or hide blurred background when done
+                    contentView.removeView(blurredBackground)
+                }, 6000) // Dismiss popup after 6 seconds
+            }
         }
 
 
@@ -240,13 +217,13 @@ class MainActivity : ComponentActivity() {
         setContent {
 
 
-            //val isDarkTheme by settingsViewModel.isDarkTheme.collectAsState()
+            val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(false)
             val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
 
 
 
-            ADHDTaskManagerTheme(darkTheme = isSystemInDarkTheme()) {
+            ADHDTaskManagerTheme(darkTheme = isDarkTheme) {
 
 
 
@@ -272,16 +249,18 @@ class MainActivity : ComponentActivity() {
                         if (isSignedIn.value) {
                             CenterAlignedTopAppBar(
                                 colors = TopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                                    containerColor = MaterialTheme.colorScheme.background,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.onBackground,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                                 ),
                                 title = {
                                     Text(
                                         "ADHD Task Manager",
-                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
+                                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -293,7 +272,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            tint = MaterialTheme.colorScheme.onBackground,
                                             imageVector = Icons.Filled.Menu,
                                             contentDescription = "Menu"
                                         )
@@ -349,18 +328,19 @@ class MainActivity : ComponentActivity() {
                                 if (isSignedIn.value) {
                                     ModalDrawerSheet(
                                         drawerContainerColor = MaterialTheme.colorScheme.background,
+                                        drawerContentColor = MaterialTheme.colorScheme.secondary,
                                         drawerTonalElevation = 2.dp
                                     ) {
                                         Spacer(Modifier.height(18.dp))
                                         screens.forEach { screen ->
                                             NavigationDrawerItem(
                                                 colors = NavigationDrawerItemDefaults.colors(
-                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.background,
+                                                    selectedTextColor = MaterialTheme.colorScheme.background,
                                                     unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                    unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.secondary
                                                 ),
                                                 icon = {
                                                     Icon(
@@ -387,12 +367,12 @@ class MainActivity : ComponentActivity() {
                                         if (isSignedIn.value) {
                                             NavigationDrawerItem(
                                                 colors = NavigationDrawerItemDefaults.colors(
-                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                    selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                                                    selectedIconColor = MaterialTheme.colorScheme.background,
+                                                    selectedTextColor = MaterialTheme.colorScheme.background,
                                                     unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                    unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                                                    unselectedTextColor = MaterialTheme.colorScheme.secondary
                                                 ),
                                                 icon = {
                                                     Icon(
@@ -403,7 +383,7 @@ class MainActivity : ComponentActivity() {
                                                 label = {
                                                     Text(
                                                         text = "Sign Out",
-                                                        color = MaterialTheme.colorScheme.primary
+                                                        color = MaterialTheme.colorScheme.secondary
                                                     )
                                                 },
                                                 selected = false,
@@ -509,7 +489,6 @@ class MainActivity : ComponentActivity() {
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
                                             firestoreViewModel = firestoreViewModel,
-                                            context = applicationContext,
                                             scope = scope
                                         )
 
@@ -662,7 +641,7 @@ class MainActivity : ComponentActivity() {
             Manifest.permission.POST_NOTIFICATIONS,
             Manifest.permission.ACCESS_NOTIFICATION_POLICY
         )
-            )
+        )
 
         if (!permissionState.allPermissionsGranted) {
             if (permissionState.shouldShowRationale) RationaleDialog()

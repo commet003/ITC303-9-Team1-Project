@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CompletedTaskCard
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortOrder
 
 
 @Composable
@@ -20,11 +20,12 @@ fun CompletedScreen(todoViewModel: TodoViewModel) {
         modifier = Modifier,
         contentPadding = PaddingValues(0.dp, 20.dp, 0.dp)
     ) {
+
         todoViewModel.filterSortTodos(
             todos = todos.value,
             showCompleted = true,
             showUncompleted = false,
-            sortOrder = SortOrder.None
+            sortOrder = SortOrder.BY_DEADLINE
         ).forEach { todo ->
             item {
                 CompletedTaskCard(todo = todo)

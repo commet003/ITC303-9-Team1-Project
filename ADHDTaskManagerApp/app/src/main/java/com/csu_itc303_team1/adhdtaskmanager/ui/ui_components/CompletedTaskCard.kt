@@ -18,14 +18,16 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+
 @Composable
 fun CompletedTaskCard(todo: Todo) {
 
     // If completion date = "" then make parsedDate Minimum Date
-    val parsedDate: LocalDateTime = if (todo.completionDate == ""){
+    val parsedDate: LocalDateTime = if (todo.completedDate == ""){
         LocalDateTime.MIN
     } else {
         LocalDateTime.parse(todo.completedDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+
     }
 
     val formattedDate = parsedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm a"))
@@ -69,7 +71,23 @@ fun CompletedTaskCard(todo: Todo) {
                 modifier = Modifier.padding(top = 8.dp, bottom = 5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = todo.priority.name)
+                Text(text = when(todo.priority) {
+                    1 -> "Low"
+                    2 -> "Medium"
+                    3 -> "High"
+                    else -> "None"
+                }
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text = when (todo.category) {
+                        "Work" -> "Work"
+                        "School" -> "School"
+                        "Personal" -> "Personal"
+                        "Other" -> "Other"
+                        else -> "None"
+                    }
+                )
                 Spacer(Modifier.width(4.dp))
                 Text(text = todo.dueDate)
                 Spacer(Modifier.width(4.dp))
