@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,6 +32,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,13 +44,34 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoItem
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortOrder
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.IntSize
+import androidx.core.view.drawToBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.draw
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 
 
 
@@ -98,11 +119,10 @@ fun TodoScreen(
                             scope.launch {
                                 sheetState.expand()
                             }
-                        },
-                        shape = CircleShape
+                        }
                     ) {
                         Icon(
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             imageVector = Icons.Default.Add,
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.primaryContainer)
@@ -154,6 +174,8 @@ fun TodoScreen(
                                 .background(MaterialTheme.colorScheme.surface),
                             expanded = expanded,
                             onDismissRequest = { expanded = false }) {
+
+                            SortType.values().forEach { sortType ->
                                 DropdownMenuItem(
                                     modifier = Modifier.clip(MaterialTheme.shapes.medium),
                                     colors = MenuItemColors(
@@ -265,7 +287,6 @@ fun TodoScreen(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-
                         todoViewModel.filterSortTodos(
                             todos = todos.value,
                             showCompleted = false,

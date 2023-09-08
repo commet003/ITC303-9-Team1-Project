@@ -5,20 +5,9 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.ContentValues
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupWindow
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -57,7 +46,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -75,15 +63,12 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScr
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
-import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
-import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
@@ -97,6 +82,24 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.widget.TextView
+import android.view.Gravity
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupWindow
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.lifecycle.Lifecycle
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.InternalCoroutinesApi
 
 
 @Suppress("UNCHECKED_CAST")
@@ -132,7 +135,27 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(34)
-    @OptIn(ExperimentalMaterial3Api::class)
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
+
+
+    private var defaultProfileImageUrl: String? = null
+
+    @RequiresApi(34)
+    fun fetchDefaultProfileImage() {
+        val storageReference = FirebaseStorage.getInstance().reference
+        val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")
+
+        defaultProfileImageRef.downloadUrl.addOnSuccessListener { uri ->
+            defaultProfileImageUrl = uri.toString()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class,
+        InternalCoroutinesApi::class
+    )
+
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -217,13 +240,13 @@ class MainActivity : ComponentActivity() {
         setContent {
 
 
-            val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(false)
+            //val isDarkTheme by settingsViewModel.isDarkTheme.collectAsState()
             val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
 
 
 
-            ADHDTaskManagerTheme(darkTheme = isDarkTheme) {
+            ADHDTaskManagerTheme(darkTheme = isSystemInDarkTheme()) {
 
 
 

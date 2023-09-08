@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortOrder
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -69,6 +69,7 @@ class TodoViewModel(
     }
 
     val state = _state
+    private val _sortType = MutableStateFlow(SortType.BY_DATE_TIME)
 
     fun onEvent(event: TodoEvent) {
         when (event) {
@@ -99,13 +100,12 @@ class TodoViewModel(
                 viewModelScope.launch {
                     todoDao.updateTodo(
                         event.todo.copy(
-                            title = _state.value.title,
-                            description = _state.value.description,
-                            priority = _state.value.priority,
-                            category = _state.value.category,
-                            dueDate = _state.value.dueDate,
-                            dueTime = _state.value.dueTime,
-                            userId = _state.value.userId
+                            title = state.value.title,
+                            description = state.value.description,
+                            priority = state.value.priority,
+                            dueDate = state.value.dueDate,
+                            dueTime = state.value.dueTime,
+                            userID = state.value.userId
                         )
                     )
                 }
@@ -174,13 +174,12 @@ class TodoViewModel(
 
 
             TodoEvent.saveTodo -> {
-                val title = _state.value.title
-                val description = _state.value.description
-                val priority = _state.value.priority
-                val category = _state.value.category
-                val dueDate = _state.value.dueDate
-                val dueTime = _state.value.dueTime
-                val userId = _state.value.userId
+                val title = state.value.title
+                val description = state.value.description
+                val priority = state.value.priority
+                val dueDate = state.value.dueDate
+                val dueTime = state.value.dueTime
+                val userId = state.value.userId
 
                 if (title.isEmpty()) {
                     TodoEvent.titleError(true)
@@ -195,10 +194,9 @@ class TodoViewModel(
                     title = title,
                     description = description,
                     priority = priority,
-                    category = category,
                     dueDate = dueDate,
                     dueTime = dueTime,
-                    userId = userId
+                    userID = userId
                 )
 
                 viewModelScope.launch {
@@ -209,8 +207,7 @@ class TodoViewModel(
                     it.copy(
                         title = "",
                         description = "",
-                        priority = Priority.Low.value,
-                        category = "",
+                        priority = Priority.LOW,
                         dueDate = "",
                         dueTime = "",
                         showDialog = false,
@@ -241,13 +238,7 @@ class TodoViewModel(
 
             is TodoEvent.setPriority -> {
                 _state.update {
-                    it.copy(priority = event.priority.value)
-                }
-            }
-
-            is TodoEvent.setCategory -> {
-                _state.update {
-                    it.copy(category = event.category.name)
+                    it.copy(priority = event.priority)
                 }
             }
 
@@ -307,8 +298,8 @@ class TodoViewModel(
                 viewModelScope.launch {
                     todoDao.updateTodo(
                         event.todo.copy(
-                            completed = !event.todo.completed,
-                            completedDate = if (event.todo.completed) {
+                            isCompleted = !event.todo.isCompleted,
+                            completionDate = if (event.todo.isCompleted) {
                                 ""
                             } else {
                                 LocalDateTime.now().toString()
@@ -348,8 +339,7 @@ class TodoViewModel(
                     it.copy(
                         title = "",
                         description = "",
-                        priority = Priority.Low.value,
-                        category = "",
+                        priority = Priority.LOW,
                         dueDate = "",
                         dueTime = "",
                         showDialog = false,
