@@ -6,7 +6,7 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
-import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -39,8 +39,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,18 +48,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -71,6 +68,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.ui.completed_screen.CompletedScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.PermissionDialog
+import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.RationaleDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.help_screen.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen.LeaderboardScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScreen
@@ -92,10 +91,9 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewM
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
@@ -106,7 +104,6 @@ class MainActivity : ComponentActivity() {
 
     private val settingsViewModel by viewModels<SettingsViewModel>()
     private val firestoreViewModel by viewModels<FirestoreViewModel>()
-    private val firestoreDatabase = Firebase.firestore.app
 
 
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
@@ -156,7 +153,6 @@ class MainActivity : ComponentActivity() {
                 isSignedIn.value = it
             }
 
-            delay(6000)
                 // Define contentView here
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
 
@@ -230,30 +226,9 @@ class MainActivity : ComponentActivity() {
             ADHDTaskManagerTheme(darkTheme = isDarkTheme) {
 
 
-                /**
-                 * This is where the Pomodoro Timer Notification is created
-                 */
 
-                val context = LocalContext.current
-                var hasNotificationPermission by remember {
-                    mutableStateOf(ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED)
-                }
+                RequestNotificationPermissionDialog()
 
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        hasNotificationPermission = isGranted
-                    }
-                )
-
-                LaunchedEffect(key1 = hasNotificationPermission) {
-                    if (!hasNotificationPermission) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }
 
 
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
@@ -298,20 +273,6 @@ class MainActivity : ComponentActivity() {
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             imageVector = Icons.Filled.Menu,
                                             contentDescription = "Menu"
-                                        )
-                                    }
-                                },
-                                actions = {
-                                    IconButton(onClick = {
-                                        if (hasNotificationPermission){
-                                            showFocusNotification()
-                                            showBreakNotification()
-                                        }
-                                    }) {
-                                        Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            imageVector = Icons.Filled.Person,
-                                            contentDescription = "Profile"
                                         )
                                     }
                                 }
@@ -512,6 +473,7 @@ class MainActivity : ComponentActivity() {
                                         TodoScreen(
                                             state = state,
                                             firestoreViewModel = firestoreViewModel,
+                                            todoViewModel = viewModel,
                                             onEvent = todoEvent
                                         )
                                     }
@@ -550,7 +512,7 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.CompletedScreen.route
                                     ) {
-                                        CompletedScreen(state)
+                                        CompletedScreen(viewModel)
                                     }
 
                                     // Sign In Screen
@@ -667,6 +629,22 @@ class MainActivity : ComponentActivity() {
                 }
             }
         })
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @OptIn(ExperimentalPermissionsApi::class)
+    @Composable
+    fun RequestNotificationPermissionDialog() {
+        val permissionState = rememberMultiplePermissionsState( listOf(
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.ACCESS_NOTIFICATION_POLICY
+        )
+            )
+
+        if (!permissionState.allPermissionsGranted) {
+            if (permissionState.shouldShowRationale) RationaleDialog()
+            else PermissionDialog { permissionState.launchMultiplePermissionRequest() }
+        }
     }
 
     private fun showFocusNotification() {

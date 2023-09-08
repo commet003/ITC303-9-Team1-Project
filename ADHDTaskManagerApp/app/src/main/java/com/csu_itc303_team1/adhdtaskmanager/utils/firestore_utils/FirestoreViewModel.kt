@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.time.Duration
 import java.util.Date
 
 class FirestoreViewModel(
@@ -168,18 +169,8 @@ class FirestoreViewModel(
                     Log.d(TAG, "DocumentSnapshot data: ${document.data}")
                     val user = document.toObject(UserData::class.java)
                     if (user != null) {
-                        val lastLoginDate = user.lastLogin
-                        val today = Timestamp.now().seconds
-                        if (lastLoginDate != null) {
-                            val lastLoginDateSeconds = lastLoginDate.seconds
-                            val difference = today - lastLoginDateSeconds
-                            if (difference in 86401..172799){
-                                lastLogin = true
-                            } else if (difference > 172800){
-                                viewModelScope.launch {
-                                    resetUserLoginStreak(userId)
-                                }
-                            }
+                        if(Duration.between(user.lastLogin?.toInstant(), Date().toInstant()).toDays() >= 1){
+                            lastLogin = true
                         }
                     }
                 } else {

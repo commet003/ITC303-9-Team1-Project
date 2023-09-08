@@ -24,11 +24,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionResult
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.utils.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.utils.ext.hasDueTime
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.FirestoreViewModel
@@ -36,8 +39,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Category
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.delay
-
-
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -49,7 +51,7 @@ internal fun TodoItem(
     onEvent: (TodoEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val showToastTrigger = remember { mutableStateOf(0) } // For triggering the toast
+    val showToastTrigger = remember { mutableIntStateOf(0) } // For triggering the toast
     val showLottieAnimation = remember { mutableStateOf(false) }
 
     LaunchedEffect(showToastTrigger.value) {
@@ -69,9 +71,19 @@ internal fun TodoItem(
                     onEvent(TodoEvent.toggleCompleted(
                         todo = todo
                     ))
+                    firestoreViewModel.updateUserRewardsPoints(
+                        TASK_COMPLETED_REWARD,
+                        todo.userId
+                    )
+                    firestoreViewModel.viewModelScope.launch {
+                        firestoreViewModel.incrementRewardCount(
+                            todo.userId,
+                            TASK_COMPLETED_REWARD_NAME
+                        )
+                    }
                     toastText = "Task Completed"
                     show = false
-                    showToastTrigger.value += 1 // Increment to trigger the toast
+                    showToastTrigger.intValue += 1 // Increment to trigger the toast
                     onEvent(TodoEvent.ToggleLottieAnimation(true))
                     showLottieAnimation.value
                     true
@@ -140,7 +152,8 @@ fun TodoCard(
             .height(74.dp)
             .clickable {
                 onEvent(TodoEvent.toggleIsClicked(todo))
-                onEvent(TodoEvent.showEditTodoDialog) },
+                onEvent(TodoEvent.showEditTodoDialog)
+            },
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
@@ -170,6 +183,20 @@ fun TodoCard(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.End
             ) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = when(todo.category) {
+                        "Work" -> "Work"
+                        "School" -> "School"
+                        "Personal" -> "Personal"
+                        "Other" -> "Other"
+                        "Home" -> "Home"
+                        else -> "None"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.weight(1f))
                 Text(
                     text = when(todo.priority) {
                         1 -> "Low"
@@ -268,16 +295,46 @@ private fun getDueDateAndTime(todo: Todo): String {
     val stringBuilder = StringBuilder("")
 
     if (todo.hasDueDate()) {
-        stringBuilder.append(todo.dueDate)
+        stringBuilder.append(formatDate(todo.dueDate))
         stringBuilder.append(" ")
     }
 
     if (todo.hasDueTime()) {
         stringBuilder.append("at ")
-        stringBuilder.append(todo.dueTime)
+        stringBuilder.append(checkIfDueTimeIsAmPm(todo.dueTime))
     }
 
     return stringBuilder.toString()
+}
+
+// format date to dd/mm/yyyy
+fun formatDate(dueDate: String): String{
+    val date = dueDate.split("-")
+    val year = date[0]
+    val month = date[1]
+    val day = date[2]
+    return "$day/$month/$year"
+}
+
+fun checkIfDueTimeIsAmPm(dueTime: String): String{
+    val time = dueTime.split(":")
+    var newTime = ""
+    val hour = time[0].toInt()
+    val minute = time[1].toInt()
+    if (hour > 12){
+        val newHour = hour - 12
+        newTime = "$newHour:$minute PM"
+    }
+    else if (hour == 12){
+         newTime = "$hour:$minute PM"
+    }
+    else if (hour == 0){
+         newTime = "12:$minute AM"
+    }
+    else {
+         newTime = "$hour:$minute AM"
+    }
+    return newTime
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

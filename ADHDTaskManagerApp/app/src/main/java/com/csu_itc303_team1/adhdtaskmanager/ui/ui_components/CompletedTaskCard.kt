@@ -25,7 +25,7 @@ fun CompletedTaskCard(todo: Todo) {
     val parsedDate: LocalDateTime = if (todo.completedDate == ""){
         LocalDateTime.MIN
     } else {
-        LocalDateTime.parse(todo.completedDate, DateTimeFormatter.ISO_DATE_TIME)
+        LocalDateTime.parse(todo.completedDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
     }
 

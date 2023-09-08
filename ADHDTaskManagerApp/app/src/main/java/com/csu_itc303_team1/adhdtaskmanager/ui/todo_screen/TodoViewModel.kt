@@ -19,44 +19,51 @@ class TodoViewModel(
 
     private val _state = MutableStateFlow(TodoState())
     private var _sortOrder = MutableStateFlow(SortOrder.BY_DEADLINE)
+    val todos = todoDao.getAllTodos()
 
-    init {
-        viewModelScope.launch {
-            todoDao.getAllTodos().collect {
-                _state.value.todos = filterSortTasks(
-                    todos = it,
-                    showCompleted = false,
-                    sortOrder = _sortOrder.value)
-            }
-        }
-    }
 
-    private fun filterSortTasks(
+    fun filterSortTodos(
         todos: List<Todo>,
         showCompleted: Boolean,
+        showUncompleted: Boolean = true,
         sortOrder: SortOrder
     ): List<Todo> {
         // filter the tasks
-        val filteredTasks = if (showCompleted) {
+        val filteredTodos = if (showCompleted) {
             todos
+        } else if(!showUncompleted) {
+            todos.filter { it.completed }
         } else {
             todos.filter { !it.completed }
         }
         // sort the tasks
         return when (sortOrder) {
-            SortOrder.NONE -> filteredTasks
-            SortOrder.BY_DEADLINE -> filteredTasks.sortedWith(
-                compareByDescending<Todo>{ it.dueTime }.thenBy{ it.dueDate }
+            SortOrder.NONE -> filteredTodos
+            SortOrder.BY_DEADLINE -> filteredTodos.sortedWith(
+                compareBy<Todo>{ it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
             )
-            SortOrder.BY_PRIORITY -> filteredTasks.sortedBy { it.priority }
-            SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTasks.sortedWith(
-                compareByDescending<Todo>
-                { it.dueTime }.thenBy { it.dueDate}.thenBy { it.priority }
+            SortOrder.BY_PRIORITY -> filteredTodos.sortedBy { it.priority }.asReversed()
+            SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTodos.sortedWith(
+                compareBy<Todo>{ it.priority }.reversed()
+                    .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy { it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
+
             )
-            SortOrder.BY_CATEGORY -> filteredTasks.sortedBy { it.category }
-            SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTasks.sortedWith(
-                compareByDescending<Todo>
-                { it.dueTime }.thenBy { it.dueDate }.thenBy { it.category }
+            SortOrder.BY_CATEGORY -> filteredTodos.sortedBy { it.category }
+            SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTodos.sortedWith(
+                compareBy<Todo>{ it.category }
+                    .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
             )
         }
     }
@@ -252,7 +259,7 @@ class TodoViewModel(
 
             is TodoEvent.sortBy -> {
                 _sortOrder.value = event.sortOrder
-                filterSortTasks(
+                filterSortTodos(
                     todos = _state.value.todos,
                     showCompleted = false,
                     sortOrder = _sortOrder.value
@@ -327,7 +334,7 @@ class TodoViewModel(
             TodoEvent.resetTodos -> {
                 viewModelScope.launch {
                     todoDao.getAllTodos().collect {
-                        _state.value.todos = filterSortTasks(
+                        _state.value.todos = filterSortTodos(
                             todos = it,
                             showCompleted = false,
                             sortOrder = _sortOrder.value)
