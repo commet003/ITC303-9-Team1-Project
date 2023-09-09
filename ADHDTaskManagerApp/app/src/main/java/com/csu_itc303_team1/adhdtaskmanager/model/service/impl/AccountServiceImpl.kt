@@ -13,7 +13,9 @@ import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
-class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : AccountService {
+class AccountServiceImpl @Inject constructor(
+    private val auth: FirebaseAuth
+) : AccountService {
 
     override val currentUserId: String
         get() = auth.currentUser?.uid.orEmpty()
@@ -71,7 +73,7 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
         auth.signOut()
 
         // Sign the user back in anonymously.
-        createAnonymousAccount()
+        //createAnonymousAccount()
     }
 
     companion object {

@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueTime
 import com.csu_itc303_team1.adhdtaskmanager.model.Category
+import com.csu_itc303_team1.adhdtaskmanager.model.Priority
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import kotlinx.coroutines.delay
 
@@ -62,6 +63,7 @@ internal fun TaskItem(
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Log.d("TaskItem", "$task")
     val context = LocalContext.current
     var show by remember { mutableStateOf(true) }
     var toastText by remember { mutableStateOf("") }
@@ -166,7 +168,7 @@ fun TaskCard(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = task.priority,
+                    text =  Priority.getByValue(task.priority).name,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,
                     )

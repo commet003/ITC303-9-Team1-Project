@@ -7,9 +7,11 @@ interface UsersStorageService {
 
     suspend fun getLeaderboardUsers(): List<FirestoreUser>
     suspend fun getUser(userId: String): FirestoreUser?
-    suspend fun save(user: FirestoreUser): String
+    suspend fun save(user: FirestoreUser)
     suspend fun update(user: FirestoreUser)
     suspend fun delete(userId: String)
+
+    fun incrementUserRewardPoints(userId: String, rewardPoints: Int, rewardCount: String)
 
     // Check if user is in database
     suspend fun checkUserExistsInDatabase(userId: String): Boolean

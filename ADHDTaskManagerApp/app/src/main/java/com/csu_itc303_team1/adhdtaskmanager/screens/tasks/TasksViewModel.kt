@@ -1,8 +1,12 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.liveData
+import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.EDIT_TASK_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.SETTINGS_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
@@ -12,6 +16,7 @@ import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -20,6 +25,7 @@ import javax.inject.Inject
 data class TasksUiModel(
     val tasks: List<Task>,
     val showCompleted: Boolean,
+    val showUncompleted: Boolean,
     val sortOrder: SortOrder
 )
 
@@ -28,6 +34,7 @@ class TasksViewModel @Inject constructor(
     logService: LogService,
     private val storageService: StorageService,
     private val configurationService: ConfigurationService,
+    private val usersStorageService: UsersStorageService,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : MainViewModel(logService) {
     private val options = mutableStateOf<List<String>>(listOf())
@@ -36,32 +43,49 @@ class TasksViewModel @Inject constructor(
         emit(userPreferencesRepository.getAllPreferences())
     }
 
-    private fun filterSortTasks(
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun filterSortTasks(
         tasks: List<Task>,
         showCompleted: Boolean,
+        showUncompleted: Boolean,
         sortOrder: SortOrder
     ): List<Task> {
         // filter the tasks
-        val filteredTasks = if (showCompleted) {
+        val filteredTodos = if (showCompleted && showUncompleted) {
             tasks
+        } else if(!showUncompleted &&  showCompleted) {
+            tasks.filter { it.completed }
         } else {
             tasks.filter { !it.completed }
         }
         // sort the tasks
         return when (sortOrder) {
-            SortOrder.NONE -> filteredTasks
-            SortOrder.BY_DEADLINE -> filteredTasks.sortedWith(
-                compareByDescending<Task>{ it.dueTime }.thenBy{ it.dueDate }
+            SortOrder.NONE -> filteredTodos
+            SortOrder.BY_DEADLINE -> filteredTodos.sortedWith(
+                compareBy<Task>{ it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
             )
-            SortOrder.BY_PRIORITY -> filteredTasks.sortedBy { it.priority }
-            SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTasks.sortedWith(
-                compareByDescending<Task>
-                { it.dueTime }.thenBy { it.dueDate}.thenBy { it.priority }
+            SortOrder.BY_PRIORITY -> filteredTodos.sortedBy { it.priority }.asReversed()
+            SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTodos.sortedWith(
+                compareBy<Task>{ it.priority }.reversed()
+                    .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy { it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
+
             )
-            SortOrder.BY_CATEGORY -> filteredTasks.sortedBy { it.category }
-            SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTasks.sortedWith(
-                compareByDescending<Task>
-                { it.dueTime }.thenBy { it.dueDate }.thenBy { it.category }
+            SortOrder.BY_CATEGORY -> filteredTodos.sortedBy { it.category }
+            SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTodos.sortedWith(
+                compareBy<Task>{ it.category }
+                    .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
+                    .thenBy { it.dueDate.slice(0..3).toIntOrNull() }
+                    .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
+                    .thenBy { it.dueTime.slice(3..4).toIntOrNull() }
             )
         }
     }
@@ -76,7 +100,10 @@ class TasksViewModel @Inject constructor(
     }
 
     private fun onTaskCompletedChange(task: Task) {
-        launchCatching { storageService.update(task.copy(completed = !task.completed)) }
+        launchCatching {
+            storageService.update(task.copy(completed = !task.completed))
+            usersStorageService.incrementUserRewardPoints(task.userId, COMPLETED_TASK_REWARD, COMPLETED_TASK_REWARD_NAME)
+        }
     }
 
     fun onAddClick(openScreen: (String) -> Unit) = openScreen(EDIT_TASK_SCREEN)

@@ -1,7 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager
 
 import android.content.res.Resources
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
@@ -14,7 +13,6 @@ import kotlinx.coroutines.launch
 @Stable
 class AppState(
     private val drawerState: DrawerState,
-    val scaffoldState: ScaffoldState,
     val navController: NavHostController,
     private val snackbarManager: SnackbarManager,
     private val resources: Resources,
@@ -24,17 +22,16 @@ class AppState(
         coroutineScope.launch {
             snackbarManager.snackbarMessages.filterNotNull().collect { snackbarMessage ->
                 val text = snackbarMessage.toMessage(resources)
-                scaffoldState.snackbarHostState.showSnackbar(text)
             }
         }
     }
 
-    suspend fun toggleDrawerState() {
-        if (drawerState.isOpen) {
-            drawerState.close()
-        } else {
-            drawerState.open()
-        }
+    suspend fun openDrawer() {
+        drawerState.open()
+    }
+
+    suspend fun closeDrawer() {
+        drawerState.close()
     }
 
     fun getDrawerState(): DrawerState {

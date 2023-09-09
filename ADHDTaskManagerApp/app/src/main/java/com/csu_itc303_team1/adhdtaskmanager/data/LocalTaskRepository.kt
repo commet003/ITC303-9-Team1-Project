@@ -22,16 +22,4 @@ class LocalTaskRepository @Inject constructor(
     override fun getAllTasks(): List<LocalTask> {
         return taskDao.getAll()
     }
-
-    override fun getAllTasksByCategory(category: String): List<LocalTask> {
-        return taskDao.getAllByCategory(category)
-    }
-
-    override fun getAllTasksByPriority(): List<LocalTask> {
-        return taskDao.getAllByPriority()
-    }
-
-    override fun getAllTasksByDueDate(): List<LocalTask> {
-        return taskDao.getAllByDueDate()
-    }
 }

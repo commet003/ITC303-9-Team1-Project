@@ -15,15 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.csu_itc303_team1.adhdtaskmanager.common.composable.ActionToolbar
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.BasicField
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.BasicToolbar
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.CardSelector
+import com.csu_itc303_team1.adhdtaskmanager.common.composable.PriorityDropdown
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.RegularCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.card
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.fieldModifier
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.spacer
-import com.csu_itc303_team1.adhdtaskmanager.model.Category
-import com.csu_itc303_team1.adhdtaskmanager.model.Priority
+import com.csu_itc303_team1.adhdtaskmanager.common.ext.toolbarActions
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
@@ -50,8 +49,11 @@ fun EditTaskScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BasicToolbar(
+        ActionToolbar(
             title = if(task.id.isNotEmpty()) AppText.edit_task else AppText.add_task,
+            modifier = Modifier.toolbarActions(),
+            endActionIcon = AppIcon.ic_check,
+            endAction = { viewModel.onDoneClick(popUpScreen) }
         )
 
         Spacer(modifier = Modifier.spacer())
@@ -62,8 +64,8 @@ fun EditTaskScreen(
 
         Spacer(modifier = Modifier.spacer())
         CardEditors(task, viewModel::onDateChange, viewModel::onTimeChange)
-        CardSelectors(task, viewModel::onPriorityChange, viewModel::onCategoryChange)
-
+        //CardSelectors(task, viewModel::onPriorityChange, viewModel::onCategoryChange)
+        PriorityDropdown(task, viewModel::onPriorityChange)
         Spacer(modifier = Modifier.spacer())
     }
 
@@ -89,14 +91,14 @@ private fun CardEditors(
     }
 }
 
-@Composable
+/*@Composable
 @ExperimentalMaterialApi
 private fun CardSelectors(
     task: Task,
     onPriorityChange: (String) -> Unit,
     onCategoryChange: (String) -> Unit
 ) {
-    val prioritySelection = Priority.getByName(task.priority).name
+    val prioritySelection = Priority.getByName(Priority.getByValue(task.priority).name).name
     CardSelector(AppText.priority, Priority.getOptions(), prioritySelection, Modifier.card()) {
             newValue ->
         onPriorityChange(newValue)
@@ -107,7 +109,7 @@ private fun CardSelectors(
             newValue ->
         onCategoryChange(newValue)
     }
-}
+}*/
 
 private fun showDatePicker(activity: AppCompatActivity?, onDateChange: (Long) -> Unit) {
     val picker = MaterialDatePicker.Builder.datePicker().build()

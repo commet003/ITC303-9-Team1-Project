@@ -60,7 +60,7 @@ class EditTaskViewModel @Inject constructor(
         task.value = task.value.copy(dueTime = newDueTime)
     }
 
-    fun onPriorityChange(newValue: String) {
+    fun onPriorityChange(newValue: Int) {
         task.value = task.value.copy(priority = newValue)
     }
 

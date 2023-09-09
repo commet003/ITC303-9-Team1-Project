@@ -4,12 +4,12 @@ import com.csu_itc303_team1.adhdtaskmanager.model.FirestoreUser
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.trace
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -21,10 +21,8 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override val leaderboardUsers: Flow<List<FirestoreUser>>
-        get() =
-            auth.currentUser.flatMapLatest { user ->
-                firestore.collection(USERS_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
-            }
+        get() = firestore.collection(USERS_COLLECTION).whereEqualTo(USER_ID_FIELD, auth.currentUserId).dataObjects()
+
 
     override suspend fun getLeaderboardUsers(): List<FirestoreUser> {
         return firestore.collection(USERS_COLLECTION)
@@ -35,10 +33,11 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
     override suspend fun getUser(userId: String): FirestoreUser? =
         firestore.collection(USERS_COLLECTION).document(userId).get().await().toObject()
 
-    override suspend fun save(user: FirestoreUser): String =
+    override suspend fun save(user: FirestoreUser) {
         trace(SAVE_USER_TRACE) {
-            firestore.collection(USERS_COLLECTION).add(user).await().id
+            firestore.collection(USERS_COLLECTION).document(user.id).set(user).await()
         }
+    }
 
     override suspend fun update(user: FirestoreUser): Unit =
         trace(UPDATE_USER_TRACE) {
@@ -52,6 +51,12 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
     override suspend fun checkUserExistsInDatabase(userId: String): Boolean {
         val user = firestore.collection(USERS_COLLECTION).document(userId).get().await()
         return user.exists()
+    }
+
+    override fun incrementUserRewardPoints(userId: String, rewardPoints: Int, rewardCount: String) {
+        firestore.collection(USERS_COLLECTION).document(userId).update("rewardPoints", FieldValue.increment(rewardPoints.toLong()),
+            "rewardsEarned.$rewardCount", FieldValue.increment(1) )
+
     }
 
     companion object {

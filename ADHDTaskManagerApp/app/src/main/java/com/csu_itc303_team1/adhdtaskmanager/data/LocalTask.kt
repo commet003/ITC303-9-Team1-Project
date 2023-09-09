@@ -9,7 +9,7 @@ data class LocalTask(
     @PrimaryKey val id: String = "",
     @ColumnInfo(name = "task_title") var title: String = "",
     @ColumnInfo(name = "task_description")var description: String = "",
-    @ColumnInfo(name = "task_priority")var priority: String = "",
+    @ColumnInfo(name = "task_priority")var priority: Int = 0,
     @ColumnInfo(name = "task_category")var category: String = "",
     @ColumnInfo(name = "task_dueDate")var dueDate: String = "",
     @ColumnInfo(name = "task_dueTime")var dueTime: String = "",

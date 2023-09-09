@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +44,29 @@ fun ActionToolbar(
         }
     )
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NavToolbar(
+    @StringRes title: Int,
+    @DrawableRes navActionIcon: Int,
+    modifier: Modifier,
+    navAction: () -> Unit
+){
+    CenterAlignedTopAppBar(
+        title = { Text(stringResource(title)) },
+        modifier = modifier,
+        navigationIcon = {
+            IconButton(onClick = navAction) {
+                Icon(painter = painterResource(navActionIcon), contentDescription = "Navigation")
+            }
+        },
+        colors = toolbarColor(),
+        )
+}
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

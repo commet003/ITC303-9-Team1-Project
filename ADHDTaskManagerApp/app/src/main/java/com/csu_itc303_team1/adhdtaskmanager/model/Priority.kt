@@ -15,11 +15,18 @@ enum class Priority(val value: Int) {
             return None
         }
 
+        fun getByValue(value: Int): Priority {
+            values().forEach { priority -> if (value == priority.value) return priority }
+
+            return None
+        }
+
         fun getOptions(): List<String> {
             val options = mutableListOf<String>()
             values().forEach { priority ->
                 Log.d("Priority", priority.name)
-                options.add(priority.name) }
+                options.add(priority.name)
+            }
             return options
         }
     }

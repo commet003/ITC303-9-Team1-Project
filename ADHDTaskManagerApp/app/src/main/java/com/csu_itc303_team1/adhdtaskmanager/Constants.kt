@@ -19,3 +19,34 @@ const val TAG_OUTPUT = "OUTPUT"
 const val KEY_BLUR_LEVEL = "KEY_BLUR_LEVEL"
 
 const val DELAY_TIME_MILLIS: Long = 3000
+
+const val LOGIN_STREAK_REWARD = 1000
+const val COMPLETED_TASK_REWARD = 300
+const val LOGIN_REWARD = 150
+
+const val LOGIN_STREAK_REWARD_NAME = "LOGIN_STREAK_REWARD"
+const val COMPLETED_TASK_REWARD_NAME = "COMPLETED_TASK_REWARD"
+const val LOGIN_REWARD_NAME = "LOGIN_REWARD"
+
+
+
+val REWARDS_COUNTS = mapOf(
+    "LOGIN_REWARD" to 0,
+    "COMPLETED_TASK_REWARD" to 0,
+    "LOGIN_STREAK_REWARD" to 0,
+)
+
+val LEVELS = mapOf<Int, Int>(
+    1 to 1500,
+    2 to 3000,
+    3 to 6000,
+    4 to 12000,
+    5 to 20000,
+    6 to 30000,
+    7 to 50000,
+    8 to 75000,
+    9 to 100000,
+    10 to 150000,
+)
+
+const val DEFAULT_PROFILE_PICTURE = "https://firebasestorage.googleapis.com/v0/b/adhdtaskmanager-d532d.appspot.com/o/default-user-profile-picture%2FUntitled.png?alt=media&token=0461fb17-8ef2-4192-9c9d-25dfacfd7420"

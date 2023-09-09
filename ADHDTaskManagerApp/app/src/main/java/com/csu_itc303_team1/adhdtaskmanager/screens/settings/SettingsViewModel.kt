@@ -4,7 +4,6 @@ import com.csu_itc303_team1.adhdtaskmanager.LOGIN_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.SPLASH_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
-import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
@@ -14,7 +13,6 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     logService: LogService,
     private val accountService: AccountService,
-    private val storageService: StorageService
 ) : MainViewModel(logService) {
     val uiState = accountService.currentUser.map {
         SettingsUiState(

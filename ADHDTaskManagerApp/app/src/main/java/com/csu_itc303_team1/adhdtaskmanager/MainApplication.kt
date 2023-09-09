@@ -6,16 +6,11 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -42,7 +36,6 @@ import com.csu_itc303_team1.adhdtaskmanager.common.snackbar.SnackbarManager
 import com.csu_itc303_team1.adhdtaskmanager.screens.edit_task.EditTaskScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsScreen
-import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.screens.splash.SplashScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.tasks.TasksScreen
 import com.csu_itc303_team1.adhdtaskmanager.theme.ADHDTaskManagerTheme
@@ -51,9 +44,6 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon
-import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -65,10 +55,10 @@ fun MainApplication() {
             RequestNotificationPermissionDialog()
         }
 
+
+
         Surface(color = MaterialTheme.colorScheme.background) {
             val appState = rememberAppState()
-            val scope = rememberCoroutineScope()
-            val settingsViewModel = hiltViewModel<SettingsViewModel>()
 
             Scaffold(
                 snackbarHost = {
@@ -79,120 +69,6 @@ fun MainApplication() {
                             Snackbar(snackbarData, contentColor = MaterialTheme.colorScheme.onPrimary)
                         }
                     )
-                },
-                scaffoldState = appState.scaffoldState,
-                drawerContent = {
-                    ModalNavigationDrawer(
-                        drawerContent = {
-                            ModalDrawerSheet {
-                                NavigationDrawerItem(
-                                    label = { AppText.tasks },
-                                    icon = { AppIcon.ic_tasks },
-                                    selected = appState.navController.currentDestination?.route == TASKS_SCREEN,
-                                    onClick = {
-                                        appState.navigate(TASKS_SCREEN)
-                                        scope.launch {
-                                            appState.toggleDrawerState()
-                                        }
-                                    }
-                                )
-
-                                NavigationDrawerItem(
-                                    label = { AppText.rewards },
-                                    icon = { AppIcon.ic_rewards },
-                                    selected = appState.navController.currentDestination?.route == REWARDS_SCREEN,
-                                    onClick = {
-                                        appState.navigate(REWARDS_SCREEN)
-                                        scope.launch {
-                                            appState.toggleDrawerState()
-                                        }
-                                    }
-                                )
-
-                                NavigationDrawerItem(
-                                    label = { AppText.leaderboard },
-                                    selected = appState.navController.currentDestination?.route == LEADERBOARD_SCREEN,
-                                    onClick = {
-                                        appState.navigate(LEADERBOARD_SCREEN)
-                                        scope.launch {
-                                            appState.toggleDrawerState()
-                                        }
-                                    }
-                                )
-
-                                NavigationDrawerItem(
-                                    label = { AppText.pomodoro_timer },
-                                    icon = { AppIcon.ic_timer },
-                                    selected = appState.navController.currentDestination?.route == POMODORO_TIMER_SCREEN,
-                                    onClick = {
-                                        appState.navigate(POMODORO_TIMER_SCREEN)
-                                        scope.launch {
-                                            appState.toggleDrawerState()
-                                        }
-                                    }
-                                )
-
-                                NavigationDrawerItem(
-                                    label = { AppText.help },
-                                    icon = { AppIcon.ic_help },
-                                    selected = appState.navController.currentDestination?.route == HELP_SCREEN,
-                                    onClick = {
-                                        appState.navigate(HELP_SCREEN)
-                                        scope.launch {
-                                            appState.toggleDrawerState()
-                                        }
-                                    }
-                                )
-
-                                NavigationDrawerItem(
-                                    label = { AppText.settings },
-                                    icon = { AppIcon.ic_settings },
-                                    selected = appState.navController.currentDestination?.route == SETTINGS_SCREEN,
-                                    onClick = {
-                                        appState.navigate(SETTINGS_SCREEN)
-                                        scope.launch {
-                                            appState.toggleDrawerState()
-                                        }
-                                    }
-                                )
-
-                                when(settingsViewModel.isSignedIn()){
-                                    true -> {
-                                        NavigationDrawerItem(
-                                            label = { AppText.sign_out },
-                                            icon = { AppIcon.ic_exit },
-                                            selected = false,
-                                            onClick = {
-                                                settingsViewModel.onSignOutClick { route ->
-                                                    appState.clearAndNavigate(route)
-                                                }
-                                                scope.launch {
-                                                    appState.toggleDrawerState()
-                                                }
-                                            }
-                                        )
-                                    }
-                                    false -> {
-                                        NavigationDrawerItem(
-                                            label = { AppText.sign_in },
-                                            icon = { AppIcon.ic_sign_in },
-                                            selected = false,
-                                            onClick = {
-                                                settingsViewModel.onLoginClick { route ->
-                                                    appState.clearAndNavigate(route)
-                                                }
-                                                scope.launch {
-                                                    appState.toggleDrawerState()
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    ) {
-
-                    }
                 },
             ) { innerPaddingModifier ->
                 NavHost(
@@ -222,18 +98,14 @@ fun RequestNotificationPermissionDialog() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberAppState(
-    drawerState: DrawerState = rememberDrawerState(
-        initialValue = DrawerValue.Closed,
-        confirmStateChange = { true }
-    ),
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     navController: NavHostController = rememberNavController(),
     snackbarManager: SnackbarManager = SnackbarManager,
     resources: Resources = resources(),
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) =
-    remember(scaffoldState, navController, snackbarManager, resources, coroutineScope, drawerState) {
-        AppState(drawerState, scaffoldState, navController, snackbarManager, resources, coroutineScope)
+    remember(navController, snackbarManager, resources, coroutineScope, drawerState) {
+        AppState(drawerState, navController, snackbarManager, resources, coroutineScope)
     }
 
 @Composable
@@ -265,7 +137,9 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
 
     composable(TASKS_SCREEN) {
         TasksScreen(
-            openScreen = { route -> appState.navigate(route) })
+            openScreen = { route -> appState.navigate(route) },
+            appState = appState
+            )
     }
 
     composable(

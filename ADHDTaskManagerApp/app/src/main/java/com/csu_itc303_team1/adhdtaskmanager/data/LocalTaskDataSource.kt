@@ -6,7 +6,4 @@ interface LocalTaskDataSource {
     suspend fun deleteTask(task: LocalTask)
     fun getTaskById(taskId : String): LocalTask
     fun getAllTasks(): List<LocalTask>
-    fun getAllTasksByCategory(category: String): List<LocalTask>
-    fun getAllTasksByPriority(): List<LocalTask>
-    fun getAllTasksByDueDate(): List<LocalTask>
 }

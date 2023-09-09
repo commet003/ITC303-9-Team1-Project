@@ -7,7 +7,7 @@ import java.util.UUID
 data class Task(
     @DocumentId val id: String = "",
     val title: String = "",
-    val priority: String = "",
+    val priority: Int = 0,
     val category: String = "None",
     val dueDate: String = "",
     val dueTime: String = "",
