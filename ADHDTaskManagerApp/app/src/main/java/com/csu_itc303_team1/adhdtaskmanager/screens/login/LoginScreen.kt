@@ -15,7 +15,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.BasicButton
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.BasicTextButton
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.BasicToolbar
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.basicButton
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.textButton
 import kotlinx.coroutines.launch
@@ -28,8 +27,6 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-
-    BasicToolbar(AppText.login_title)
 
     Column(
         modifier = modifier.fillMaxWidth().fillMaxHeight().verticalScroll(rememberScrollState()),

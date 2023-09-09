@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.BasicToolbar
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DangerousCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogCancelButton
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogConfirmButton
@@ -44,7 +43,6 @@ fun SettingsScreen(
         modifier = modifier.fillMaxWidth().fillMaxHeight().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BasicToolbar(AppText.settings)
 
         Spacer(modifier = Modifier.spacer())
 

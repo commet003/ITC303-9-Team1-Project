@@ -42,6 +42,10 @@ class AppState(
         navController.popBackStack()
     }
 
+    fun currentRoute(): String {
+        return navController.currentDestination?.route ?: ""
+    }
+
     fun navigate(route: String) {
         navController.navigate(route) { launchSingleTop = true }
     }

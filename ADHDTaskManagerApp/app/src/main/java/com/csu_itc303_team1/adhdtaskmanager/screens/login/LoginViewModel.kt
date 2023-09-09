@@ -3,7 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.login
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.mutableStateOf
 import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
@@ -26,8 +25,7 @@ class LoginViewModel @Inject constructor(
     private val usersStorageService: UsersStorageService,
     logService: LogService
 ) : MainViewModel(logService) {
-    var uiState = mutableStateOf(LoginUiState())
-        private set
+
 
     fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
 
