@@ -21,13 +21,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import com.csu_itc303_team1.adhdtaskmanager.DEFAULT_PROFILE_PICTURE
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.UserData
 
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
     Card(
@@ -82,7 +79,7 @@ fun LeaderboardCard(user: UserData, rank: Int, currentUserId: String) {
 
             Image(
                 painter = rememberImagePainter(
-                    data = if(user.profilePicture != "null") user.profilePicture else DEFAULT_PROFILE_PICTURE,
+                    data = user.profilePicture,
                 ),
                 contentDescription = "User's Profile Picture",
                 alignment = Alignment.Center,

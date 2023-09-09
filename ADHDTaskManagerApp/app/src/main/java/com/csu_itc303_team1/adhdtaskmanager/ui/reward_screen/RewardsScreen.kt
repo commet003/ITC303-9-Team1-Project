@@ -83,7 +83,7 @@ fun RewardsScreen(
         modifier = Modifier.padding(10.dp, 150.dp, 10.dp)
     ) {
         items(REWARDS_COUNTS.size) { reward ->
-            RewardCard(currentUser.getSignedInUser()!!.rewardsEarned?.keys?.elementAt(reward)!!, reward, currentUser, firestoreViewModel)
+            RewardCard(user?.rewardsEarned?.keys?.elementAt(reward)!!, reward, currentUser, firestoreViewModel)
         }
     }
 }

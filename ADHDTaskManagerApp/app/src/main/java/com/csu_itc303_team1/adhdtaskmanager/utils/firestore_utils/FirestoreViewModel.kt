@@ -1,6 +1,5 @@
 package com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils
 
-import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -63,13 +62,13 @@ class FirestoreViewModel(
     }
 
 
-    @SuppressLint("RestrictedApi")
+    // Check if user exists in firestore
     suspend fun checkUserExists(userId: String): Boolean{
-        usersRef.document(userId).get()
+        val washingtonRef = usersRef.document(userId)
+        washingtonRef.get()
             .addOnSuccessListener { document ->
                 if (document != null) {
                     Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                    _user.value = document.toObject(UserData::class.java)
                     _userExists.value = true
                 } else {
                     Log.d(TAG, "No such document")
@@ -169,7 +168,7 @@ class FirestoreViewModel(
                     Log.d(TAG, "DocumentSnapshot data: ${document.data}")
                     val user = document.toObject(UserData::class.java)
                     if (user != null) {
-                        if(Duration.between(user.lastLogin?.toInstant(), Date().toInstant()).toDays() >= 1){
+                        if(Duration.between(user.lastLogin?.toDate()?.toInstant(), Date().toInstant()).toDays() >= 1){
                             lastLogin = true
                         }
                     }

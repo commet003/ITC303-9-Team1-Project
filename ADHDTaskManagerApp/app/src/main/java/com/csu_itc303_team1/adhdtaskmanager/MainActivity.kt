@@ -23,7 +23,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -61,7 +60,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -148,6 +146,8 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+        val signInViewModel by viewModels<SignInViewModel>()
+
         lifecycleScope.launch {
             googleAuthUiClient.addAuthStateListener {
                 isSignedIn.value = it
@@ -218,7 +218,6 @@ class MainActivity : ComponentActivity() {
 
 
             val isDarkTheme by settingsViewModel.isDarkTheme.observeAsState(false)
-            val signInViewModel = viewModel<SignInViewModel>()
             val signInState by signInViewModel.state.collectAsState()
 
 
@@ -546,31 +545,7 @@ class MainActivity : ComponentActivity() {
 
                                         SignInScreen(
                                             state = signInState,
-                                            onSignInClick = {
-                                                lifecycleScope.launch {
-                                                    val signInIntentSender =
-                                                        googleAuthUiClient.signIn()
-                                                    launcher.launch(
-                                                        IntentSenderRequest.Builder(
-                                                            signInIntentSender ?: return@launch
-                                                        ).build()
-                                                    )
-                                                }
-                                            },
-                                            onAnonymousSignIn = {
-                                                lifecycleScope.launch {
-                                                    googleAuthUiClient.signInAnonymously()
-                                                    Toast.makeText(
-                                                        applicationContext,
-                                                        "Signed in anonymously",
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
-
-                                                    signInViewModel.userIsAnonymous()
-
-                                                    navController.navigate("todo_screen")
-                                                }
-                                            }
+                                            signInViewModel = signInViewModel
                                         )
                                     }
 

@@ -19,14 +19,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.SignInState
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignInScreen(
     state: SignInState,
-    onSignInClick: () -> Unit,
-    onAnonymousSignIn: () -> Unit
+    signInViewModel: SignInViewModel
 ) {
     val context = LocalContext.current
     LaunchedEffect(key1 = state.signInError) {
@@ -58,7 +59,11 @@ fun SignInScreen(
                         containerColor = Color.Black,
                         contentColor = Color.White
                     ),
-                    onClick = onSignInClick
+                    onClick = {
+                        signInViewModel.viewModelScope.launch {
+                            signInViewModel.onSignInClick()
+                        }
+                    }
                 ) {
                     Image(
                         painter = painterResource(
@@ -81,7 +86,12 @@ fun SignInScreen(
                         containerColor = Color.White,
                         contentColor = Color.Black
                     ),
-                    onClick = onAnonymousSignIn) {
+                    onClick = {
+                        signInViewModel.viewModelScope.launch {
+                            signInViewModel.onSignInAnonymouslyClick()
+                        }
+                    }
+                ) {
                     Text(
                         text = "Sign in Anonymously",
                         modifier = Modifier.padding(6.dp),

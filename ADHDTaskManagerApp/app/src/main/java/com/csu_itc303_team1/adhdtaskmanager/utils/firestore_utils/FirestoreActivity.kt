@@ -44,11 +44,6 @@ class FirestoreActivity: Activity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        
-    }
-
     override fun onStop() {
         super.onStop()
         listener?.remove()
