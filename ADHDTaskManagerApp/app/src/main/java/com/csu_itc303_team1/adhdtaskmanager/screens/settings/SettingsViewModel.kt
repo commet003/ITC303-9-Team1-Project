@@ -29,7 +29,7 @@ class SettingsViewModel @Inject constructor(
     fun onLinkAccountClick(openScreen: (String) -> Unit){
         launchCatching {
             accountService.linkAccount()
-            /* Todo: Add a screen for linking accounts */
+            openScreen(LOGIN_SCREEN)
         }
     }
 

@@ -68,6 +68,10 @@ class EditTaskViewModel @Inject constructor(
         task.value = task.value.copy(category = newCategory)
     }
 
+    fun onNavClick(popUpScreen: () -> Unit) {
+
+    }
+
     fun onDoneClick(popUpScreen: () -> Unit) {
 
         launchCatching {

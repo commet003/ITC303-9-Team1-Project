@@ -1,8 +1,10 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service.impl
 
+import android.app.Activity
 import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
+import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.perf.ktx.trace
@@ -16,6 +18,10 @@ import javax.inject.Inject
 class AccountServiceImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : AccountService {
+
+    private val requireActivity = Activity()
+    private lateinit var signInClient: SignInClient
+
 
     override val currentUserId: String
         get() = auth.currentUser?.uid.orEmpty()
@@ -35,7 +41,7 @@ class AccountServiceImpl @Inject constructor(
         }
 
     override suspend fun authenticateWithGoogle() {
-        /* TODO: Implement Google Sign-In */
+
     }
 
     override suspend fun createAnonymousAccount() {
@@ -80,3 +86,9 @@ class AccountServiceImpl @Inject constructor(
         private const val LINK_ACCOUNT_TRACE = "linkAccount"
     }
 }
+
+class SignInWithGoogleActivity() : Activity(){
+
+}
+
+

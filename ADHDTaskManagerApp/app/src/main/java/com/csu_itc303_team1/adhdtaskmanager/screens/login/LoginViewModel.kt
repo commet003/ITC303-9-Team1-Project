@@ -27,10 +27,52 @@ class LoginViewModel @Inject constructor(
 ) : MainViewModel(logService) {
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
 
         launchCatching {
-            accountService.authenticateWithGoogle()
+            //accountService.authenticateWithGoogle()
+            if(accountService.hasUser){
+                val check = usersStorageService.checkUserExistsInDatabase(accountService.currentUserId)
+                if(check){
+                    Log.d("LoginViewModel", "User exist in database")
+                    val user = usersStorageService.getUser(accountService.currentUserId)
+                    when(Duration.between(user?.lastLogin?.toDate()?.toInstant(), Date().toInstant()).toDays()) {
+                        0L -> {
+                            Log.d("LoginViewModel", "User logged in today")
+                            Timestamp.now()
+                        }
+                        1L -> {
+                            if (user?.loginStreak!! < 7) {
+                                user.loginStreak = user.loginStreak.plus(1)
+                            } else if (user.loginStreak == 7) {
+                                user.loginStreak = 1
+                                user.rewardPoints = user.rewardPoints.plus(LOGIN_REWARD)
+                                user.rewardsEarned[LOGIN_REWARD_NAME] = user.rewardsEarned[LOGIN_REWARD_NAME]?.plus(1) ?: 1
+                            }
+                            Timestamp.now()
+                        }
+                        else -> {
+                            user?.loginStreak = 1
+                            Timestamp.now()
+                        }
+                    }
+                    usersStorageService.update(user!!)
+                } else {
+                    Log.d("LoginViewModel", "User does not exist in database")
+                    val newUser = FirestoreUser(
+                        id = accountService.currentUserId,
+                        isAnonymous = true,
+                        username = generateRandomUsername(),
+                        leaderboardRank = 1,
+                        rewardPoints = 0,
+                        lastLogin = Timestamp.now(),
+                        loginStreak = 1,
+                        rewardsEarned = REWARDS_COUNTS.toMutableMap()
+                    )
+                    usersStorageService.save(newUser)
+                }
+            }
             openAndPopUp(TASKS_SCREEN, SETTINGS_SCREEN)
         }
     }

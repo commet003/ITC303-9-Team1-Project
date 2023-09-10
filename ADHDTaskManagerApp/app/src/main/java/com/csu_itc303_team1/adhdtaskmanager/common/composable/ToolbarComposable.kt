@@ -32,7 +32,7 @@ fun ActionToolbar(
     modifier: Modifier,
     endAction: () -> Unit
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = { Text(stringResource(title)) },
         colors = toolbarColor(),
         actions = {

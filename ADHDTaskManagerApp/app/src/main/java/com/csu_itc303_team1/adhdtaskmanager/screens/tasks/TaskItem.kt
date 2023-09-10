@@ -167,6 +167,19 @@ fun TaskCard(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.End
             ) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = when(task.category) {
+                        "Work" -> "Work"
+                        "School" -> "School"
+                        "Other" -> "Other"
+                        "Home" -> "Home"
+                        else -> "None"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.weight(1f))
                 Text(
                     text =  Priority.getByValue(task.priority).name,
                     style = MaterialTheme.typography.bodySmall,

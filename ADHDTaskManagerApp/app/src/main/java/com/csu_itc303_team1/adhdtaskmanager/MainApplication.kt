@@ -335,7 +335,6 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
     composable(TASKS_SCREEN) {
         TasksScreen(
             openScreen = { route -> appState.navigate(route) },
-            appState = appState
         )
     }
 

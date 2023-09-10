@@ -219,7 +219,7 @@ fun CategoryDropdown(
                 onClick = { }) {
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = if (categorySelection.isBlank()) "Category" else Category.getCategoryByName(
+                    text = if (categorySelection == "None") "Category" else Category.getCategoryByName(
                         categorySelection
                     ).name,
                     color = MaterialTheme.colorScheme.onPrimary,

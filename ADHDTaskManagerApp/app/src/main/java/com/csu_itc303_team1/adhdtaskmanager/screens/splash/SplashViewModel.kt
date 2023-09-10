@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.splash
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.csu_itc303_team1.adhdtaskmanager.LOGIN_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.SPLASH_SCREEN
@@ -26,7 +27,11 @@ class SplashViewModel @Inject constructor(
     fun onAppStart(openAndPopUp: (String, String) -> Unit) {
 
         showError.value = false
-        if (accountService.hasUser) openAndPopUp(TASKS_SCREEN, SPLASH_SCREEN)
-        else openAndPopUp(LOGIN_SCREEN, SPLASH_SCREEN)
+        if (accountService.hasUser){
+            openAndPopUp(TASKS_SCREEN, SPLASH_SCREEN)
+            Log.d("SplashViewModel", "User ${accountService.currentUserId} logged in")
+        } else {
+            openAndPopUp(LOGIN_SCREEN, SPLASH_SCREEN)
+        }
     }
 }

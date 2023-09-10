@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.csu_itc303_team1.adhdtaskmanager.AppState
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.smallSpacer
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
@@ -30,7 +29,6 @@ import com.csu_itc303_team1.adhdtaskmanager.common.ext.smallSpacer
 @ExperimentalMaterialApi
 fun TasksScreen(
     openScreen: (String) -> Unit,
-    appState: AppState,
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = hiltViewModel()
 ) {
