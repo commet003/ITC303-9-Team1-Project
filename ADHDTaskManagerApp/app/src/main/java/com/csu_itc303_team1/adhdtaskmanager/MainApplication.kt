@@ -6,6 +6,7 @@ import android.content.res.Resources
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -65,6 +66,8 @@ import com.csu_itc303_team1.adhdtaskmanager.screens.edit_task.EditTaskScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.help.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginViewModel
+import com.csu_itc303_team1.adhdtaskmanager.screens.pomodoro_timer.Session
+import com.csu_itc303_team1.adhdtaskmanager.screens.pomodoro_timer.Timer
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.screens.splash.SplashScreen
@@ -374,6 +377,17 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
 
     composable(HELP_SCREEN) {
         HelpScreen()
+    }
+
+
+    composable(POMODORO_TIMER_SCREEN) {
+        Column {
+            Timer(
+                duration = 25,
+                onTimerCompleted = {Log.d("Timer", "Timer Completed")}
+            )
+            Session()
+        }
     }
 
     composable(

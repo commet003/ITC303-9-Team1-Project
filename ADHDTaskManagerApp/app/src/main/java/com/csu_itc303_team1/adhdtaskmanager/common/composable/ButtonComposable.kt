@@ -2,11 +2,21 @@ package com.csu_itc303_team1.adhdtaskmanager.common.composable
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -90,5 +100,45 @@ fun GoogleSignInButton(@StringRes label: Int, onClick: () -> Unit) {
             fontSize = 18.sp
         )
     }
+}
 
+
+@Composable
+fun ControlButton(
+    modifier: Modifier = Modifier,
+    running: Boolean,
+    onResumeClicked: () -> Unit,
+    onRestartClicked: () -> Unit,
+    onPauseClicked: () -> Unit,
+) {
+    if (running) {
+        Row {
+            Icon(
+                imageVector = Icons.Filled.Pause,
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = stringResource(id = R.string.stop_timer_description),
+                modifier = modifier
+                    .size(50.dp)
+                    .clickable { onPauseClicked.invoke() },
+            )
+            Spacer(modifier = Modifier.width(width = 16.dp))
+            Icon(
+                imageVector = Icons.Outlined.Refresh,
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = stringResource(id = R.string.restart_timer_description),
+                modifier = modifier
+                    .size(50.dp)
+                    .clickable { onRestartClicked.invoke() },
+            )
+        }
+    } else {
+        Icon(
+            imageVector = Icons.Filled.PlayArrow,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = stringResource(id = R.string.resume_timer_description),
+            modifier = modifier
+                .size(50.dp)
+                .clickable { onResumeClicked.invoke() },
+        )
+    }
 }

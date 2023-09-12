@@ -52,4 +52,7 @@
     <string name="notification_permission_description">The notification permission is important for this app. Please grant the permission.</string>
     <string name="notification_permission_settings">The notification permission is important for this app. Please navigate to your device settings and enable notifications for Make it So.</string>
     <string name="your_web_client_id" />
+    <string name="stop_timer_description">Stop Timer</string>
+    <string name="restart_timer_description">Restart Timer</string>
+    <string name="resume_timer_description">Resume Timer</string>
 </resources>

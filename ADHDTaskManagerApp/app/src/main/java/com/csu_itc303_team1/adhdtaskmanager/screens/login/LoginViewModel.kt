@@ -46,10 +46,10 @@ class LoginViewModel @Inject constructor(
                         }
                         1L -> {
                             if (user?.loginStreak!! < 7) {
-                                user.loginStreak = user.loginStreak.plus(1)
+                                user.loginStreak += 1
                             } else if (user.loginStreak == 7) {
                                 user.loginStreak = 1
-                                user.rewardPoints = user.rewardPoints.plus(LOGIN_REWARD)
+                                user.rewardPoints += LOGIN_REWARD
                                 user.rewardsEarned[LOGIN_REWARD_NAME] = user.rewardsEarned[LOGIN_REWARD_NAME]?.plus(1) ?: 1
                             }
                             user.lastLogin = Timestamp.now()
