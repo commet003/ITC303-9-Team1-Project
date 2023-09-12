@@ -4,7 +4,6 @@ import android.app.Activity
 import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.perf.ktx.trace
@@ -19,9 +18,7 @@ class AccountServiceImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : AccountService {
 
-    private val requireActivity = Activity()
-    private lateinit var signInClient: SignInClient
-
+    private var _isSignedIn = false
 
     override val currentUserId: String
         get() = auth.currentUser?.uid.orEmpty()
@@ -42,6 +39,13 @@ class AccountServiceImpl @Inject constructor(
 
     override suspend fun authenticateWithGoogle() {
 
+    }
+
+    override fun addAuthStateListener(listener: (Boolean) -> Unit) {
+        auth.addAuthStateListener {
+            _isSignedIn = it.currentUser != null
+            listener(_isSignedIn)
+        }
     }
 
     override suspend fun createAnonymousAccount() {

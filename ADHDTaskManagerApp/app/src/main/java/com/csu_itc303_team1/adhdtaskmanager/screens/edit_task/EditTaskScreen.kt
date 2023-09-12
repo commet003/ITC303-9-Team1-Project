@@ -106,26 +106,6 @@ private fun CardEditors(
     }
 }
 
-/*@Composable
-@ExperimentalMaterialApi
-private fun CardSelectors(
-    task: Task,
-    onPriorityChange: (String) -> Unit,
-    onCategoryChange: (String) -> Unit
-) {
-    val prioritySelection = Priority.getByName(Priority.getByValue(task.priority).name).name
-    CardSelector(AppText.priority, Priority.getOptions(), prioritySelection, Modifier.card()) {
-            newValue ->
-        onPriorityChange(newValue)
-    }
-
-    val categorySelection = Category.getCategoryByName(task.category).name
-    CardSelector(AppText.category, Category.getCategories(), categorySelection, Modifier.card()) {
-            newValue ->
-        onCategoryChange(newValue)
-    }
-}*/
-
 private fun showDatePicker(activity: AppCompatActivity?, onDateChange: (Long) -> Unit) {
     val picker = MaterialDatePicker.Builder.datePicker().build()
 

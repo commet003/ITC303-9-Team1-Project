@@ -9,6 +9,8 @@ interface AccountService {
 
     val currentUser: Flow<User>
 
+    fun addAuthStateListener(listener: (Boolean) -> Unit)
+
     suspend fun authenticateWithGoogle()
     suspend fun createAnonymousAccount()
     suspend fun linkAccount()

@@ -19,9 +19,12 @@ class SplashViewModel @Inject constructor(
     logService: LogService
 ) : MainViewModel(logService) {
     val showError = mutableStateOf(false)
+    var currentUser = accountService.currentUser
 
     init {
-        launchCatching { configurationService.fetchConfiguration() }
+        launchCatching {
+            configurationService.fetchConfiguration()
+        }
     }
 
     fun onAppStart(openAndPopUp: (String, String) -> Unit) {

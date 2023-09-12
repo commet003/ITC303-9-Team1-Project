@@ -125,6 +125,9 @@ class LoginViewModel @Inject constructor(
             openAndPopUp(TASKS_SCREEN, SETTINGS_SCREEN)
         }
     }
+    fun authStateListener(listener: (Boolean) -> Unit) {
+        accountService.addAuthStateListener(listener)
+    }
 
     private fun generateRandomUsername(): String {
         return "Anonymous" + (0..100000).random()

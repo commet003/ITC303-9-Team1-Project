@@ -55,36 +55,12 @@ fun SettingsScreen(
                 viewModel.onLinkAccountClick(openScreen)
             }
         } else if (uiState.isSignedIn) {
-            SignOutCard { viewModel.onSignOutClick(restartApp) }
             DeleteMyAccountCard { viewModel.onDeleteMyAccountClick(restartApp) }
         }
     }
 }
 
-@ExperimentalMaterialApi
-@Composable
-private fun SignOutCard(signOut: () -> Unit) {
-    var showWarningDialog by remember { mutableStateOf(false) }
 
-    RegularCardEditor(AppText.sign_out, AppIcon.ic_exit, "", Modifier.card()) {
-        showWarningDialog = true
-    }
-
-    if (showWarningDialog) {
-        AlertDialog(
-            title = { Text(stringResource(AppText.sign_out_title)) },
-            text = { Text(stringResource(AppText.sign_out_description)) },
-            dismissButton = { DialogCancelButton(AppText.cancel) { showWarningDialog = false } },
-            confirmButton = {
-                DialogConfirmButton(AppText.sign_out) {
-                    signOut()
-                    showWarningDialog = false
-                }
-            },
-            onDismissRequest = { showWarningDialog = false }
-        )
-    }
-}
 
 @ExperimentalMaterialApi
 @Composable
