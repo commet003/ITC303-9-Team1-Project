@@ -6,6 +6,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
+import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsViewModel
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -75,12 +83,27 @@ private val DarkColors = darkColorScheme(
 @SuppressLint("NewApi")
 @Composable
 fun ADHDTaskManagerTheme(
+    viewModel: SettingsViewModel = hiltViewModel(),
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val myColorScheme = when {
-        isDarkTheme -> DarkColors
-        else -> LightColors
+    val themeState by viewModel.getPreferences().collectAsState(initial = UserPreferences())
+
+    var myColorScheme by remember {
+        mutableStateOf(
+            LightColors
+        )
+    }
+    myColorScheme = if (themeState.darkMode == isDarkTheme) {
+        when {
+            isDarkTheme -> DarkColors
+            else -> LightColors
+        }
+    } else {
+        when {
+            themeState.darkMode -> DarkColors
+            else -> LightColors
+        }
     }
 
     MaterialTheme(

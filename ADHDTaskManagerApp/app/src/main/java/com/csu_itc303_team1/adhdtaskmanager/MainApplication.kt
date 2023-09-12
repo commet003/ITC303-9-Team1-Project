@@ -88,7 +88,7 @@ fun MainApplication(
     viewModel: LoginViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
-    ADHDTaskManagerTheme {
+    ADHDTaskManagerTheme{
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             RequestNotificationPermissionDialog()
         }

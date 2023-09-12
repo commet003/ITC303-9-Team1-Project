@@ -7,12 +7,14 @@ import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.PomodoroTimerService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.UserPreferencesService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AccountServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.ConfigurationServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.LogServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.PomodoroTimerServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.StorageServiceImpl
+import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.UserPreferencesServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.UsersStorageServiceImpl
 import dagger.Binds
 import dagger.Module
@@ -43,4 +45,7 @@ abstract class ServiceModule {
 
     @Binds
     abstract fun providePomoTimerService(impl: PomodoroTimerServiceImpl): PomodoroTimerService
+
+    @Binds
+    abstract fun userPreferencesService(impl: UserPreferencesServiceImpl): UserPreferencesService
 }

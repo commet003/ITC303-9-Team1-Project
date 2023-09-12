@@ -32,7 +32,7 @@ fun DangerousCardEditor(
     modifier: Modifier,
     onEditClick: () -> Unit
 ) {
-    CardEditor(title, icon, content, onEditClick, MaterialTheme.colorScheme.primary, modifier)
+    CardEditor(title, icon, content, onEditClick, MaterialTheme.colorScheme.error, modifier)
 }
 
 @ExperimentalMaterialApi
