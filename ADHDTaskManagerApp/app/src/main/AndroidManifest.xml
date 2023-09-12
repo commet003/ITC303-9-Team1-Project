@@ -5,6 +5,8 @@
         android:label="@string/app_name"
         android:name=".HiltApp"
         android:theme="@style/Theme.ADHD">
+        <!-- For viewing webpage -->
+        <activity android:name=".screens.help.WebViewActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

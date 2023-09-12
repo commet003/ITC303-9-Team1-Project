@@ -1,10 +1,14 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service.impl
 
-import android.app.Activity
+import android.content.Intent
+import android.content.IntentSender
 import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.perf.ktx.trace
 import kotlinx.coroutines.channels.awaitClose
@@ -19,6 +23,11 @@ class AccountServiceImpl @Inject constructor(
 ) : AccountService {
 
     private var _isSignedIn = false
+
+    override var oneTapClient: SignInClient? = null
+    private val token = "525253102394-s29vu43otv2br84kgvfjjtje4pgpmoa0.apps.googleusercontent.com"
+
+
 
     override val currentUserId: String
         get() = auth.currentUser?.uid.orEmpty()
@@ -37,8 +46,48 @@ class AccountServiceImpl @Inject constructor(
             awaitClose { auth.removeAuthStateListener(listener) }
         }
 
-    override suspend fun authenticateWithGoogle() {
+    override suspend fun authenticateWithGoogle(): IntentSender? {
+        val result = try {
+            oneTapClient?.beginSignIn(
+                buildSignInRequest()
+            )?.await()
+        } catch(e: Exception) {
+            e.printStackTrace()
+            if(e is CancellationException) throw e
+            null
+        }
+        return result?.pendingIntent?.intentSender
+    }
 
+    override suspend fun signInWithIntent(intent: Intent): FirebaseUser? {
+        var user: FirebaseUser? = null
+        val credential = oneTapClient!!.getSignInCredentialFromIntent(intent)
+        val googleIdToken = credential.googleIdToken
+        val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
+        try {
+            user = auth.signInWithCredential(googleCredentials).await().user
+            if (user != null) {
+                Log.d("AccountServiceImpl", "signInWithIntent: ${user.uid}")
+            } else {
+                Log.d("AccountServiceImpl", "signInWithIntent: null")
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            if(e is CancellationException) throw e
+        }
+        return user
+    }
+
+    override fun buildSignInRequest(): BeginSignInRequest {
+        return BeginSignInRequest.Builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    .setFilterByAuthorizedAccounts(false)
+                    .setServerClientId(token)
+                    .build()
+            )
+            .build()
     }
 
     override fun addAuthStateListener(listener: (Boolean) -> Unit) {
@@ -81,9 +130,6 @@ class AccountServiceImpl @Inject constructor(
             auth.currentUser!!.delete()
         }
         auth.signOut()
-
-        // Sign the user back in anonymously.
-        //createAnonymousAccount()
     }
 
     companion object {
@@ -91,8 +137,5 @@ class AccountServiceImpl @Inject constructor(
     }
 }
 
-class SignInWithGoogleActivity() : Activity(){
-
-}
 
 

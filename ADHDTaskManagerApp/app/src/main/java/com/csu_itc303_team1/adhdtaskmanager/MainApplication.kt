@@ -62,6 +62,7 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.PermissionDialog
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.RationaleDialog
 import com.csu_itc303_team1.adhdtaskmanager.common.snackbar.SnackbarManager
 import com.csu_itc303_team1.adhdtaskmanager.screens.edit_task.EditTaskScreen
+import com.csu_itc303_team1.adhdtaskmanager.screens.help.HelpScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginViewModel
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsScreen
@@ -369,6 +370,10 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
         TasksScreen(
             openScreen = { route -> appState.navigate(route) },
         )
+    }
+
+    composable(HELP_SCREEN) {
+        HelpScreen()
     }
 
     composable(

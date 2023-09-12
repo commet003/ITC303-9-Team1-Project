@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.login
 
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -13,7 +14,9 @@ import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
+import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Duration
 import java.util.Date
@@ -26,13 +29,12 @@ class LoginViewModel @Inject constructor(
     logService: LogService
 ) : MainViewModel(logService) {
 
+    private var currentUser: FirebaseUser? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
-
         launchCatching {
-            //accountService.authenticateWithGoogle()
-            if(accountService.hasUser){
+            if(currentUser != null){
                 val check = usersStorageService.checkUserExistsInDatabase(accountService.currentUserId)
                 if(check){
                     Log.d("LoginViewModel", "User exist in database")
@@ -40,7 +42,7 @@ class LoginViewModel @Inject constructor(
                     when(Duration.between(user?.lastLogin?.toDate()?.toInstant(), Date().toInstant()).toDays()) {
                         0L -> {
                             Log.d("LoginViewModel", "User logged in today")
-                            Timestamp.now()
+                            user?.lastLogin = Timestamp.now()
                         }
                         1L -> {
                             if (user?.loginStreak!! < 7) {
@@ -50,11 +52,11 @@ class LoginViewModel @Inject constructor(
                                 user.rewardPoints = user.rewardPoints.plus(LOGIN_REWARD)
                                 user.rewardsEarned[LOGIN_REWARD_NAME] = user.rewardsEarned[LOGIN_REWARD_NAME]?.plus(1) ?: 1
                             }
-                            Timestamp.now()
+                            user.lastLogin = Timestamp.now()
                         }
                         else -> {
                             user?.loginStreak = 1
-                            Timestamp.now()
+                            user?.lastLogin = Timestamp.now()
                         }
                     }
                     usersStorageService.update(user!!)
@@ -124,6 +126,22 @@ class LoginViewModel @Inject constructor(
             }
             openAndPopUp(TASKS_SCREEN, SETTINGS_SCREEN)
         }
+    }
+
+    suspend fun signIn() = accountService.authenticateWithGoogle()
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun signInWithIntent(openAndPopUp: (String, String) -> Unit, intent: Intent){
+        launchCatching {
+            accountService.signInWithIntent(intent)?.let {
+                currentUser = it
+            }
+            onSignInClick(openAndPopUp)
+        }
+    }
+
+    // Function to set accountService.oneTapSignIn to oneTapClient
+    fun setOneTapClient(client: SignInClient) {
+        accountService.oneTapClient = client
     }
     fun authStateListener(listener: (Boolean) -> Unit) {
         accountService.addAuthStateListener(listener)
