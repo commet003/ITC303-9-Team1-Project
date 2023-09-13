@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.EDIT_TASK_SCREEN
-import com.csu_itc303_team1.adhdtaskmanager.SETTINGS_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
 import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
@@ -119,7 +118,6 @@ class TasksViewModel @Inject constructor(
 
     fun onAddClick(openScreen: (String) -> Unit) = openScreen(EDIT_TASK_SCREEN)
 
-    fun onSettingsClick(openScreen: (String) -> Unit) = openScreen(SETTINGS_SCREEN)
 
     fun onTaskActionClick(openScreen: (String) -> Unit, task: Task, action: String) {
         when (TaskActionOption.getByTitle(action)) {

@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.model.service.impl
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
+import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -25,7 +26,7 @@ class AccountServiceImpl @Inject constructor(
     private var _isSignedIn = false
 
     override var oneTapClient: SignInClient? = null
-    private val token = "525253102394-s29vu43otv2br84kgvfjjtje4pgpmoa0.apps.googleusercontent.com"
+
 
 
 
@@ -89,7 +90,7 @@ class AccountServiceImpl @Inject constructor(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(token)
+                    .setServerClientId(BuildConfig.FIREBASE_API_KEY)
                     .build()
             )
             .build()

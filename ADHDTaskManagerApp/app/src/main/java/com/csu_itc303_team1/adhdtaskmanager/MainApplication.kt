@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -331,7 +330,6 @@ fun RequestNotificationPermissionDialog() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun rememberAppState(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),

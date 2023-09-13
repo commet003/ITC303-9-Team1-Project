@@ -1,3 +1,7 @@
+
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -9,9 +13,19 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.10.0"
 }
 
+val apiKeyFile = rootProject.file("apikey.properties")
+
+// Initializes a new Properties() object called keystoreProperties.
+val apiKeyProperties = Properties()
+
+// Loads the keystore.properties file into the keystoreProperties object.
+apiKeyProperties.load(FileInputStream(apiKeyFile))
+
+
 android {
     compileSdk = 34
     namespace = "com.csu_itc303_team1.adhdtaskmanager"
+
 
     defaultConfig {
         applicationId = "com.csu_itc303_team1.adhdtaskmanager"
@@ -19,6 +33,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "FIREBASE_API_KEY", "\"${apiKeyProperties["WEB_CLIENT_ID"]}\"")
+        buildConfigField("String", "DB_PASSWORD", "\"${apiKeyProperties["TASK_DATABASE_PASSPHRASE"]}\"")
 
         testInstrumentationRunner = "com.csu_itc303_team1.adhdtaskmanager.ExampleInstrumentedTest"
         vectorDrawables.useSupportLibrary = true
