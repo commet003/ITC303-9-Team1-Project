@@ -55,4 +55,10 @@
     <string name="stop_timer_description">Stop Timer</string>
     <string name="restart_timer_description">Restart Timer</string>
     <string name="resume_timer_description">Resume Timer</string>
+
+
+    <!-- Rewards Earned Descriptions -->
+    <string name="completed_task_reward_description">You have earned the \"Completed Tasks\" reward for completing your tasks!</string>
+    <string name="login_reward_description">You have earned this reward for building good habits and logging in to complete your tasks!</string>
+    <string name="login_streak_reward_description">You have earned this reward for consistently logging in to complete your tasks!</string>
 </resources>

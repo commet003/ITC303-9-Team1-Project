@@ -5,9 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.csu_itc303_team1.adhdtaskmanager.common.ext.smallSpacer
 import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
@@ -51,13 +50,14 @@ fun TasksScreen(
     viewModel: TasksViewModel = hiltViewModel()
 ) {
     Scaffold(
+        modifier = modifier.padding(10.dp),
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.onAddClick(openScreen) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,
-                modifier = modifier.padding(16.dp)
+                modifier = modifier.padding(10.dp)
             ) {
                 Icon(Icons.Filled.Add, "Add")
             }
@@ -66,18 +66,19 @@ fun TasksScreen(
     ) {
         val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
 
-        Column(modifier = Modifier
-            .fillMaxSize()) {
-
+        Column(
+            modifier = Modifier
+            .fillMaxSize()
+        ) {
             Row(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .height(40.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ){
                 filterTasksDropdown()
             }
-            Spacer(modifier = Modifier.smallSpacer())
 
             LazyColumn {
                 items(tasks.value, key = { it.id }) { taskItem ->

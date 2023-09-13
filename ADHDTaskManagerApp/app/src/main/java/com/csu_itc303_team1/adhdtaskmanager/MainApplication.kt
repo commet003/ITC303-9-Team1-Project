@@ -68,6 +68,7 @@ import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginViewModel
 import com.csu_itc303_team1.adhdtaskmanager.screens.pomodoro_timer.Session
 import com.csu_itc303_team1.adhdtaskmanager.screens.pomodoro_timer.Timer
+import com.csu_itc303_team1.adhdtaskmanager.screens.rewards.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.screens.splash.SplashScreen
@@ -357,6 +358,10 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
             openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }
         )
 
+    }
+
+    composable(REWARDS_SCREEN) {
+        RewardsScreen()
     }
 
     composable(SETTINGS_SCREEN) {

@@ -8,7 +8,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -18,8 +17,9 @@ class UsersStorageServiceImpl
 constructor(private val firestore: FirebaseFirestore, private val auth: AccountService) :
     UsersStorageService {
 
+    override val currentUser: Flow<FirestoreUser?>
+        get() = firestore.collection(USERS_COLLECTION).document(auth.currentUserId).dataObjects()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override val leaderboardUsers: Flow<List<FirestoreUser>>
         get() = firestore.collection(USERS_COLLECTION).whereEqualTo(USER_ID_FIELD, auth.currentUserId).dataObjects()
 
