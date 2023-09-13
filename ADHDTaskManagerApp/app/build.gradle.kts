@@ -88,6 +88,9 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
 
+    // Import Coil Compose
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.csu_itc303_team1.adhdtaskmanager.DEFAULT_PROFILE_PICTURE
 import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
@@ -63,11 +64,11 @@ class LoginViewModel @Inject constructor(
                 } else {
                     Log.d("LoginViewModel", "User does not exist in database")
                     val newUser = FirestoreUser(
-                        id = accountService.currentUserId,
-                        isAnonymous = true,
-                        username = generateRandomUsername(),
-                        leaderboardRank = 1,
+                        id = currentUser?.uid!!,
+                        isAnonymous = currentUser!!.isAnonymous,
+                        username = currentUser?.displayName!!,
                         rewardPoints = 0,
+                        profilePictureUrl = currentUser?.photoUrl.toString(),
                         lastLogin = Timestamp.now(),
                         loginStreak = 1,
                         rewardsEarned = REWARDS_COUNTS.toMutableMap()
@@ -115,8 +116,8 @@ class LoginViewModel @Inject constructor(
                         id = accountService.currentUserId,
                         isAnonymous = true,
                         username = generateRandomUsername(),
-                        leaderboardRank = 1,
                         rewardPoints = 0,
+                        profilePictureUrl = DEFAULT_PROFILE_PICTURE,
                         lastLogin = Timestamp.now(),
                         loginStreak = 1,
                         rewardsEarned = REWARDS_COUNTS.toMutableMap()

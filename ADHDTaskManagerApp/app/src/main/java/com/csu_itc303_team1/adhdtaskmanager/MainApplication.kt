@@ -64,6 +64,7 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.RationaleDialog
 import com.csu_itc303_team1.adhdtaskmanager.common.snackbar.SnackbarManager
 import com.csu_itc303_team1.adhdtaskmanager.screens.edit_task.EditTaskScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.help.HelpScreen
+import com.csu_itc303_team1.adhdtaskmanager.screens.leaderboard.LeaderboardScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.login.LoginViewModel
 import com.csu_itc303_team1.adhdtaskmanager.screens.pomodoro_timer.Session
@@ -284,6 +285,7 @@ fun MainApplication(
                                     colors = navigationItemColors(),
                                     selected = false,
                                     onClick = {
+                                        selectedItem = TASKS_SCREEN
                                         showWarningDialog = true
                                         coroutineScope.launch {
                                             appState.closeDrawer()
@@ -385,6 +387,9 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
         HelpScreen()
     }
 
+    composable(LEADERBOARD_SCREEN) {
+        LeaderboardScreen()
+    }
 
     composable(POMODORO_TIMER_SCREEN) {
         Column {
