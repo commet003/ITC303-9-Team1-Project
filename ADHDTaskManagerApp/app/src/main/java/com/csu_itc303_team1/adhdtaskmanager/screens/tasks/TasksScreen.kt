@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,13 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -29,6 +31,7 @@ import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +43,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
+import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 
+@RequiresApi(Build.VERSION_CODES.N)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @ExperimentalMaterialApi
@@ -49,6 +54,8 @@ fun TasksScreen(
     modifier: Modifier = Modifier,
     viewModel: TasksViewModel = hiltViewModel()
 ) {
+    val userPreferences by viewModel.getPreferences().collectAsState(initial = UserPreferences())
+
     Scaffold(
         modifier = modifier.padding(10.dp),
         floatingActionButton = {
@@ -68,7 +75,7 @@ fun TasksScreen(
 
         Column(
             modifier = Modifier
-            .fillMaxSize()
+                .fillMaxSize()
         ) {
             Row(
                 modifier = Modifier
@@ -77,16 +84,32 @@ fun TasksScreen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                filterTasksDropdown()
+                FilterTasksDropdown(
+                    viewModel = viewModel
+                )
             }
 
-            LazyColumn {
-                items(tasks.value, key = { it.id }) { taskItem ->
 
-                    TaskItem(
-                        task = taskItem,
-                        onActionClick = { action -> viewModel.onTaskActionClick(openScreen, taskItem, action) }
-                    )
+            LazyColumn {
+                viewModel.filterSortTasks(
+                    tasks = tasks.value,
+                    showCompleted = false,
+                    showUncompleted = true,
+                    sortOrder = userPreferences.sortOrder
+                ).forEach { task ->
+                    item {
+                        TaskItem(
+                            task = task,
+                            onActionClick = { action ->
+                                viewModel.onTaskActionClick(
+                                    openScreen,
+                                    task,
+                                    action
+                                )
+                            },
+                        )
+
+                    }
                 }
             }
         }
@@ -98,12 +121,12 @@ fun TasksScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun filterTasksDropdown(
+fun FilterTasksDropdown(
+    viewModel: TasksViewModel
+){
 
-): SortOrder{
-
-    var sortOrder = remember {SortOrder.NONE}
     var expanded by remember { mutableStateOf(false) }
+    val userPreferences by viewModel.getPreferences().collectAsState(initial = UserPreferences())
 
 
     Column (
@@ -127,7 +150,7 @@ fun filterTasksDropdown(
                 onClick = { }) {
                 Icon(
                     tint = MaterialTheme.colorScheme.onBackground,
-                    imageVector = Icons.Filled.List,
+                    imageVector = Icons.AutoMirrored.Filled.List,
                     contentDescription = "Filter"
                 )
             }
@@ -148,10 +171,10 @@ fun filterTasksDropdown(
                         disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
-                    enabled = sortOrder != SortOrder.NONE,
+                    enabled = userPreferences.sortOrder != SortOrder.NONE,
                     onClick = {
                         expanded = false
-                        sortOrder = SortOrder.NONE
+                        viewModel.setSortOrder(SortOrder.NONE)
                     },
                     text = { Text("None") }
                 )
@@ -165,10 +188,10 @@ fun filterTasksDropdown(
                         disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
-                    enabled = sortOrder != SortOrder.BY_DEADLINE,
+                    enabled = userPreferences.sortOrder != SortOrder.BY_DEADLINE,
                     onClick = {
                         expanded = false
-                        sortOrder = SortOrder.BY_DEADLINE
+                        viewModel.setSortOrder(SortOrder.BY_DEADLINE)
                     },
                     text = { Text("Deadline") }
                 )
@@ -182,10 +205,10 @@ fun filterTasksDropdown(
                         disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
-                    enabled = sortOrder != SortOrder.BY_PRIORITY,
+                    enabled = userPreferences.sortOrder != SortOrder.BY_PRIORITY,
                     onClick = {
                         expanded = false
-                        sortOrder = SortOrder.BY_PRIORITY
+                        viewModel.setSortOrder(SortOrder.BY_PRIORITY)
                     },
                     text = { Text("Priority") }
                 )
@@ -199,10 +222,10 @@ fun filterTasksDropdown(
                         disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
-                    enabled = sortOrder != SortOrder.BY_DEADLINE_AND_PRIORITY,
+                    enabled = userPreferences.sortOrder != SortOrder.BY_DEADLINE_AND_PRIORITY,
                     onClick = {
                         expanded = false
-                        sortOrder = SortOrder.BY_DEADLINE_AND_PRIORITY
+                        viewModel.setSortOrder(SortOrder.BY_DEADLINE_AND_PRIORITY)
                     },
                     text = { Text("Deadline and Priority") }
                 )
@@ -216,10 +239,10 @@ fun filterTasksDropdown(
                         disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
-                    enabled = sortOrder != SortOrder.BY_CATEGORY,
+                    enabled = userPreferences.sortOrder != SortOrder.BY_CATEGORY,
                     onClick = {
                         expanded = false
-                        sortOrder = SortOrder.BY_CATEGORY
+                        viewModel.setSortOrder(SortOrder.BY_CATEGORY)
                     },
                     text = { Text("Category") }
                 )
@@ -233,16 +256,14 @@ fun filterTasksDropdown(
                         disabledLeadingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                         disabledTrailingIconColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
-                    enabled = sortOrder != SortOrder.BY_DEADLINE_AND_CATEGORY,
+                    enabled = userPreferences.sortOrder != SortOrder.BY_DEADLINE_AND_CATEGORY,
                     onClick = {
                         expanded = false
-                        sortOrder = SortOrder.BY_DEADLINE_AND_CATEGORY
+                        viewModel.setSortOrder(SortOrder.BY_DEADLINE_AND_CATEGORY)
                     },
                     text = { Text("Deadline and Category") }
                 )
             }
         }
     }
-
-    return sortOrder
 }

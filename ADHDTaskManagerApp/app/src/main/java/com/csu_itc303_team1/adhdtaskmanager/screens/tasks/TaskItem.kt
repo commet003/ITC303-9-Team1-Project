@@ -43,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -88,7 +89,7 @@ internal fun TaskItem(
                 }
             }
         },
-        positionalThreshold =  { 150.dp.value },
+        positionalThreshold =  { 200.dp.value },
     )
     AnimatedVisibility(
         show,
@@ -96,7 +97,8 @@ internal fun TaskItem(
     ) {
         SwipeToDismiss(
             state = dismissState,
-            modifier = Modifier,
+            modifier = Modifier.fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraLarge),
             background = {
                 DismissBackground(dismissState)
             },
@@ -127,6 +129,7 @@ fun TaskCard(
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
+    Log.d("TaskCard Due Date", "Due Date ${task.dueDate}")
     Card(
         elevation = CardDefaults.elevatedCardElevation(4.dp),
         border = BorderStroke(
