@@ -68,7 +68,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material:material")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
@@ -82,8 +82,11 @@ dependencies {
     ksp("com.google.dagger:hilt-compiler:2.47")
 
     // Material 3 Components
-    implementation("androidx.compose.material3:material3:1.2.0-alpha06")
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-alpha06")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha07")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.0-alpha07")
+
+
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
 
 
     // Coroutines

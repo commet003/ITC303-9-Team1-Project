@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PomodoroTimerViewModel @Inject constructor(
-    private val timeManager: PomodoroTimerService
+    private val timeManager: PomodoroTimerService,
 ) : ViewModel() {
 
     private val _buttonState: MutableLiveData<Boolean> = MutableLiveData()
@@ -22,7 +22,7 @@ class PomodoroTimerViewModel @Inject constructor(
     val timer: LiveData<TimerState> = timeManager.timer
 
     fun subscribe(duration: Int) {
-        sessionTimerState = TimerState(duration.toLong(), 0)
+        sessionTimerState = TimerState(duration, 0)
         timeManager.initiate(sessionTimerState)
     }
 

@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.screens.settings.SettingsViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -87,6 +88,7 @@ fun ADHDTaskManagerTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val systemUiController = rememberSystemUiController()
     val themeState by viewModel.getPreferences().collectAsState(initial = UserPreferences())
 
     var myColorScheme by remember {
@@ -96,13 +98,53 @@ fun ADHDTaskManagerTheme(
     }
     myColorScheme = if (themeState.darkMode == isDarkTheme) {
         when {
-            isDarkTheme -> DarkColors
-            else -> LightColors
+            isDarkTheme -> {
+                systemUiController.setStatusBarColor(
+                    color = md_theme_dark_primary,
+                    darkIcons = true
+                )
+                systemUiController.setNavigationBarColor(
+                    color = md_theme_dark_background,
+                    darkIcons = false
+                )
+                DarkColors
+            }
+            else -> {
+                systemUiController.setStatusBarColor(
+                    color = md_theme_light_primary,
+                    darkIcons = false
+                )
+                systemUiController.setNavigationBarColor(
+                    color = md_theme_light_background,
+                    darkIcons = true
+                )
+                LightColors
+            }
         }
     } else {
         when {
-            themeState.darkMode -> DarkColors
-            else -> LightColors
+            themeState.darkMode -> {
+                systemUiController.setStatusBarColor(
+                    color = md_theme_dark_primary,
+                    darkIcons = true
+                )
+                systemUiController.setNavigationBarColor(
+                    color = md_theme_dark_background,
+                    darkIcons = false
+                )
+                DarkColors
+            }
+            else -> {
+                systemUiController.setStatusBarColor(
+                    color = md_theme_light_primary,
+                    darkIcons = false
+                )
+                systemUiController.setNavigationBarColor(
+                    color = md_theme_light_background,
+                    darkIcons = true
+                )
+                LightColors
+            }
         }
     }
 

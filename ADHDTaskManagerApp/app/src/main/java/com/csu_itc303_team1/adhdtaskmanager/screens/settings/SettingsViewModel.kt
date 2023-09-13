@@ -1,6 +1,5 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.settings
 
-import androidx.compose.runtime.mutableStateOf
 import com.csu_itc303_team1.adhdtaskmanager.LOGIN_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.SPLASH_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
@@ -35,9 +34,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
     private val userPreferencesFlow = userPreferencesService.userPreferencesFlow
-    val timerRounds = mutableStateOf("")
 
-    fun onLoginClick(openScreen: (String) -> Unit) = openScreen(LOGIN_SCREEN)
 
     // Is signed in
     fun isSignedIn() = accountService.hasUser

@@ -24,17 +24,17 @@ enum class SessionState {
 }
 
 data class TimerState(
-    val minutes: Long = 0,
-    val seconds: Long = 0
+    var minutes: Int = 0,
+    var seconds: Int = 0
 ) {
 
     companion object {
-        const val SECOND_MILLS = 100L
-        const val SECONDS_PER_MINUTE = 6000L
+        const val SECOND_MILLS = 1000L
+        const val SECONDS_PER_MINUTE = 60000L
     }
 
     fun convertToSeconds(): Long {
-        return minutes * SECONDS_PER_MINUTE + seconds * SECOND_MILLS
+        return (minutes * SECONDS_PER_MINUTE) + (seconds * SECOND_MILLS)
     }
 
     override fun toString(): String {
@@ -48,7 +48,7 @@ class PomodoroTimerServiceImpl @Inject constructor(): PomodoroTimerService {
     private val _progress: MutableLiveData<Float> = MutableLiveData()
     override val progress: LiveData<Float> = _progress
 
-    override val _timer: MutableLiveData<TimerState> = MutableLiveData()
+    private val _timer: MutableLiveData<TimerState> = MutableLiveData()
     override val timer: LiveData<TimerState> = _timer
 
     override var currentTimerState = TimerState()
@@ -67,6 +67,15 @@ class PomodoroTimerServiceImpl @Inject constructor(): PomodoroTimerService {
             TimerState.SECOND_MILLS
         ) {
             override fun onTick(millisUntilFinished: Long) {
+                millisUntilFinished.minus(TimerState.SECOND_MILLS)
+
+                if (millisUntilFinished == 0L) {
+                    restartTimer(session)
+                } else if(millisUntilFinished.convertToTimerState().minutes >= 0 && millisUntilFinished.convertToTimerState().seconds > 0){
+                    millisUntilFinished.minus(TimerState.SECOND_MILLS)
+                } else if(millisUntilFinished.convertToTimerState().minutes > 0 && millisUntilFinished.convertToTimerState().seconds == 0){
+                    millisUntilFinished.minus((TimerState.SECOND_MILLS + TimerState.SECONDS_PER_MINUTE))
+                }
                 updateTimerSate(millisUntilFinished.convertToTimerState(), session)
             }
 

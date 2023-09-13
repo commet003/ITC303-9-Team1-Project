@@ -140,7 +140,7 @@ fun MainApplication(
                 ModalNavigationDrawer(
                     modifier = Modifier.padding(innerPaddingModifier),
                     drawerState = appState.getDrawerState(),
-                    gesturesEnabled = false,
+                    gesturesEnabled = true,
                     drawerContent = {
                         ModalDrawerSheet()
                         {
@@ -351,6 +351,7 @@ fun resources(): Resources {
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterialApi
 fun NavGraphBuilder.navGraph(appState: AppState) {
+
     composable(SPLASH_SCREEN) {
         SplashScreen(
             openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }
@@ -382,10 +383,7 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
 
     composable(POMODORO_TIMER_SCREEN) {
         Column {
-            Timer(
-                duration = 25,
-                onTimerCompleted = {Log.d("Timer", "Timer Completed")}
-            )
+            Timer()
             Session()
         }
     }

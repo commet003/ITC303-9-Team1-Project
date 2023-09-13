@@ -15,10 +15,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,32 +27,38 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.ControlButton
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.PomodoroTimer
+import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.PomodoroScreenEntity
 
 @Composable
 fun Timer(
-    duration: Int,
     viewModel: PomodoroTimerViewModel = hiltViewModel(),
-    onTimerCompleted: () -> Unit
+    sessionViewModel: SessionViewModel = hiltViewModel(),
 ) {
-    viewModel.subscribe(duration)
-    Timer(viewModel = viewModel, onTimerCompleted)
+    val preferences = sessionViewModel.getPreferences().collectAsState(initial = UserPreferences())
+    viewModel.subscribe(sessionViewModel.sessionDuration.value ?: preferences.value.pomodoroTimerFocusDuration.toInt())
+    Timer(
+        viewModel,
+        sessionViewModel,
+    ) { sessionViewModel.onSessionCompleted() }
 }
 
 @Composable
 internal fun Timer(
     viewModel: PomodoroTimerViewModel = hiltViewModel(),
+    sessionViewModel: SessionViewModel = hiltViewModel(),
     onTimerCompleted: () -> Unit
 ) {
+    val timerPreferences by sessionViewModel.getPreferences().collectAsState(initial = UserPreferences())
     val timerState = viewModel.timer.observeAsState()
     val timerRunning = viewModel.timerRunning.observeAsState()
     val progress = viewModel.progress.observeAsState()
     PomScreen(
         modifier = Modifier,
         PomodoroScreenEntity(
-            sessionName = "Task Name",
-            text = timerState.value?.toString() ?: "",
-            numberOfPoms = 4,
+            sessionName = "Pomodoro Timer",
+            text = timerState.value.toString(),
+            numberOfPoms = timerPreferences.pomodoroTimerRounds,
             pomsCompleted = 0,
             timerRunning = timerRunning.value ?: false,
             progress = progress.value ?: 0f,
@@ -140,6 +145,7 @@ data class SessionIndicatorEntity(
 @Composable
 fun SessionIndicator(
     indicators: List<SessionIndicatorEntity>,
+    viewModel: SessionViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val active = MaterialTheme.colorScheme.primary
@@ -147,6 +153,7 @@ fun SessionIndicator(
 
     val activeTextColor = MaterialTheme.colorScheme.onSurface
     val inactiveTextColor = MaterialTheme.colorScheme.onSecondary
+    val preferences = viewModel.getPreferences().collectAsState(initial = UserPreferences())
 
     Row(
         modifier = modifier
@@ -162,7 +169,12 @@ fun SessionIndicator(
                 val textColor = if (indicator.active) activeTextColor else inactiveTextColor
                 val tint = if (indicator.active) active else inactive
                 Text(
-                    text = "${indicator.duration} Min",
+                    text = when(indicator){
+                        indicators[0] -> "${preferences.value.pomodoroTimerFocusDuration} Mins"
+                        indicators[1] -> "${preferences.value.pomodoroTimerShortBreakDuration} Mins"
+                        indicators[2] -> "${preferences.value.pomodoroTimerLongBreakDuration} Mins"
+                        else -> ""
+                    },
                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     color = textColor
                 )
@@ -193,17 +205,15 @@ internal fun SessionScreen(
     viewModel: SessionViewModel,
     modifier: Modifier = Modifier
 ) {
+    val preferences = viewModel.getPreferences().collectAsState(initial = UserPreferences())
     Column(
         modifier = modifier.wrapContentSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val pomCount by remember {
-            mutableStateOf(viewModel.pomCount.value)
-        }
         val completed = viewModel.completedPom.observeAsState(initial = 0).value
         Text(
-            text = "$completed of $pomCount",
+            text = "$completed of ${preferences.value.pomodoroTimerRounds}",
             modifier = Modifier.padding(vertical = 16.dp),
             fontSize = 20.sp
         )
