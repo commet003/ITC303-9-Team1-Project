@@ -72,34 +72,10 @@ fun TasksScreen(
     splashViewModel: SplashViewModel = hiltViewModel()
 ) {
     val userPreferences by viewModel.getPreferences().collectAsState(initial = UserPreferences())
-    val currentUser by viewModel.getCurrentUser().collectAsState(initial = User())
-    var returningUser by remember { mutableStateOf(false) }
-    var shouldShowWelcome by remember { mutableStateOf(false) }
     val showToast = remember { mutableStateOf(false) }
-    val showWelcomeToast = remember { mutableStateOf(false) }
-    val welcomeMessageText = remember { mutableStateOf(listOf(0)) }
-    val showWelcomeToastTrigger = remember { mutableIntStateOf(0) } // For triggering the toast
 
 
-    shouldShowWelcome = splashViewModel.getShouldShowWelcome()
-    returningUser = splashViewModel.getReturningUser()
 
-    Log.d("TasksScreen", "shouldShowWelcome: $shouldShowWelcome")
-    Log.d("TasksScreen", "returningUser: $returningUser")
-
-
-    LaunchedEffect(showWelcomeToastTrigger.intValue) {
-        if (showWelcomeToastTrigger.intValue > 0) {
-            showWelcomeToast.value = true
-            delay(4000) // 4 seconds
-            showWelcomeToast.value = false
-            splashViewModel.setReturningUser(false)
-            returningUser = false
-            splashViewModel.setShouldShowWelcome(false)
-            shouldShowWelcome = false
-            showWelcomeToastTrigger.intValue = 0 // Reset the trigger
-        }
-    }
 
 
     Scaffold(
@@ -134,34 +110,7 @@ fun TasksScreen(
                     viewModel = viewModel
                 )
             }
-
-            if (shouldShowWelcome){
-                when(returningUser){
-                    true -> {
-                        showWelcomeToastTrigger.intValue = 1
-                        welcomeMessageText.value = listOf(R.string.welcome_new_user_1, R.string.welcome_new_user_2)
-                    }
-                    false -> {
-                        showWelcomeToastTrigger.intValue = 1
-                        welcomeMessageText.value = listOf(R.string.welcome_existing_user_1, R.string.welcome_existing_user_2)
-                    }
-                }
-            }
-
-            if (showWelcomeToast.value){
-                AlertDialog(
-                    onDismissRequest = { showWelcomeToast.value = false },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent)
-                        .blur(radius = 4.dp),
-                ) {
-                    WelcomeAnimation(isVisible = showWelcomeToast.value)
-                    WelcomeToast(isVisible = showWelcomeToast.value, username = currentUser.username, welcomeText = welcomeMessageText.value)
-                }
-            }
-
-
+            
             LazyColumn {
                 viewModel.filterSortTasks(
                     tasks = tasks.value,
