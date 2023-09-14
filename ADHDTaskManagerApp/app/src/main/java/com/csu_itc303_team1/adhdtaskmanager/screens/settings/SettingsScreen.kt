@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.settings
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,11 +38,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.csu_itc303_team1.adhdtaskmanager.model.AlarmItem
+import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AndroidAlarmSchedulerServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DangerousCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogCancelButton
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogConfirmButton
@@ -47,9 +53,11 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.RegularCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.card
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon
 import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
 
+@RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalMaterialApi
 @Composable
 fun SettingsScreen(
@@ -337,6 +345,28 @@ fun SettingsScreen(
         }
 
         HorizontalDivider()
+        val context = LocalContext.current
+        val scheduler = AndroidAlarmSchedulerServiceImpl(context = context)
+        var alarmItem: AlarmItem? = null
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(onClick = {
+                alarmItem = AlarmItem(
+                    time = LocalDateTime.now().plusSeconds(10),
+                    title = "Pomodoro Timer",
+                    description = "Time to take a break!"
+                )
+                alarmItem?.let(scheduler::schedule)
+            }) {
+                Text("Schedule Notification")
+            }
+            Button(onClick = {
+                alarmItem?.let(scheduler::cancel)
+            }) {
+                Text("Cancel Notification")
+            }
+        }
 
         Spacer(modifier = Modifier.height(40.dp))
 

@@ -76,6 +76,7 @@ import com.csu_itc303_team1.adhdtaskmanager.screens.tasks.TasksScreen
 import com.csu_itc303_team1.adhdtaskmanager.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.CoroutineScope
@@ -322,11 +323,18 @@ fun MainApplication(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestNotificationPermissionDialog() {
-    val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    val permissionState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.USE_EXACT_ALARM,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NOTIFICATION_POLICY,
+        )
+    )
 
-    if (!permissionState.status.isGranted) {
-        if (permissionState.status.shouldShowRationale) RationaleDialog()
-        else PermissionDialog { permissionState.launchPermissionRequest() }
+    if (!permissionState.allPermissionsGranted) {
+        if (permissionState.shouldShowRationale) RationaleDialog()
+        else PermissionDialog { permissionState.launchMultiplePermissionRequest() }
     }
 }
 

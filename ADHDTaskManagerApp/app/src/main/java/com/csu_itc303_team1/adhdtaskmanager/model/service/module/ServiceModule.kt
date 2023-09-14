@@ -3,14 +3,18 @@ package com.csu_itc303_team1.adhdtaskmanager.model.service.module
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskDataSource
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.AndroidAlarmSchedulerService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.ConnectivityObserverService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.PomodoroTimerService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UserPreferencesService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AccountServiceImpl
+import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AndroidAlarmSchedulerServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.ConfigurationServiceImpl
+import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.ConnectivityObserverServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.LogServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.PomodoroTimerServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.StorageServiceImpl
@@ -24,6 +28,12 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class ServiceModule {
+
+    @Binds
+    abstract fun providesAlarmSchedulerService(impl: AndroidAlarmSchedulerServiceImpl): AndroidAlarmSchedulerService
+
+    @Binds
+    abstract fun provideConnectivityObserverService(impl: ConnectivityObserverServiceImpl): ConnectivityObserverService
 
     @Binds
     abstract fun bindLocalTaskDatabase(impl: LocalTaskRepository): LocalTaskDataSource
