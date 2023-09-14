@@ -1,7 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.leaderboard
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,8 +30,6 @@ fun LeaderboardScreen(
 ) {
     val leaderboardUsers = viewModel.leaderboardUsers.collectAsStateWithLifecycle(emptyList()).value.sortedByDescending { it.rewardPoints }
     val currentUserId = viewModel.getCurrentUserId()
-
-    Log.d("LeaderboardScreen", "LeaderboardScreen: ${leaderboardUsers}")
 
     Surface(
         modifier = Modifier

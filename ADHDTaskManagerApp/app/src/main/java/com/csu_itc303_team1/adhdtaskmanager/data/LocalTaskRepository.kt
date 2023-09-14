@@ -1,6 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager.data
 
 import android.util.Log
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LocalTaskRepository @Inject constructor(
@@ -16,10 +17,10 @@ class LocalTaskRepository @Inject constructor(
     override suspend fun deleteTask(task: LocalTask){
         taskDao.deleteTask(task)
     }
-    override fun getTaskById(taskId : String): LocalTask{
+    override fun getTaskById(taskId : Int): LocalTask{
         return taskDao.getById(taskId)
     }
-    override fun getAllTasks(): List<LocalTask> {
+    override fun getAllTasks(): Flow<List<LocalTask>> {
         return taskDao.getAll()
     }
 }

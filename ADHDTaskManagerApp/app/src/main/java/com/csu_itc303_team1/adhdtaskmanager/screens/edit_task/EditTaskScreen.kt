@@ -31,7 +31,7 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.RegularCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.card
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.fieldModifier
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.spacer
-import com.csu_itc303_team1.adhdtaskmanager.model.Task
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -93,7 +93,7 @@ fun EditTaskScreen(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CardEditors(
-    task: Task,
+    task: LocalTask,
     onDateChange: (Long) -> Unit,
     onTimeChange: (Int, Int) -> Unit
 ) {

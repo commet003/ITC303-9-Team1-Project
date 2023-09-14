@@ -5,14 +5,12 @@ import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.firebase.Timestamp
 import java.time.Instant
-import java.time.LocalDateTime
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Entity(tableName = "task_table")
 data class LocalTask @RequiresApi(Build.VERSION_CODES.O) constructor(
-    @PrimaryKey val id: String = "",
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "task_title") var title: String = "",
     @ColumnInfo(name = "task_description")var description: String = "",
     @ColumnInfo(name = "task_priority")var priority: Int = 0,

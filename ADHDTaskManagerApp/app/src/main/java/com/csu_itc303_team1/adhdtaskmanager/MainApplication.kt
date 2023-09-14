@@ -4,7 +4,6 @@ package com.csu_itc303_team1.adhdtaskmanager
 import android.Manifest
 import android.content.res.Resources
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,10 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
@@ -75,10 +74,7 @@ import com.csu_itc303_team1.adhdtaskmanager.screens.splash.SplashScreen
 import com.csu_itc303_team1.adhdtaskmanager.screens.tasks.TasksScreen
 import com.csu_itc303_team1.adhdtaskmanager.theme.ADHDTaskManagerTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -106,9 +102,12 @@ fun MainApplication(
 
 
 
+
         Surface(color = MaterialTheme.colorScheme.background) {
             val appState = rememberAppState()
             val coroutineScope = rememberCoroutineScope()
+
+
 
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
@@ -160,7 +159,6 @@ fun MainApplication(
                                 selected = selectedItem == TASKS_SCREEN,
                                 onClick = {
                                     selectedItem = TASKS_SCREEN
-                                    Log.d("Current Route", appState.currentRoute())
                                     appState.navigate(TASKS_SCREEN)
                                     coroutineScope.launch {
                                         appState.closeDrawer()
@@ -193,7 +191,7 @@ fun MainApplication(
                                 modifier = Modifier.padding(8.dp),
                                 icon = {
                                     Icon(
-                                        imageVector = Icons.Filled.ListAlt,
+                                        imageVector = Icons.AutoMirrored.Filled.ListAlt,
                                         tint = if(selectedItem == LEADERBOARD_SCREEN) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
                                         contentDescription = "Leaderboard"
                                     )
@@ -235,9 +233,9 @@ fun MainApplication(
                                 label = { Text(text = "Help") },
                                 icon = {
                                     Icon(
-                                        imageVector = Icons.Filled.Help,
+                                        imageVector = Icons.AutoMirrored.Filled.Help,
                                         tint = if(selectedItem == HELP_SCREEN) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                                        contentDescription = "Home"
+                                        contentDescription = "Help"
                                     )
                                 },
                                 colors = navigationItemColors(),
@@ -276,7 +274,7 @@ fun MainApplication(
                                     modifier = Modifier.padding(8.dp),
                                     icon = {
                                         Icon(
-                                            imageVector = Icons.Filled.ExitToApp,
+                                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                             tint = MaterialTheme.colorScheme.primary,
                                             contentDescription = "Sign Out"
                                         )

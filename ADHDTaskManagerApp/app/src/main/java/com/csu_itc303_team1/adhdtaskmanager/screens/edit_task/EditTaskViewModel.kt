@@ -2,12 +2,14 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.edit_task
 
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
-import com.csu_itc303_team1.adhdtaskmanager.common.ext.idFromParameter
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
-import com.csu_itc303_team1.adhdtaskmanager.model.Task
+import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
@@ -19,22 +21,28 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class EditTaskViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     logService: LogService,
     private val localTaskRepository: LocalTaskRepository,
+    private val accountService: AccountService,
     private val storageService: StorageService,
 ) : MainViewModel(logService) {
 
 
-    val task = mutableStateOf(Task())
+    private val currentUserId = accountService.currentUserId
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    val task = mutableStateOf(LocalTask())
 
     init {
-        val taskId = savedStateHandle.get<String>(TASK_ID)
+        val taskId = savedStateHandle.get<Int>(TASK_ID)
         if (taskId != null) {
             launchCatching {
-                task.value = storageService.getTask(taskId.idFromParameter()) ?: Task()
+                //task.value = storageService.getTask(taskId.idFromParameter()) ?: Task()
+                task.value = localTaskRepository.getTaskById(taskId)
             }
         }
     }
@@ -72,13 +80,14 @@ class EditTaskViewModel @Inject constructor(
     fun onDoneClick(popUpScreen: () -> Unit) {
 
         launchCatching {
+            task.value = task.value.copy(userId = currentUserId)
             val editedTask = task.value
-            if (editedTask.id.isBlank()) {
-                localTaskRepository.saveTask(editedTask.toLocalTask())
-                storageService.save(editedTask)
+            if (editedTask.id == 0) {
+                localTaskRepository.saveTask(editedTask)
+               // storageService.save(editedTask)
             } else {
-                localTaskRepository.saveTask(editedTask.toLocalTask())
-                storageService.update(editedTask)
+                localTaskRepository.saveTask(editedTask)
+               // storageService.update(editedTask)
             }
             popUpScreen()
         }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -53,23 +52,21 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.zIndex
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CompleteTaskAnimation
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueTime
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.csu_itc303_team1.adhdtaskmanager.model.Category
 import com.csu_itc303_team1.adhdtaskmanager.model.Priority
-import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 internal fun TaskItem(
-    task: Task,
+    task: LocalTask,
     showToast: MutableState<Boolean>,
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -170,10 +167,11 @@ internal fun TaskItem(
 
 @Composable
 fun TaskCard(
-    task: Task,
+    task: LocalTask,
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
+    Log.d("Task:", "Task: $task")
     Card(
         elevation = CardDefaults.elevatedCardElevation(4.dp),
         border = BorderStroke(
@@ -193,7 +191,7 @@ fun TaskCard(
     ) {
         Log.d("isDarkMode", isSystemInDarkTheme().toString())
         Row(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
-            CardRibbon(colorInt = Category.getCategoryByName(task.category).color?.toArgb())
+            //CardRibbon(colorInt = Category.getCategoryByName(task.category).color?.toArgb())
             Spacer(Modifier.width(8.dp))
             Column(modifier = Modifier
                 .fillMaxHeight()
@@ -217,14 +215,7 @@ fun TaskCard(
                 horizontalAlignment = Alignment.End
             ) {
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    text = when(task.category) {
-                        "Work" -> "Work"
-                        "School" -> "School"
-                        "Other" -> "Other"
-                        "Home" -> "Home"
-                        else -> "None"
-                    },
+                Text(text = task.category,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -242,7 +233,7 @@ fun TaskCard(
 }
 
 @Composable
-internal fun RelativeDateText(task: Task) {
+internal fun RelativeDateText(task: LocalTask) {
     Text(
         text = getDueDateAndTime(task),
         color = MaterialTheme.colorScheme.onSurface,
@@ -253,7 +244,7 @@ internal fun RelativeDateText(task: Task) {
 }
 
 
-private fun getDueDateAndTime(task: Task): String {
+private fun getDueDateAndTime(task: LocalTask): String {
     val stringBuilder = StringBuilder("")
 
     if (task.hasDueDate()) {

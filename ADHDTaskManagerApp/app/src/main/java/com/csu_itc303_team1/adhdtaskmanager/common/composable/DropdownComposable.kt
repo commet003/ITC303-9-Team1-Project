@@ -37,9 +37,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.csu_itc303_team1.adhdtaskmanager.model.Category
 import com.csu_itc303_team1.adhdtaskmanager.model.Priority
-import com.csu_itc303_team1.adhdtaskmanager.model.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,7 +134,7 @@ fun DropdownSelector(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityDropdown(
-    task: Task,
+    task: LocalTask,
     onNewValue: (Int) -> Unit
 ){
     var prioritySelection by remember { mutableIntStateOf(task.priority) }
@@ -197,7 +197,7 @@ fun PriorityDropdown(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDropdown(
-    task: Task,
+    task: LocalTask,
     onNewValue: (String) -> Unit
 ){
     var categorySelection by remember { mutableStateOf(task.category) }

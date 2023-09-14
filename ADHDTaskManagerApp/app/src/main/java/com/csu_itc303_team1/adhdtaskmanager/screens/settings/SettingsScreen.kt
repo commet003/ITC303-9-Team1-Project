@@ -44,14 +44,14 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.csu_itc303_team1.adhdtaskmanager.model.AlarmItem
-import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AndroidAlarmSchedulerServiceImpl
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DangerousCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogCancelButton
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogConfirmButton
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.RegularCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.card
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
+import com.csu_itc303_team1.adhdtaskmanager.model.AlarmItem
+import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AndroidAlarmSchedulerServiceImpl
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon
@@ -353,6 +353,7 @@ fun SettingsScreen(
         ) {
             Button(onClick = {
                 alarmItem = AlarmItem(
+                    1,
                     time = LocalDateTime.now().plusSeconds(10),
                     title = "Pomodoro Timer",
                     description = "Time to take a break!"

@@ -1,9 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
-import com.csu_itc303_team1.adhdtaskmanager.model.User
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -33,32 +30,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getString
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.csu_itc303_team1.adhdtaskmanager.R
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.CompleteTaskAnimation
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.CustomToastMessage
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.WelcomeAnimation
-import com.csu_itc303_team1.adhdtaskmanager.common.composable.WelcomeToast
 import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.screens.splash.SplashViewModel
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.N)
@@ -93,7 +78,8 @@ fun TasksScreen(
         },
         backgroundColor = MaterialTheme.colorScheme.background,
     ) {
-        val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
+        //val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
+        val localTask = viewModel.localTask.collectAsStateWithLifecycle(initialValue = emptyList())
 
         Column(
             modifier = Modifier
@@ -113,7 +99,7 @@ fun TasksScreen(
             
             LazyColumn {
                 viewModel.filterSortTasks(
-                    tasks = tasks.value,
+                    tasks = localTask.value,
                     showCompleted = false,
                     showUncompleted = true,
                     sortOrder = userPreferences.sortOrder

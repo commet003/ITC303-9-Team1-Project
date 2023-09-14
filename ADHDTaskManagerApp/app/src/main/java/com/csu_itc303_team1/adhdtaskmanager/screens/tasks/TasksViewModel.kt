@@ -7,6 +7,8 @@ import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.EDIT_TASK_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
+import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
 import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferencesRepository
@@ -35,32 +37,41 @@ class TasksViewModel @Inject constructor(
     private val accountService: AccountService,
     private val storageService: StorageService,
     private val usersStorageService: UsersStorageService,
+    private val localTaskRepository: LocalTaskRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : MainViewModel(logService) {
 
     private var userPreferencesFlow = userPreferencesRepository.userPreferencesFlow
-    private val currentUser = accountService.currentUser
+    val localTask = localTaskRepository.getAllTasks()
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun filterSortTasks(
-        tasks: List<Task>,
+        tasks: List<LocalTask>,
         showCompleted: Boolean,
         showUncompleted: Boolean,
         sortOrder: SortOrder
-    ): List<Task> {
+    ): List<LocalTask> {
         // filter the tasks
         val filteredTodos = if (showCompleted && showUncompleted) {
-            tasks
+            tasks.filter {
+                it.userId == accountService.currentUserId
+            }
         } else if(!showUncompleted &&  showCompleted) {
-            tasks.filter { it.completed }
+            tasks.filter {
+                it.completed
+                it.userId == accountService.currentUserId
+            }
         } else {
-            tasks.filter { !it.completed }
+            tasks.filter {
+                !it.completed
+                it.userId == accountService.currentUserId
+            }
         }
         // sort the tasks
         return when (sortOrder) {
             SortOrder.NONE -> filteredTodos
             SortOrder.BY_DEADLINE -> filteredTodos.sortedWith(
-                compareBy<Task>{ it.dueDate.slice(5..6).toIntOrNull() }
+                compareBy<LocalTask>{ it.dueDate.slice(5..6).toIntOrNull() }
                     .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
                     .thenBy { it.dueDate.slice(11..14).toIntOrNull() }
                     .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
@@ -68,7 +79,7 @@ class TasksViewModel @Inject constructor(
             )
             SortOrder.BY_PRIORITY -> filteredTodos.sortedBy { it.priority }.asReversed()
             SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTodos.sortedWith(
-                compareBy<Task>{ it.priority }.reversed()
+                compareBy<LocalTask>{ it.priority }.reversed()
                     .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
                     .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
                     .thenBy { it.dueDate.slice(11..14).toIntOrNull() }
@@ -78,7 +89,7 @@ class TasksViewModel @Inject constructor(
             )
             SortOrder.BY_CATEGORY -> filteredTodos.sortedBy { it.category }
             SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTodos.sortedWith(
-                compareBy<Task>{ it.category }
+                compareBy<LocalTask>{ it.category }
                     .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
                     .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
                     .thenBy { it.dueDate.slice(11..14).toIntOrNull() }
@@ -108,9 +119,10 @@ class TasksViewModel @Inject constructor(
 
 
 
-    private fun onTaskCompletedChange(task: Task) {
+    private fun onTaskCompletedChange(task: LocalTask) {
         launchCatching {
-            storageService.update(task.copy(completed = !task.completed))
+           // storageService.update(task.copy(completed = !task.completed))
+            localTaskRepository.updateTask(task.copy(completed = !task.completed))
             usersStorageService.incrementUserRewardPoints(task.userId, COMPLETED_TASK_REWARD, COMPLETED_TASK_REWARD_NAME)
         }
     }
@@ -118,7 +130,7 @@ class TasksViewModel @Inject constructor(
     fun onAddClick(openScreen: (String) -> Unit) = openScreen(EDIT_TASK_SCREEN)
 
 
-    fun onTaskActionClick(openScreen: (String) -> Unit, task: Task, action: String) {
+    fun onTaskActionClick(openScreen: (String) -> Unit, task: LocalTask, action: String) {
         when (TaskActionOption.getByTitle(action)) {
             TaskActionOption.CompleteTask -> onTaskCompletedChange(task)
             TaskActionOption.EditTask -> openScreen("$EDIT_TASK_SCREEN?$TASK_ID={${task.id}}")
@@ -126,7 +138,10 @@ class TasksViewModel @Inject constructor(
         }
     }
 
-    private fun onDeleteTaskChange(task: Task) {
-        launchCatching { storageService.delete(task.id) }
+    private fun onDeleteTaskChange(task: LocalTask) {
+        launchCatching {
+            localTaskRepository.deleteTask(task)
+            //storageService.delete(task.id)
+        }
     }
 }

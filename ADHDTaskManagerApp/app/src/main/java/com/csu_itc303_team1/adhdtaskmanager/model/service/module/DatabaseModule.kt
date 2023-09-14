@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service.module
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.Room
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
 import com.csu_itc303_team1.adhdtaskmanager.data.TaskDao
@@ -21,6 +23,7 @@ const val TASK_DATABASE= "task_database"
 @Module
 object DatabaseModule {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): TaskDatabase {
@@ -32,6 +35,7 @@ object DatabaseModule {
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Provides
     fun provideTaskDao(database: TaskDatabase): TaskDao {
         return database.taskDao()
