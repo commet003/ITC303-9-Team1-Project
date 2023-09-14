@@ -13,7 +13,7 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.10.0"
 }
 
-val apiKeyFile = rootProject.file("apikey.properties")
+val apiKeyFile: File = rootProject.file("apikey.properties")
 
 // Initializes a new Properties() object called keystoreProperties.
 val apiKeyProperties = Properties()
@@ -34,8 +34,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        buildConfigField("String", "FIREBASE_API_KEY", "\"${apiKeyProperties["WEB_CLIENT_ID"]}\"")
-        buildConfigField("String", "DB_PASSWORD", "\"${apiKeyProperties["TASK_DATABASE_PASSPHRASE"]}\"")
+        buildConfigField("String", "FIREBASE_KEY", "${apiKeyProperties["FIREBASE_API_KEY"]}")
+        buildConfigField("String", "DATABASE_PASSWORD", "${apiKeyProperties["DB_PASSWORD"]}")
 
         testInstrumentationRunner = "com.csu_itc303_team1.adhdtaskmanager.ExampleInstrumentedTest"
         vectorDrawables.useSupportLibrary = true
@@ -153,7 +153,7 @@ dependencies {
 
 
     // Air BNB Lottie
-    implementation("com.airbnb.android:lottie-compose:6.1.0")
+    implementation ("com.airbnb.android:lottie-compose:6.1.0")
 
 
     //Test

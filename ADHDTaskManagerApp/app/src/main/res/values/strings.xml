@@ -56,6 +56,18 @@
     <string name="restart_timer_description">Restart Timer</string>
     <string name="resume_timer_description">Resume Timer</string>
 
+    <!-- Rewards Toast Messages -->
+    <string name="completed_task_reward_toast">Woohoo! Congratulations on completing your tasks!</string>
+    <string name="login_reward_toast">You have earned this reward for building good habits and logging in to complete your tasks!</string>
+    <string name="login_streak_reward_toast">You have earned this reward for consistently logging in to complete your tasks!</string>
+
+
+    <!-- Welcome User -->
+    <string name="welcome_new_user_1">Welcome, </string>
+    <string name="welcome_new_user_2">It\'s Great To Have You Here</string>
+    <string name="welcome_existing_user_1">Welcome Back, </string>
+    <string name="welcome_existing_user_2">It\'s Great To See You Again!</string>
+
 
     <!-- Rewards Earned Descriptions -->
     <string name="completed_task_reward_description">You have earned the \"Completed Tasks\" reward for completing your tasks!</string>

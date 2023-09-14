@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
@@ -37,7 +39,9 @@ import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,6 +53,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
+import com.csu_itc303_team1.adhdtaskmanager.R
+import com.csu_itc303_team1.adhdtaskmanager.common.composable.CompleteTaskAnimation
+import com.csu_itc303_team1.adhdtaskmanager.common.composable.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueTime
 import com.csu_itc303_team1.adhdtaskmanager.model.Category
@@ -61,12 +70,27 @@ import kotlinx.coroutines.delay
 @Composable
 internal fun TaskItem(
     task: Task,
+    showToast: MutableState<Boolean>,
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Log.d("TaskItem", "$task")
+
+    val showToastTrigger = remember { mutableIntStateOf(0) } // For triggering the toast
+
+    LaunchedEffect(showToastTrigger.intValue) {
+        if (showToastTrigger.intValue > 0) {
+            showToast.value = true
+            delay(3000) // 3 seconds
+            showToast.value = false
+            showToastTrigger.intValue = 0 // Reset the trigger
+        }
+    }
+
+
     val context = LocalContext.current
     var show by remember { mutableStateOf(true) }
+    var showDeletedToast by remember { mutableStateOf(false) }
+    var showAnimation by remember { mutableStateOf(false) }
     var toastText by remember { mutableStateOf("") }
     var actionOption by remember { mutableStateOf("") }
     val dismissState = rememberDismissState(
@@ -75,12 +99,15 @@ internal fun TaskItem(
                 DismissValue.DismissedToEnd -> {
                     actionOption = "Complete task"
                     toastText = "Task Completed"
+                    showToastTrigger.intValue += 1 // Increment to trigger the toast
+                    showAnimation = true
                     show = false
                     true
                 }
                 DismissValue.DismissedToStart -> {
                     actionOption = "Delete task"
                     toastText = "Task Deleted"
+                    showDeletedToast = true
                     show = false
                     true
                 }
@@ -97,7 +124,8 @@ internal fun TaskItem(
     ) {
         SwipeToDismiss(
             state = dismissState,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .clip(MaterialTheme.shapes.extraLarge),
             background = {
                 DismissBackground(dismissState)
@@ -113,7 +141,24 @@ internal fun TaskItem(
         )
     }
 
-    LaunchedEffect(show) {
+    if (showToast.value){
+        AlertDialog(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent),
+            onDismissRequest = { showToast.value = false },
+        ){
+            CompleteTaskAnimation(showToast.value)
+            CustomToastMessage(
+                message = R.string.completed_task_reward_toast,
+                isVisible = showToast.value,
+            )
+        }
+    }
+
+
+
+    LaunchedEffect(showDeletedToast) {
         if (!show) {
             delay(800)
             onActionClick(actionOption)
@@ -129,7 +174,6 @@ fun TaskCard(
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
-    Log.d("TaskCard Due Date", "Due Date ${task.dueDate}")
     Card(
         elevation = CardDefaults.elevatedCardElevation(4.dp),
         border = BorderStroke(
@@ -151,7 +195,8 @@ fun TaskCard(
         Row(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
             CardRibbon(colorInt = Category.getCategoryByName(task.category).color?.toArgb())
             Spacer(Modifier.width(8.dp))
-            Column(modifier = Modifier.fillMaxHeight()
+            Column(modifier = Modifier
+                .fillMaxHeight()
                 .background(MaterialTheme.colorScheme.surface)
                 , verticalArrangement = Arrangement.Center) {
                 Text(
@@ -165,7 +210,8 @@ fun TaskCard(
             }
             Spacer(Modifier.weight(1f))
             Column(
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.surface),
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.End

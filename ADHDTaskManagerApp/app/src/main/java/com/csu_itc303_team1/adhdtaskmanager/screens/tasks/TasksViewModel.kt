@@ -3,7 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.mutableStateOf
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.EDIT_TASK_SCREEN
@@ -12,7 +11,8 @@ import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferencesRepository
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
-import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
+import com.csu_itc303_team1.adhdtaskmanager.model.User
+import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
@@ -32,15 +32,14 @@ data class TasksUiModel(
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     logService: LogService,
+    private val accountService: AccountService,
     private val storageService: StorageService,
-    private val configurationService: ConfigurationService,
     private val usersStorageService: UsersStorageService,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : MainViewModel(logService) {
-    private val options = mutableStateOf<List<String>>(listOf())
-
 
     private var userPreferencesFlow = userPreferencesRepository.userPreferencesFlow
+    private val currentUser = accountService.currentUser
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun filterSortTasks(
@@ -97,6 +96,10 @@ class TasksViewModel @Inject constructor(
         return userPreferencesFlow
     }
 
+    fun getCurrentUser(): Flow<User> {
+        return accountService.currentUser
+    }
+
     fun setSortOrder(sortOrder: SortOrder) {
         launchCatching {
             userPreferencesRepository.setSortOrder(sortOrder)
@@ -104,10 +107,6 @@ class TasksViewModel @Inject constructor(
     }
 
 
-    fun loadTaskOptions() {
-        val hasEditOption = configurationService.isShowTaskEditButtonConfig
-        options.value = TaskActionOption.getOptions(hasEditOption)
-    }
 
     private fun onTaskCompletedChange(task: Task) {
         launchCatching {
@@ -128,6 +127,6 @@ class TasksViewModel @Inject constructor(
     }
 
     private fun onDeleteTaskChange(task: Task) {
-        launchCatching { storageService.delete(task.id.toString()) }
+        launchCatching { storageService.delete(task.id) }
     }
 }

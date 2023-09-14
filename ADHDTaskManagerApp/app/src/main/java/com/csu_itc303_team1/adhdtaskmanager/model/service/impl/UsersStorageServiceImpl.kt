@@ -18,6 +18,10 @@ class UsersStorageServiceImpl
 constructor(private val firestore: FirebaseFirestore, private val auth: AccountService) :
     UsersStorageService {
 
+    private var newUser = false
+    private var returningUser = false
+
+
     override val currentUser: Flow<FirestoreUser?>
         get() = firestore.collection(USERS_COLLECTION).document(auth.currentUserId).dataObjects()
 

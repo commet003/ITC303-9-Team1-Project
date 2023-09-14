@@ -24,7 +24,7 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): TaskDatabase {
-        val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.DB_PASSWORD.toCharArray()))
+        val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.DATABASE_PASSWORD.toCharArray()))
         return Room.databaseBuilder(
             appContext,
             TaskDatabase::class.java,

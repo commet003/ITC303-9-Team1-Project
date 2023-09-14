@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.edit_task
 
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -48,6 +49,7 @@ fun EditTaskScreen(
     viewModel: EditTaskViewModel = hiltViewModel()
 ) {
     val task by viewModel.task
+    Log.d("EditTaskScreen", "$popUpScreen")
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(

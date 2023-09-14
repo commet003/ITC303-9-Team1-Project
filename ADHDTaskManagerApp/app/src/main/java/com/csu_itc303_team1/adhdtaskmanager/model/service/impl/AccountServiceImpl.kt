@@ -1,17 +1,26 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service.impl
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
+import androidx.annotation.StringRes
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat.getString
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
+import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.perf.ktx.trace
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -26,9 +35,6 @@ class AccountServiceImpl @Inject constructor(
     private var _isSignedIn = false
 
     override var oneTapClient: SignInClient? = null
-
-
-
 
     override val currentUserId: String
         get() = auth.currentUser?.uid.orEmpty()
@@ -90,7 +96,7 @@ class AccountServiceImpl @Inject constructor(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(BuildConfig.FIREBASE_API_KEY)
+                    .setServerClientId(BuildConfig.FIREBASE_KEY)
                     .build()
             )
             .build()

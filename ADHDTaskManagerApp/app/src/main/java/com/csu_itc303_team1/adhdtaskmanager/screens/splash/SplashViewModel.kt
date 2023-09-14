@@ -8,6 +8,7 @@ import com.csu_itc303_team1.adhdtaskmanager.TASKS_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConfigurationService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -19,7 +20,6 @@ class SplashViewModel @Inject constructor(
     logService: LogService
 ) : MainViewModel(logService) {
     val showError = mutableStateOf(false)
-
 
     init {
         launchCatching {
