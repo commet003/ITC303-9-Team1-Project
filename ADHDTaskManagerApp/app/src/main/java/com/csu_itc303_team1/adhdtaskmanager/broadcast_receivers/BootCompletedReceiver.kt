@@ -8,7 +8,9 @@ import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AndroidAlarmSched
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class BootCompletedReceiver: BroadcastReceiver() {
+class BootCompletedReceiver(
+    private val alarmScheduler: AndroidAlarmSchedulerServiceImpl
+): BroadcastReceiver() {
 
 
     override fun onReceive(context: Context?, intent: Intent?) {
