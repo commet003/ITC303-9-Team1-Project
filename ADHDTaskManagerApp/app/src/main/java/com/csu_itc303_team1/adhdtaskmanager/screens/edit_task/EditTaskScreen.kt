@@ -31,12 +31,10 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.RegularCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.card
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.fieldModifier
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.spacer
-import com.csu_itc303_team1.adhdtaskmanager.model.AlarmItem
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import java.time.LocalDateTime
 import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon
 import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
 
@@ -57,18 +55,7 @@ fun EditTaskScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-
-                    val scheduler = viewModel.scheduler
-                    val alarmItem = AlarmItem(
-                        id = task.id,
-                        time = LocalDateTime.now().plusSeconds(5),
-                        title = task.title,
-                        description = task.description,
-                    )
-                    alarmItem.let { scheduler::schedule }
-                    viewModel.onDoneClick(popUpScreen)
-                          },
+                onClick = { viewModel.onDoneClick(popUpScreen) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,

@@ -50,8 +50,6 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.DialogConfirmButto
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.RegularCardEditor
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.card
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
-import com.csu_itc303_team1.adhdtaskmanager.model.AlarmItem
-import com.csu_itc303_team1.adhdtaskmanager.model.service.impl.AndroidAlarmSchedulerServiceImpl
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon

@@ -11,9 +11,7 @@ import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
-import com.csu_itc303_team1.adhdtaskmanager.model.service.AndroidAlarmSchedulerService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
-import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,11 +31,8 @@ class EditTaskViewModel @Inject constructor(
     logService: LogService,
     private val localTaskRepository: LocalTaskRepository,
     private val accountService: AccountService,
-    private val storageService: StorageService,
-    private val alarmService: AndroidAlarmSchedulerService
 ) : MainViewModel(logService) {
 
-    val scheduler = alarmService
     private val currentUserId = accountService.currentUserId
 
     @RequiresApi(Build.VERSION_CODES.O)
