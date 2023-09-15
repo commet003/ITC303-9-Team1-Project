@@ -4,9 +4,11 @@ import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.ExperimentalMaterialApi
 import com.airbnb.lottie.LottieAnimationView
 class ADHDTaskManager : AppCompatActivity() {
 
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_video_splash)

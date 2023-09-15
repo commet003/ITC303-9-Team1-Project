@@ -3,13 +3,18 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.help
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -48,19 +54,13 @@ fun HelpScreen() {
     var viewVideoClicked by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Welcome to the Help Page")
-                }
-            )
-        }
-    ) {
+    Scaffold{
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(79.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
             Text(
                 text = "Click on One Of the Options: ",
@@ -150,17 +150,27 @@ fun HelpScreen() {
 
 
 class WebViewActivity : ComponentActivity() {
-    private lateinit var webView: WebView
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val webView = WebView(this)
-        setContentView(webView)
+        //setContentView(webView)
+        setContentView(webView,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        )
 
         // Retrieve the URL from the Intent extras
         val url = intent.getStringExtra("URL")
 
         // Enable JavaScript to play videos
         webView.settings.javaScriptEnabled = true
+        webView.settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NORMAL
+        webView.settings.useWideViewPort = true
+        webView.settings.safeBrowsingEnabled = true
+
 
         // Load the URL in the WebView
         if (url != null) {

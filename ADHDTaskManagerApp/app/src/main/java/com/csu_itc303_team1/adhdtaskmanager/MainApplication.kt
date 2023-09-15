@@ -101,8 +101,6 @@ fun MainApplication(
         }
 
 
-
-
         Surface(color = MaterialTheme.colorScheme.background) {
             val appState = rememberAppState()
             val coroutineScope = rememberCoroutineScope()
