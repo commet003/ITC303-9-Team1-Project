@@ -7,15 +7,12 @@ import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class BootCompletedReceiver(
-    private val alarmScheduler: AndroidAlarmSchedulerServiceImpl
-): BroadcastReceiver() {
+class BootCompletedReceiver(): BroadcastReceiver() {
 
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
             println("Boot completed")
-            val alarmScheduler = AndroidAlarmSchedulerServiceImpl(context!!)
             Log.d("BootCompletedReceiver", "onReceive: Boot completed")
         }
     }

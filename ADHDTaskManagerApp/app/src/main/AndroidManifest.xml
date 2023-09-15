@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:name=".HiltApp"
         android:theme="@style/Theme.ADHD"
-        android:icon="@mipmap">
+        android:icon="@mipmap/new_logo">
         <!-- For viewing webpage -->
         <activity android:name=".screens.help.WebViewActivity" />
         <activity
