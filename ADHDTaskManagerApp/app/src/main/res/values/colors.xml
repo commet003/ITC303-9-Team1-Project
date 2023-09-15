@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="NavyBlueDark">#FF05445E</color>
-    <color name="BlueGrottoDark">#FF0476D0</color>
-    <color name="BlueGreenDark">#FF75E6DA</color>
-    <color name="BabyBlueDark">#FF8BD9E1</color>
-    <color name="NavyBlueLight">#FF0A85B9</color>
-    <color name="BlueGrottoLight">#FF56D0E9</color>
-    <color name="BlueGreenLight">#FFBEF3EE</color>
-    <color name="BabyBlueLight">#FFD4F1F4</color>
+    <color name="medium_orange">#FFFFA000</color>
+    <color name="light_orange">#FFFFCA28</color>
+    <color name="dark_orange">#FFF57C00</color>
+    <color name="bright_orange">#FFFF8A65</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- Light -->
+    <color name="blue500">#0540F2</color>
+    <color name="blue800">#001CCF</color>
+    <color name="yellow700">#F3B711</color>
+    <!-- Dark -->
+    <color name="blue300">#6F7EF9</color>
+    <color name="blue400">#4860F7</color>
+    <color name="yellow400">#F6E547</color>
 
-    <color name="colorPrimary">@color/NavyBlueLight</color>
-    <color name="colorPrimaryDark">@color/NavyBlueDark</color>
-    <color name="onPrimary">#FFFFFF</color>
-    <color name="onPrimaryDark">#FFFFFF</color>
-    <color name="colorPrimaryVariant">@color/BlueGrottoLight</color>
-    <color name="colorPrimaryVariantDark">@color/BlueGrottoDark</color>
+    <!-- Logo -->
+    <color name="yellow_logo">@color/yellow700</color>
+    <color name="blue_logo">@color/blue500</color>
 
-    <color name="secondary">@color/BlueGreenLight</color>
-    <color name="secondaryDark">@color/BlueGreenDark</color>
-    <color name="onSecondary">#000000</color>
-    <color name="onSecondaryDark">#FFFFFF</color>
-    <color name="secondaryVariant">@color/BabyBlueLight</color>
-    <color name="secondaryVariantDark">@color/BabyBlueDark</color>
-    <color name="toastBackground">#11143e</color>
-
+    <!-- Status bar -->
+    <color name="black30">#4D000000</color>
 
 </resources>

@@ -1,0 +1,26 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Allows us to override platform level specific attributes in their
+         respective values-vXX folder. -->
+    <style name="Theme.ADHD" parent="Theme.Material3.DayNight">
+        <item name="android:statusBarColor">@color/black30</item>
+    </style>
+
+    <!-- The actual theme we use. This varies for light theme (here),
+         and values-night for dark theme. -->
+    <style name="Theme.ADHD.NoActionBar." parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/blue500</item>
+        <item name="colorPrimaryDark">@color/blue800</item>
+        <item name="colorAccent">@color/yellow700</item>
+    </style>
+
+    <style name="Theme.ADHD.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.ADHD.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
+
+    <style name="Theme.ADHD.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+</resources>
