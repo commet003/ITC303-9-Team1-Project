@@ -57,16 +57,16 @@ import com.csu_itc303_team1.adhdtaskmanager.common.composable.CompleteTaskAnimat
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueTime
-import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.csu_itc303_team1.adhdtaskmanager.model.Category
 import com.csu_itc303_team1.adhdtaskmanager.model.Priority
+import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 internal fun TaskItem(
-    task: LocalTask,
+    task: Task,
     showToast: MutableState<Boolean>,
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -167,7 +167,7 @@ internal fun TaskItem(
 
 @Composable
 fun TaskCard(
-    task: LocalTask,
+    task: Task,
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
@@ -233,7 +233,7 @@ fun TaskCard(
 }
 
 @Composable
-internal fun RelativeDateText(task: LocalTask) {
+internal fun RelativeDateText(task: Task) {
     Text(
         text = getDueDateAndTime(task),
         color = MaterialTheme.colorScheme.onSurface,
@@ -244,7 +244,7 @@ internal fun RelativeDateText(task: LocalTask) {
 }
 
 
-private fun getDueDateAndTime(task: LocalTask): String {
+private fun getDueDateAndTime(task: Task): String {
     val stringBuilder = StringBuilder("")
 
     if (task.hasDueDate()) {

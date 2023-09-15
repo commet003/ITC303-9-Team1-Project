@@ -2,13 +2,15 @@ package com.csu_itc303_team1.adhdtaskmanager.model
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
-import com.google.firebase.firestore.DocumentId
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.time.Instant
+import java.util.UUID
 
+@Entity(tableName = "task_table")
 @RequiresApi(Build.VERSION_CODES.O)
 data class Task(
-    @DocumentId val id: String = "",
+    @PrimaryKey var id: Long = UUID.randomUUID().mostSignificantBits,
     val title: String = "",
     val priority: Int = 0,
     val category: String = "None",
@@ -19,20 +21,4 @@ data class Task(
     val description: String = "",
     val completed: Boolean = false,
     val userId: String = ""
-){
-    fun toLocalTask(): LocalTask {
-        return LocalTask(
-            id = 0,
-            title = title,
-            priority = priority,
-            category = category,
-            dueDate = dueDate,
-            dueTime = dueTime,
-            reminderSet = reminderSet,
-            taskReminderTime = taskReminderTime,
-            description = description,
-            completed = completed,
-            userId = userId
-        )
-    }
-}
+)

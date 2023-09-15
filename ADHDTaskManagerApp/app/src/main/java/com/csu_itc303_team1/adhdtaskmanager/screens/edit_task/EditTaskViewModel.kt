@@ -3,17 +3,21 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.edit_task
 
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
-import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
+import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
+import com.csu_itc303_team1.adhdtaskmanager.model.service.AndroidAlarmSchedulerService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.mapLatest
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -21,6 +25,7 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class EditTaskViewModel @Inject constructor(
@@ -29,20 +34,23 @@ class EditTaskViewModel @Inject constructor(
     private val localTaskRepository: LocalTaskRepository,
     private val accountService: AccountService,
     private val storageService: StorageService,
+    private val alarmService: AndroidAlarmSchedulerService
 ) : MainViewModel(logService) {
 
-
+    val scheduler = alarmService
     private val currentUserId = accountService.currentUserId
 
     @RequiresApi(Build.VERSION_CODES.O)
-    val task = mutableStateOf(LocalTask())
+    val task = mutableStateOf(Task())
 
     init {
-        val taskId = savedStateHandle.get<Int>(TASK_ID)
+        val taskId = savedStateHandle.get<String>(TASK_ID)
         if (taskId != null) {
             launchCatching {
                 //task.value = storageService.getTask(taskId.idFromParameter()) ?: Task()
-                task.value = localTaskRepository.getTaskById(taskId)
+                localTaskRepository.getTaskById(taskId).mapLatest {
+                    task.value = it
+                }
             }
         }
     }
@@ -78,17 +86,17 @@ class EditTaskViewModel @Inject constructor(
 
 
     fun onDoneClick(popUpScreen: () -> Unit) {
-
         launchCatching {
-            task.value = task.value.copy(userId = currentUserId)
-            val editedTask = task.value
-            if (editedTask.id == 0) {
+            var editedTask = task.value
+            editedTask = editedTask.copy(userId = currentUserId)
+            if (editedTask.id != 0L) {
                 localTaskRepository.saveTask(editedTask)
-               // storageService.save(editedTask)
+                //storageService.save(editedTask)
             } else {
                 localTaskRepository.saveTask(editedTask)
-               // storageService.update(editedTask)
+                //storageService.update(editedTask)
             }
+            Log.d("Edited Task", "Edited Task: $editedTask")
             popUpScreen()
         }
     }

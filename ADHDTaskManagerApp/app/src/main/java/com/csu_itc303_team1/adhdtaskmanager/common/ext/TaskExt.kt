@@ -1,11 +1,11 @@
 package com.csu_itc303_team1.adhdtaskmanager.common.ext
 
-import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
+import com.csu_itc303_team1.adhdtaskmanager.model.Task
 
-fun LocalTask?.hasDueDate(): Boolean {
+fun Task?.hasDueDate(): Boolean {
     return this?.dueDate.orEmpty().isNotBlank()
 }
 
-fun LocalTask?.hasDueTime(): Boolean {
+fun Task?.hasDueTime(): Boolean {
     return this?.dueTime.orEmpty().isNotBlank()
 }

@@ -12,6 +12,14 @@ const val NOTIFICATION_ID = 1
 // The name of the image manipulation work
 const val IMAGE_MANIPULATION_WORK_NAME = "image_manipulation_work"
 
+const val TARGET_ACTIVITY_NAME = "com.csu_itc303_team1.adhdtaskmanager.MainActivity"
+const val TASK_NOTIFICATION_CHANNEL_ID = "TASK_NOTIFICATION_CHANNEL"
+const val TASK_NOTIFICATION_GROUP = "TASK_NOTIFICATION_GROUP"
+const val MAX_NUM_NOTIFICATIONS = 5
+const val TASK_NOTIFICATION_ID = 3
+const val TASK_NOTIFICATION_SUMMARY_ID = 2
+const val TASK_NOTIFICATION_REQUEST_CODE = 1
+
 // Other keys
 const val OUTPUT_PATH = "blur_filter_outputs"
 const val KEY_IMAGE_URI = "KEY_IMAGE_URI"
@@ -19,7 +27,6 @@ const val TAG_OUTPUT = "OUTPUT"
 const val KEY_BLUR_LEVEL = "KEY_BLUR_LEVEL"
 
 const val DELAY_TIME_MILLIS: Long = 3000
-const val TASK_NOTIFICATION_CHANNEL_ID = "TASK_NOTIFICATION_CHANNEL"
 const val TASK_ID_EXTRA = "task_Id"
 
 const val LOGIN_STREAK_REWARD = 1000

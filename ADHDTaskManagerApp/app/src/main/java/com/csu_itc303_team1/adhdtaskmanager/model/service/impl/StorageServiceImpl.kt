@@ -28,15 +28,15 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
     override suspend fun getTask(taskId: String): Task? =
         firestore.collection(TASKS_COLLECTION).document(taskId).get().await().toObject()
 
-    override suspend fun save(task: Task): String =
-        trace(SAVE_TASK_TRACE) {
-            val taskWithUserId = task.copy(userId = auth.currentUserId)
-            firestore.collection(TASKS_COLLECTION).add(taskWithUserId).await().id
+    override suspend fun save(task: Task) {
+        trace(UPDATE_TASK_TRACE) {
+            firestore.collection(TASKS_COLLECTION).document(task.id.toString()).set(task).await()
         }
+    }
 
     override suspend fun update(task: Task): Unit =
         trace(UPDATE_TASK_TRACE) {
-            firestore.collection(TASKS_COLLECTION).document(task.id).set(task).await()
+            firestore.collection(TASKS_COLLECTION).document(task.id.toString()).set(task).await()
         }
 
     override suspend fun delete(taskId: String) {

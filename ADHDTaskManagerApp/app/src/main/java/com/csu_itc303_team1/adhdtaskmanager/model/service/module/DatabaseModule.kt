@@ -37,7 +37,12 @@ object DatabaseModule {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Provides
+    @Singleton
     fun provideTaskDao(database: TaskDatabase): TaskDao {
         return database.taskDao()
     }
+
+    @Singleton
+    @Provides
+    fun provideAppContext(@ApplicationContext context: Context) = context
 }

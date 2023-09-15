@@ -7,7 +7,6 @@ import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.EDIT_TASK_SCREEN
 import com.csu_itc303_team1.adhdtaskmanager.TASK_ID
-import com.csu_itc303_team1.adhdtaskmanager.data.LocalTask
 import com.csu_itc303_team1.adhdtaskmanager.data.LocalTaskRepository
 import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
@@ -24,13 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
-data class TasksUiModel(
-    val tasks: List<Task>,
-    val showCompleted: Boolean,
-    val showUncompleted: Boolean,
-    val sortOrder: SortOrder
-)
-
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     logService: LogService,
@@ -46,11 +38,11 @@ class TasksViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun filterSortTasks(
-        tasks: List<LocalTask>,
+        tasks: List<Task>,
         showCompleted: Boolean,
         showUncompleted: Boolean,
         sortOrder: SortOrder
-    ): List<LocalTask> {
+    ): List<Task> {
         // filter the tasks
         val filteredTodos = if (showCompleted && showUncompleted) {
             tasks.filter {
@@ -71,7 +63,7 @@ class TasksViewModel @Inject constructor(
         return when (sortOrder) {
             SortOrder.NONE -> filteredTodos
             SortOrder.BY_DEADLINE -> filteredTodos.sortedWith(
-                compareBy<LocalTask>{ it.dueDate.slice(5..6).toIntOrNull() }
+                compareBy<Task>{ it.dueDate.slice(5..6).toIntOrNull() }
                     .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
                     .thenBy { it.dueDate.slice(11..14).toIntOrNull() }
                     .thenBy{ it.dueTime.slice(0..1).toIntOrNull()}
@@ -79,7 +71,7 @@ class TasksViewModel @Inject constructor(
             )
             SortOrder.BY_PRIORITY -> filteredTodos.sortedBy { it.priority }.asReversed()
             SortOrder.BY_DEADLINE_AND_PRIORITY -> filteredTodos.sortedWith(
-                compareBy<LocalTask>{ it.priority }.reversed()
+                compareBy<Task>{ it.priority }.reversed()
                     .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
                     .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
                     .thenBy { it.dueDate.slice(11..14).toIntOrNull() }
@@ -89,7 +81,7 @@ class TasksViewModel @Inject constructor(
             )
             SortOrder.BY_CATEGORY -> filteredTodos.sortedBy { it.category }
             SortOrder.BY_DEADLINE_AND_CATEGORY -> filteredTodos.sortedWith(
-                compareBy<LocalTask>{ it.category }
+                compareBy<Task>{ it.category }
                     .thenBy { it.dueDate.slice(5..6).toIntOrNull() }
                     .thenBy { it.dueDate.slice(8..9).toIntOrNull() }
                     .thenBy { it.dueDate.slice(11..14).toIntOrNull() }
@@ -101,7 +93,7 @@ class TasksViewModel @Inject constructor(
 
 
 
-    val tasks = storageService.tasks
+    //val tasks = storageService.tasks
 
     fun getPreferences(): Flow<UserPreferences> {
         return userPreferencesFlow
@@ -119,7 +111,7 @@ class TasksViewModel @Inject constructor(
 
 
 
-    private fun onTaskCompletedChange(task: LocalTask) {
+    private fun onTaskCompletedChange(task: Task) {
         launchCatching {
            // storageService.update(task.copy(completed = !task.completed))
             localTaskRepository.updateTask(task.copy(completed = !task.completed))
@@ -130,7 +122,7 @@ class TasksViewModel @Inject constructor(
     fun onAddClick(openScreen: (String) -> Unit) = openScreen(EDIT_TASK_SCREEN)
 
 
-    fun onTaskActionClick(openScreen: (String) -> Unit, task: LocalTask, action: String) {
+    fun onTaskActionClick(openScreen: (String) -> Unit, task: Task, action: String) {
         when (TaskActionOption.getByTitle(action)) {
             TaskActionOption.CompleteTask -> onTaskCompletedChange(task)
             TaskActionOption.EditTask -> openScreen("$EDIT_TASK_SCREEN?$TASK_ID={${task.id}}")
@@ -138,7 +130,7 @@ class TasksViewModel @Inject constructor(
         }
     }
 
-    private fun onDeleteTaskChange(task: LocalTask) {
+    private fun onDeleteTaskChange(task: Task) {
         launchCatching {
             localTaskRepository.deleteTask(task)
             //storageService.delete(task.id)

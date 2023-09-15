@@ -73,4 +73,8 @@
     <string name="completed_task_reward_description">You have earned the \"Completed Tasks\" reward for completing your tasks!</string>
     <string name="login_reward_description">You have earned this reward for building good habits and logging in to complete your tasks!</string>
     <string name="login_streak_reward_description">You have earned this reward for consistently logging in to complete your tasks!</string>
+    <string name="currentTaskId" />
+    <string name="task_notification_channel_description" />
+    <string name="task_notification_channel_name" />
+    <string name="task_notification_group_summary" />
 </resources>

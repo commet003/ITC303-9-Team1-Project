@@ -7,17 +7,19 @@ import android.net.Network
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConnectivityObserverService
-import kotlinx.coroutines.flow.Flow
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConnectivityObserverService.Status
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ConnectivityObserverServiceImpl @Inject constructor(
-    private val context: Context
-): ConnectivityObserverService {
+class ConnectivityObserverServiceImpl @Inject constructor(): ConnectivityObserverService {
+
+    @Inject
+    lateinit var context: Context
+
     @RequiresApi(Build.VERSION_CODES.N)
     @SuppressLint("ServiceCast")
     override fun observeConnectivity(): Flow<Status> {

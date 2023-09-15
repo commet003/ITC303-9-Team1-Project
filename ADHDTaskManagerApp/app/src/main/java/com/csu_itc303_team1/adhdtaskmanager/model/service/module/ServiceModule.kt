@@ -58,4 +58,5 @@ abstract class ServiceModule {
 
     @Binds
     abstract fun userPreferencesService(impl: UserPreferencesServiceImpl): UserPreferencesService
+
 }

@@ -13,13 +13,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class UsersStorageServiceImpl
-@Inject
-constructor(private val firestore: FirebaseFirestore, private val auth: AccountService) :
+class UsersStorageServiceImpl @Inject constructor(
+    private val firestore: FirebaseFirestore, private val auth: AccountService):
     UsersStorageService {
-
-    private var newUser = false
-    private var returningUser = false
 
 
     override val currentUser: Flow<FirestoreUser?>

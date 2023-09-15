@@ -79,7 +79,7 @@ fun TasksScreen(
         backgroundColor = MaterialTheme.colorScheme.background,
     ) {
         //val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
-        val localTask = viewModel.localTask.collectAsStateWithLifecycle(initialValue = emptyList())
+        val tasks  = viewModel.localTask.collectAsStateWithLifecycle(emptyList())
 
         Column(
             modifier = Modifier
@@ -99,7 +99,7 @@ fun TasksScreen(
             
             LazyColumn {
                 viewModel.filterSortTasks(
-                    tasks = localTask.value,
+                    tasks = tasks.value,
                     showCompleted = false,
                     showUncompleted = true,
                     sortOrder = userPreferences.sortOrder
