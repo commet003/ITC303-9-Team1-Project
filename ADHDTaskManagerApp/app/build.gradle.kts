@@ -145,6 +145,11 @@ dependencies {
     // Google Play services library
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
+    implementation("androidx.webkit:webkit:1.8.0")
+    implementation("androidx.browser:browser:1.6.0")
+
+
+
     //Room dependencies
     implementation("androidx.room:room-ktx:2.5.2")
     implementation("androidx.room:room-runtime:2.5.2")
@@ -154,6 +159,9 @@ dependencies {
     implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
     implementation("androidx.sqlite:sqlite-ktx:2.3.1")
     implementation("androidx.sqlite:sqlite-framework:2.3.1")
+
+    // ExoPlayer implementation
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
 
 
     // Air BNB Lottie

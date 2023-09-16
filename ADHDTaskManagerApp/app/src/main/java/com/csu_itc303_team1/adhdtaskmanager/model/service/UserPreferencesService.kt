@@ -17,7 +17,16 @@ interface UserPreferencesService{
     suspend fun updatePomodoroTimerShortBreakLength(pomodoroTimerShortBreakLength: Long)
     suspend fun updatePomodoroTimerLongBreakLength(pomodoroTimerLongBreakLength: Long)
 
+    suspend fun updateUserPoints(userPoints: Int)
+
+    suspend fun updateRewardsEarned(rewardsEarned: MutableMap<String, Int>)
+
+
     suspend fun updateDarkThemeEnabled(darkThemeEnabled: Boolean)
+
+    suspend fun getRewardsEarned(): MutableMap<String, Int>
+
+    suspend fun getUserPoints(): Int
 
     suspend fun getDarkThemeEnabled(): Boolean
 

@@ -7,9 +7,9 @@ interface LocalTaskDataSource {
     suspend fun saveTask(task: Task)
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
-    fun getTaskById(taskId : String): Flow<Task>
+    fun getTaskById(taskId : Int): Flow<Task>
 
-    suspend fun getTaskByIdNonFlow(taskId : String): Task
+    suspend fun getTaskByIdNonFlow(taskId : Int): Task
 
     fun getAllTasksNonFlow(): List<Task>
     fun getAllTasks(): Flow<List<Task>>

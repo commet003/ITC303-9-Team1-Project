@@ -12,7 +12,6 @@ class BootCompletedReceiver(): BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            println("Boot completed")
             Log.d("BootCompletedReceiver", "onReceive: Boot completed")
         }
     }

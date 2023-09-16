@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 //noinspection UsingMaterialAndMaterial3Libraries
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -104,6 +105,7 @@ fun TasksScreen(
                     showUncompleted = true,
                     sortOrder = userPreferences.sortOrder
                 ).forEach { task ->
+                    Log.d("TasksScreen", "Task: $task")
                     item {
                         TaskItem(
                             task = task,

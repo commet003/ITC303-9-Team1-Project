@@ -35,7 +35,11 @@ data class UserPreferences(
     var pomodoroTimerRounds: Int = 4,
     val pomodoroTimerFocusDuration: Long = 25L,
     val pomodoroTimerShortBreakDuration: Long = 5L,
-    val pomodoroTimerLongBreakDuration: Long = 15L
+    val pomodoroTimerLongBreakDuration: Long = 15L,
+    var userRewardsPoints: Int = 0,
+    val userRewardsEarnedCompletedTask: Int = 0,
+    val userRewardsEarnedLogin: Int = 0,
+    val userRewardsEarnedLoginStreak: Int = 0,
 )
 
 // domain layer
@@ -78,6 +82,18 @@ interface UserPrefRepository {
         sortOrder: SortOrder,
         darkMode: Boolean
     )
+
+    suspend fun setUserRewardsPoints(
+        userRewardsPoints: Int
+    )
+
+    suspend fun setUserRewardsEarned(
+        userRewardsEarned: MutableMap<String, Int>
+    )
+
+    suspend fun getUserRewardsPoints(): Int
+
+    suspend fun getUserRewardsEarned(): MutableMap<String, Int>
 
     suspend fun getAllPreferences(): UserPreferences
 
@@ -127,6 +143,10 @@ class UserPreferencesRepository @Inject constructor(
         val POMODORO_TIMER_FOCUS_DURATION = longPreferencesKey("pomodoro_timer_focus_duration")
         val POMODORO_TIMER_SHORT_BREAK_DURATION = longPreferencesKey("pomodoro_timer_short_break_duration")
         val POMODORO_TIMER_LONG_BREAK_DURATION = longPreferencesKey("pomodoro_timer_long_break_duration")
+        val USER_REWARDS_POINTS = intPreferencesKey("user_rewards_points")
+        val USER_COMPLETED_REWARDS_EARNED = intPreferencesKey("user_completed_task_rewards")
+        val USER_LOGIN_REWARDS_EARNED = intPreferencesKey("user_login_rewards")
+        val USER_LOGIN_STREAK_REWARDS_EARNED = intPreferencesKey("user_login_streak_rewards")
     }
     override suspend fun setShowCompleted(showCompleted: Boolean) {
         dataStore.edit { preferences ->
@@ -235,6 +255,34 @@ class UserPreferencesRepository @Inject constructor(
             preferences[PreferencesKeys.SORT_ORDER] = sortOrder.name
             preferences[PreferencesKeys.IS_DARK_MODE] = darkMode
         }
+    }
+
+    override suspend fun setUserRewardsPoints(userRewardsPoints: Int) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.USER_REWARDS_POINTS] = userRewardsPoints
+        }
+    }
+
+    override suspend fun setUserRewardsEarned(userRewardsEarned: MutableMap<String, Int>) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.USER_COMPLETED_REWARDS_EARNED] = userRewardsEarned["COMPLETED_TASK_REWARD"] ?: 0
+            preferences[PreferencesKeys.USER_LOGIN_REWARDS_EARNED] = userRewardsEarned["LOGIN_REWARD"] ?: 0
+            preferences[PreferencesKeys.USER_LOGIN_STREAK_REWARDS_EARNED] = userRewardsEarned["LOGIN_STREAK_REWARD"] ?: 0
+        }
+    }
+
+    override suspend fun getUserRewardsPoints(): Int {
+        val preferences = dataStore.data.first()
+        return preferences[PreferencesKeys.USER_REWARDS_POINTS] ?: 0
+    }
+
+    override suspend fun getUserRewardsEarned(): MutableMap<String, Int> {
+        val preferences = dataStore.data.first()
+        val userRewardsEarned = mutableMapOf<String, Int>()
+        userRewardsEarned["COMPLETED_TASK_REWARD"] = preferences[PreferencesKeys.USER_COMPLETED_REWARDS_EARNED] ?: 0
+        userRewardsEarned["LOGIN_REWARD"] = preferences[PreferencesKeys.USER_LOGIN_REWARDS_EARNED] ?: 0
+        userRewardsEarned["LOGIN_STREAK_REWARD"] = preferences[PreferencesKeys.USER_LOGIN_STREAK_REWARDS_EARNED] ?: 0
+        return userRewardsEarned
     }
 
     override suspend fun getAllPreferences(): UserPreferences {

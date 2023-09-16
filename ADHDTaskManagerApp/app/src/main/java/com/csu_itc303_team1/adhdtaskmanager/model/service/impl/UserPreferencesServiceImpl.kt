@@ -57,8 +57,24 @@ class UserPreferencesServiceImpl @Inject constructor(
         userPreferencesRepository.setPomodoroTimerLongBreakDuration(pomodoroTimerLongBreakLength)
     }
 
+    override suspend fun updateUserPoints(userPoints: Int) {
+        userPreferencesRepository.setUserRewardsPoints(userPoints)
+    }
+
+    override suspend fun updateRewardsEarned(rewardsEarned: MutableMap<String, Int>) {
+        userPreferencesRepository.setUserRewardsEarned(rewardsEarned)
+    }
+
     override suspend fun updateDarkThemeEnabled(darkThemeEnabled: Boolean) {
         userPreferencesRepository.setDarkMode(darkThemeEnabled)
+    }
+
+    override suspend fun getRewardsEarned(): MutableMap<String, Int> {
+        return userPreferencesRepository.getUserRewardsEarned()
+    }
+
+    override suspend fun getUserPoints(): Int {
+        return userPreferencesRepository.getUserRewardsPoints()
     }
 
     override suspend fun getDarkThemeEnabled(): Boolean {

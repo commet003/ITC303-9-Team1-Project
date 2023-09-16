@@ -15,7 +15,6 @@ import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
-import com.csu_itc303_team1.adhdtaskmanager.model.service.StorageService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +26,7 @@ import javax.inject.Inject
 class TasksViewModel @Inject constructor(
     logService: LogService,
     private val accountService: AccountService,
-    private val storageService: StorageService,
+    //private val storageService: StorageService,
     private val usersStorageService: UsersStorageService,
     private val localTaskRepository: LocalTaskRepository,
     private val userPreferencesRepository: UserPreferencesRepository

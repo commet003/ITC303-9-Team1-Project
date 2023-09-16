@@ -40,7 +40,7 @@ import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 @ExperimentalMaterialApi
 fun EditTaskScreen(
@@ -82,7 +82,6 @@ fun EditTaskScreen(
 
             Spacer(modifier = Modifier.spacer())
             CardEditors(task, viewModel::onDateChange, viewModel::onTimeChange)
-            //CardSelectors(task, viewModel::onPriorityChange, viewModel::onCategoryChange)
             PriorityDropdown(task = task, onNewValue = viewModel::onPriorityChange)
             CategoryDropdown(task = task, onNewValue = viewModel::onCategoryChange)
             Spacer(modifier = Modifier.spacer())

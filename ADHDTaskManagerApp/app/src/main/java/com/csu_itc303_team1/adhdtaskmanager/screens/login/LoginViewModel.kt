@@ -65,7 +65,7 @@ class LoginViewModel @Inject constructor(
                     Log.d("LoginViewModel", "User does not exist in database")
                     val newUser = FirestoreUser(
                         id = currentUser?.uid!!,
-                        isAnonymous = currentUser!!.isAnonymous,
+                        isAnonymous = false,
                         username = currentUser?.displayName!!,
                         rewardPoints = 0,
                         profilePictureUrl = currentUser?.photoUrl.toString(),

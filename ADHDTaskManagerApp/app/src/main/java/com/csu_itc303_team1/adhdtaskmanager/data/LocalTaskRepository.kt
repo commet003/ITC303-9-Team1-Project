@@ -20,7 +20,7 @@ class LocalTaskRepository @Inject constructor(
         taskDao.deleteTask(task)
     }
 
-    override suspend fun getTaskByIdNonFlow(taskId: String): Task {
+    override suspend fun getTaskByIdNonFlow(taskId: Int): Task {
         return taskDao.getTaskByIdNonFlow(taskId)
     }
 
@@ -28,7 +28,7 @@ class LocalTaskRepository @Inject constructor(
         return taskDao.getAllNonFlow()
     }
 
-    override fun getTaskById(taskId : String): Flow<Task>{
+    override fun getTaskById(taskId : Int): Flow<Task>{
         return flowOf(taskDao.getById(taskId))
     }
     override fun getAllTasks(): Flow<List<Task>> {

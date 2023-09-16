@@ -5,12 +5,11 @@ import androidx.annotation.RequiresApi
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.Instant
-import java.util.UUID
 
 @Entity(tableName = "task_table")
 @RequiresApi(Build.VERSION_CODES.O)
 data class Task(
-    @PrimaryKey var id: Long = UUID.randomUUID().mostSignificantBits,
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val title: String = "",
     val priority: Int = 0,
     val category: String = "None",

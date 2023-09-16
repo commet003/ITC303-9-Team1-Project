@@ -39,6 +39,7 @@ import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,11 +53,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CompleteTaskAnimation
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CustomToastMessage
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueDate
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.hasDueTime
+import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.model.Category
 import com.csu_itc303_team1.adhdtaskmanager.model.Priority
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
@@ -69,10 +73,12 @@ internal fun TaskItem(
     task: Task,
     showToast: MutableState<Boolean>,
     onActionClick: (String) -> Unit,
+    viewModel: TasksViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
 
     val showToastTrigger = remember { mutableIntStateOf(0) } // For triggering the toast
+    val userPreferences = viewModel.getPreferences().collectAsState(initial = UserPreferences())
 
     LaunchedEffect(showToastTrigger.intValue) {
         if (showToastTrigger.intValue > 0) {
@@ -94,11 +100,12 @@ internal fun TaskItem(
         confirmValueChange = {
             when(it) {
                 DismissValue.DismissedToEnd -> {
-                    actionOption = "Complete task"
                     toastText = "Task Completed"
                     showToastTrigger.intValue += 1 // Increment to trigger the toast
                     showAnimation = true
                     show = false
+                    userPreferences.value.userRewardsEarnedCompletedTask.plus(1)
+                    userPreferences.value.userRewardsPoints.plus(COMPLETED_TASK_REWARD)
                     true
                 }
                 DismissValue.DismissedToStart -> {
@@ -173,9 +180,9 @@ fun TaskCard(
 ){
     Log.d("Task:", "Task: $task")
     Card(
-        elevation = CardDefaults.elevatedCardElevation(4.dp),
+        elevation = CardDefaults.elevatedCardElevation(8.dp),
         border = BorderStroke(
-            width = 1.dp,
+            width = 2.dp,
             color = Category.getCategoryByName(task.category).color?.toArgb()?.let { Color(it) } ?: MaterialTheme.colorScheme.onSurface
         ),
         shape = MaterialTheme.shapes.medium,
@@ -266,7 +273,7 @@ fun DismissBackground(dismissState: DismissState) {
     val color = when (dismissState.dismissDirection) {
         DismissDirection.StartToEnd -> Color(0xFF1DE9B6)
         DismissDirection.EndToStart -> Color(0xFFFF1744)
-        null -> Color.Transparent
+        null -> MaterialTheme.colorScheme.background
     }
     val direction = dismissState.dismissDirection
 

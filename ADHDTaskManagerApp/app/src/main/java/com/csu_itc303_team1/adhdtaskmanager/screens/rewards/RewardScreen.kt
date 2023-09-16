@@ -17,6 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
+import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD_NAME
+import com.csu_itc303_team1.adhdtaskmanager.LOGIN_STREAK_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.LOGIN_STREAK_REWARD_NAME
+import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.RewardsCard
 import com.csu_itc303_team1.adhdtaskmanager.model.FirestoreUser
 import com.csu_itc303_team1.adhdtaskmanager.model.service.ConnectivityObserverService
@@ -68,9 +74,27 @@ fun RewardsScreen(
                         fontSize = 26.sp,
                     )
                 }
-                user?.rewardsEarned?.forEach { reward ->
-                    RewardsCard(reward)
-                }
+
+                RewardsCard(
+                    rewardTitle = "Completed Task",
+                    rewardDescription = R.string.completed_task_reward_description,
+                    rewardCount = user?.rewardsEarned?.get(COMPLETED_TASK_REWARD_NAME) ?: 0,
+                    pointsPerReward = COMPLETED_TASK_REWARD
+                )
+
+                RewardsCard(
+                    rewardTitle = "Login Reward",
+                    rewardDescription = R.string.login_reward_description,
+                    rewardCount = user?.rewardsEarned?.get(LOGIN_REWARD_NAME) ?: 0,
+                    pointsPerReward = 0
+                )
+
+                RewardsCard(
+                    rewardTitle = "Login Streak",
+                    rewardDescription = R.string.login_streak_reward_description,
+                    rewardCount = user?.rewardsEarned?.get(LOGIN_STREAK_REWARD_NAME) ?: 0,
+                    pointsPerReward = LOGIN_STREAK_REWARD
+                )
             }
         }
         else -> {

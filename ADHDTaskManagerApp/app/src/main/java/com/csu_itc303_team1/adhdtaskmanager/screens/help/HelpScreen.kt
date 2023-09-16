@@ -41,11 +41,6 @@ import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-
-
-
-
 @Composable
 fun HelpScreen() {
     val context = LocalContext.current
@@ -140,8 +135,6 @@ fun HelpScreen() {
             }
         }
     }
-
-
 }
 
 

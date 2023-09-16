@@ -25,10 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,14 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
-import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.DEFAULT_PROFILE_PICTURE
-import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD
-import com.csu_itc303_team1.adhdtaskmanager.LOGIN_REWARD_NAME
-import com.csu_itc303_team1.adhdtaskmanager.LOGIN_STREAK_REWARD
-import com.csu_itc303_team1.adhdtaskmanager.LOGIN_STREAK_REWARD_NAME
-import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.dropdownSelector
 import com.csu_itc303_team1.adhdtaskmanager.model.FirestoreUser
 
@@ -148,35 +137,11 @@ fun CardSelector(
 
 @Composable
 fun RewardsCard(
-    rewardEarned: Map.Entry<String, Int>
+    rewardTitle: String,
+    @StringRes rewardDescription: Int,
+    rewardCount: Int,
+    pointsPerReward: Int
 ){
-    var rewardTitle by remember {
-        mutableStateOf("")
-    }
-    var rewardDescription by remember {
-        mutableStateOf(0)
-    }
-    var pointsPerReward by remember {
-        mutableStateOf(0)
-    }
-
-    when (rewardEarned.key){
-        COMPLETED_TASK_REWARD_NAME -> {
-            rewardTitle = "Completed Task Reward"
-            rewardDescription = R.string.completed_task_reward_description
-            pointsPerReward = COMPLETED_TASK_REWARD
-        }
-        LOGIN_REWARD_NAME -> {
-            rewardTitle = "Login Reward"
-            rewardDescription = R.string.login_reward_description
-            pointsPerReward = LOGIN_REWARD
-        }
-        LOGIN_STREAK_REWARD_NAME -> {
-            rewardTitle = "Login Streak Reward"
-            rewardDescription = R.string.login_streak_reward_description
-            pointsPerReward = LOGIN_STREAK_REWARD
-        }
-    }
 
     ElevatedCard(
         modifier = Modifier
@@ -186,7 +151,8 @@ fun RewardsCard(
     ) {
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(10.dp),
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.Start
@@ -204,7 +170,7 @@ fun RewardsCard(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Achieved:   ${rewardEarned.value}",
+                    text = "Achieved:   ${rewardCount}",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
@@ -213,7 +179,8 @@ fun RewardsCard(
 
             }
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(80.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
@@ -234,7 +201,7 @@ fun RewardsCard(
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = "Total Points: ${rewardEarned.value * pointsPerReward}",
+                    text = "Total Points: ${rewardCount * pointsPerReward}",
                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
                     fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
                     fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
