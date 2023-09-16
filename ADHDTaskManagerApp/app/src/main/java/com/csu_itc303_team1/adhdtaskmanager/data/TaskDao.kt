@@ -21,8 +21,8 @@ interface TaskDao {
     fun getTaskByIdNonFlow(taskId : Int): Task
 
     // Get task by id
-    @Query("SELECT * FROM task_table WHERE id = :id")
-    fun getById(id: Int): Task
+    @Query("SELECT * FROM task_table WHERE id = :taskId")
+    fun getById(taskId: Int): Task
     // Save a task
     @Upsert
     suspend fun upsertTask(task: Task)

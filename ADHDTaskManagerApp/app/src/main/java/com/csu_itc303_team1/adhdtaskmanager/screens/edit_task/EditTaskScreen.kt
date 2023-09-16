@@ -50,7 +50,7 @@ fun EditTaskScreen(
 ) {
     val task by viewModel.task
 
-    Log.d("EditTaskScreen", "$popUpScreen")
+    Log.d("EditTaskScreen", "$task")
 
     Scaffold(
         floatingActionButton = {

@@ -17,7 +17,7 @@ import net.sqlcipher.database.SupportFactory
 import javax.inject.Singleton
 
 
-const val TASK_DATABASE= "task_database"
+const val TASK_DATABASE= "task_database.db"
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -31,7 +31,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             appContext,
             TaskDatabase::class.java,
-            "$TASK_DATABASE.db"
+            TASK_DATABASE
         ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 

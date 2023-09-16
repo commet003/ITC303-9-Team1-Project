@@ -178,7 +178,6 @@ fun TaskCard(
     onActionClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
-    Log.d("Task:", "Task: $task")
     Card(
         elevation = CardDefaults.elevatedCardElevation(8.dp),
         border = BorderStroke(

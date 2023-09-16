@@ -79,7 +79,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 @ExperimentalMaterialApi
 fun MainApplication(
@@ -353,7 +353,7 @@ fun resources(): Resources {
     return LocalContext.current.resources
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @ExperimentalMaterialApi
 fun NavGraphBuilder.navGraph(appState: AppState) {
 

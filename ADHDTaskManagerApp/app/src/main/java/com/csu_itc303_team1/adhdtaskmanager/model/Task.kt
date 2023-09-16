@@ -11,13 +11,13 @@ import java.time.Instant
 data class Task(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val title: String = "",
+    val description: String = "",
     val priority: Int = 0,
     val category: String = "None",
     val dueDate: String = "",
     val dueTime: String = "",
     var reminderSet: Boolean = false,
     var taskReminderTime: String = Instant.now().toString(),
-    val description: String = "",
     val completed: Boolean = false,
     val userId: String = ""
 )

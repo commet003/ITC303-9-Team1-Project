@@ -12,7 +12,6 @@ import com.csu_itc303_team1.adhdtaskmanager.data.SortOrder
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferences
 import com.csu_itc303_team1.adhdtaskmanager.data.UserPreferencesRepository
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
-import com.csu_itc303_team1.adhdtaskmanager.model.User
 import com.csu_itc303_team1.adhdtaskmanager.model.service.AccountService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.LogService
 import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
@@ -96,10 +95,6 @@ class TasksViewModel @Inject constructor(
 
     fun getPreferences(): Flow<UserPreferences> {
         return userPreferencesFlow
-    }
-
-    fun getCurrentUser(): Flow<User> {
-        return accountService.currentUser
     }
 
     fun setSortOrder(sortOrder: SortOrder) {
