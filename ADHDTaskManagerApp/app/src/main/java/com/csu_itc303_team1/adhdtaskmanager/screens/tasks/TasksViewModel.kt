@@ -3,6 +3,7 @@ package com.csu_itc303_team1.adhdtaskmanager.screens.tasks
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.EDIT_TASK_SCREEN
@@ -18,17 +19,20 @@ import com.csu_itc303_team1.adhdtaskmanager.model.service.UsersStorageService
 import com.csu_itc303_team1.adhdtaskmanager.screens.MainViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     logService: LogService,
+
     private val accountService: AccountService,
     //private val storageService: StorageService,
     private val usersStorageService: UsersStorageService,
     private val localTaskRepository: LocalTaskRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+
 ) : MainViewModel(logService) {
 
     private var userPreferencesFlow = userPreferencesRepository.userPreferencesFlow
@@ -112,6 +116,18 @@ class TasksViewModel @Inject constructor(
             usersStorageService.incrementUserRewardPoints(task.userId, COMPLETED_TASK_REWARD, COMPLETED_TASK_REWARD_NAME)
         }
     }
+
+    fun updateRewardsForCompletedTask(currentUserId: String) {
+
+        viewModelScope.launch {
+            usersStorageService.incrementUserRewardPoints(currentUserId, 1,"TASK_COMPLETED_REWARD" )
+        }
+    }
+
+
+
+
+
 
     fun onAddClick(openScreen: (String) -> Unit) = openScreen(EDIT_TASK_SCREEN)
 

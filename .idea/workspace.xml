@@ -4,11 +4,16 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c015dc61-7bfb-47a9-953c-d538fac0610d" name="Changes" comment="" />
+    <list default="true" id="c015dc61-7bfb-47a9-953c-d538fac0610d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/ADHDTaskManagerApp/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ADHDTaskManagerApp/.idea/misc.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -24,6 +29,7 @@
     "RunOnceActivity.cidr.known.project.marker": "true",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "C:/Users/macca/StudioProjects/ITC303-9-Team1-Project/ADHDTaskManagerApp",
     "settings.editor.selected.configurable": "advanced.settings",
     "show.migrate.to.gradle.popup": "false"
   }

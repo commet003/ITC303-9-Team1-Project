@@ -22,6 +22,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import com.csu_itc303_team1.adhdtaskmanager.screens.tasks.TasksViewModel
 
 @Module
 @InstallIn(SingletonComponent::class)

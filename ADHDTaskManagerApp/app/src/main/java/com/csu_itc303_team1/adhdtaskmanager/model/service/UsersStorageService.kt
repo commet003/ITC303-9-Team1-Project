@@ -1,6 +1,8 @@
 package com.csu_itc303_team1.adhdtaskmanager.model.service
 
+import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.model.FirestoreUser
+import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.flow.Flow
 interface UsersStorageService {
     val currentUser: Flow<FirestoreUser?>
@@ -13,6 +15,8 @@ interface UsersStorageService {
     suspend fun delete(userId: String)
 
     fun incrementUserRewardPoints(userId: String, rewardPoints: Int, rewardCount: String)
+
+
 
     // Check if user is in database
     suspend fun checkUserExistsInDatabase(userId: String): Boolean

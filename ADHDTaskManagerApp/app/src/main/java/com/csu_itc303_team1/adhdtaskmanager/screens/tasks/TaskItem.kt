@@ -55,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD
+import com.csu_itc303_team1.adhdtaskmanager.COMPLETED_TASK_REWARD_NAME
 import com.csu_itc303_team1.adhdtaskmanager.R
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CompleteTaskAnimation
 import com.csu_itc303_team1.adhdtaskmanager.common.composable.CustomToastMessage
@@ -65,6 +66,8 @@ import com.csu_itc303_team1.adhdtaskmanager.model.Category
 import com.csu_itc303_team1.adhdtaskmanager.model.Priority
 import com.csu_itc303_team1.adhdtaskmanager.model.Task
 import kotlinx.coroutines.delay
+import com.csu_itc303_team1.adhdtaskmanager.model.service.module.ServiceModule
+import com.csu_itc303_team1.adhdtaskmanager.screens.rewards.RewardViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -74,8 +77,10 @@ internal fun TaskItem(
     showToast: MutableState<Boolean>,
     onActionClick: (String) -> Unit,
     viewModel: TasksViewModel = hiltViewModel(),
+    rewardViewModel: RewardViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
 ) {
+    val user by rewardViewModel.getUser().collectAsState(initial = null)
 
     val showToastTrigger = remember { mutableIntStateOf(0) } // For triggering the toast
     val userPreferences = viewModel.getPreferences().collectAsState(initial = UserPreferences())
@@ -100,12 +105,16 @@ internal fun TaskItem(
         confirmValueChange = {
             when(it) {
                 DismissValue.DismissedToEnd -> {
+                    if (user != null) {
+                        viewModel.updateRewardsForCompletedTask(user!!.id)
+                    }
                     toastText = "Task Completed"
                     showToastTrigger.intValue += 1 // Increment to trigger the toast
                     showAnimation = true
                     show = false
                     userPreferences.value.userRewardsEarnedCompletedTask.plus(1)
                     userPreferences.value.userRewardsPoints.plus(COMPLETED_TASK_REWARD)
+
                     true
                 }
                 DismissValue.DismissedToStart -> {
@@ -301,4 +310,5 @@ fun DismissBackground(dismissState: DismissState) {
             )
         }
     }
+
 }

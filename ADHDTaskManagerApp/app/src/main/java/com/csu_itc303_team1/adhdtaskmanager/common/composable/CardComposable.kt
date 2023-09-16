@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.csu_itc303_team1.adhdtaskmanager.DEFAULT_PROFILE_PICTURE
+import com.csu_itc303_team1.adhdtaskmanager.TASK_COMPLETED_REWARD
 import com.csu_itc303_team1.adhdtaskmanager.common.ext.dropdownSelector
 import com.csu_itc303_team1.adhdtaskmanager.model.FirestoreUser
 
@@ -140,7 +141,9 @@ fun RewardsCard(
     rewardTitle: String,
     @StringRes rewardDescription: Int,
     rewardCount: Int,
-    pointsPerReward: Int
+    pointsPerReward: Int,
+    rewardPoints: Int,
+
 ){
 
     ElevatedCard(
@@ -170,12 +173,14 @@ fun RewardsCard(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Achieved:   ${rewardCount}",
+                    text = "Achieved:   ${rewardPoints * pointsPerReward}",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                     fontFamily = MaterialTheme.typography.titleMedium.fontFamily
                 )
+
+
 
             }
             Row(

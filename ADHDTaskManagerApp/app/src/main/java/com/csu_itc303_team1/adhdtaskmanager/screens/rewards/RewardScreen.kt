@@ -79,21 +79,29 @@ fun RewardsScreen(
                     rewardTitle = "Completed Task",
                     rewardDescription = R.string.completed_task_reward_description,
                     rewardCount = user?.rewardsEarned?.get(COMPLETED_TASK_REWARD_NAME) ?: 0,
-                    pointsPerReward = COMPLETED_TASK_REWARD
+                    pointsPerReward = COMPLETED_TASK_REWARD,
+                    rewardPoints = user?.rewardPoints ?: 0,
+
+
                 )
 
                 RewardsCard(
                     rewardTitle = "Login Reward",
                     rewardDescription = R.string.login_reward_description,
                     rewardCount = user?.rewardsEarned?.get(LOGIN_REWARD_NAME) ?: 0,
-                    pointsPerReward = 0
+                    pointsPerReward = 0,
+                    rewardPoints = user?.rewardPoints ?: 0,
+
+
                 )
 
                 RewardsCard(
                     rewardTitle = "Login Streak",
                     rewardDescription = R.string.login_streak_reward_description,
                     rewardCount = user?.rewardsEarned?.get(LOGIN_STREAK_REWARD_NAME) ?: 0,
-                    pointsPerReward = LOGIN_STREAK_REWARD
+                    pointsPerReward = LOGIN_STREAK_REWARD,
+                    rewardPoints = user?.rewardPoints ?: 0
+
                 )
             }
         }

@@ -18,5 +18,11 @@ data class FirestoreUser(
     var rewardPoints: Int = 0,
     var lastLogin: Timestamp = Timestamp.now(),
     var loginStreak: Int = 1,
-    val rewardsEarned: MutableMap<String, Int> = mutableMapOf()
-)
+    val rewardsEarned: MutableMap<String, Int> = mutableMapOf(),
+
+
+
+
+) {
+
+}
