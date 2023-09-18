@@ -16,8 +16,7 @@ data class Task(
     val category: String = "None",
     val dueDate: String = "",
     val dueTime: String = "",
-    var reminderSet: Boolean = false,
-    var taskReminderTime: String = Instant.now().toString(),
+    val edit: Boolean = false,
     val completed: Boolean = false,
     val userId: String = ""
 )

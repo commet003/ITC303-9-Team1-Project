@@ -39,7 +39,7 @@ import com.csu_itc303_team1.adhdtaskmanager.R.drawable as AppIcon
 import com.csu_itc303_team1.adhdtaskmanager.R.string as AppText
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
 @ExperimentalMaterialApi
@@ -48,14 +48,27 @@ fun EditTaskScreen(
     modifier: Modifier = Modifier,
     viewModel: EditTaskViewModel = hiltViewModel()
 ) {
-    val task by viewModel.task
+    val tasks by viewModel.tasks.collectAsState(emptyList())
+    for (task in tasks){
+        if(task.edit){
+            viewModel.task = remember {
+                mutableStateOf(task)
+            }
+        }
+    }
+    var task = viewModel.task.value
 
     Log.d("EditTaskScreen", "$task")
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.onDoneClick(popUpScreen) },
+                onClick = {
+                    if (task.edit){
+                        viewModel.task.value = viewModel.task.value.copy(edit = false)
+                    }
+                    viewModel.onDoneClick(popUpScreen)
+                },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,

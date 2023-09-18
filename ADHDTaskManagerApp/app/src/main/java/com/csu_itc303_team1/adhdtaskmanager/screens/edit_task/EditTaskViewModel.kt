@@ -33,20 +33,15 @@ class EditTaskViewModel @Inject constructor(
 ) : MainViewModel(logService) {
 
     private val currentUserId = accountService.currentUserId
-    private var alarmHours: Int? = null
-    private var alarmMinutes: Int? = null
-    private var alarmInMillis: Long? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
-    val task = mutableStateOf(Task())
+    var task = mutableStateOf(Task())
+    val tasks = localTaskRepository.getAllTasks()
 
-    init {
-        val taskId = savedStateHandle.get<Int>(TASK_ID)
-        if (taskId != null) {
-            launchCatching {
-                //task.value = storageService.getTask(taskId.idFromParameter()) ?: Task()
-                task.value = localTaskRepository.getTaskByIdNonFlow(taskId) ?: Task()
-            }
+
+    fun onEditTaskClick(task: Task) {
+        launchCatching {
+            localTaskRepository.updateTask(task.copy(edit = !task.edit))
         }
     }
 
@@ -62,15 +57,12 @@ class EditTaskViewModel @Inject constructor(
     fun onDateChange(newValue: Long) {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.systemDefault()))
         calendar.timeInMillis = newValue
-        alarmInMillis = newValue
         val newDueDate = SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH).format(calendar.time)
         task.value = task.value.copy(dueDate = newDueDate)
     }
 
     fun onTimeChange(hour: Int, minute: Int) {
         val newDueTime = "${hour.toClockPattern()}:${minute.toClockPattern()}"
-        alarmHours = hour
-        alarmMinutes = minute
         task.value = task.value.copy(dueTime = newDueTime)
     }
 
@@ -90,10 +82,8 @@ class EditTaskViewModel @Inject constructor(
             editedTask = editedTask.copy(userId = currentUserId)
             if (editedTask.id != 0) {
                 localTaskRepository.saveTask(editedTask)
-                //storageService.save(editedTask)
             } else {
                 localTaskRepository.saveTask(editedTask)
-                //storageService.update(editedTask)
             }
             popUpScreen()
         }

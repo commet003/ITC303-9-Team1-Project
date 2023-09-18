@@ -142,8 +142,6 @@ fun RewardsCard(
     @StringRes rewardDescription: Int,
     rewardCount: Int,
     pointsPerReward: Int,
-    rewardPoints: Int,
-
 ){
 
     ElevatedCard(
@@ -173,7 +171,7 @@ fun RewardsCard(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Text(
-                    text = "Achieved:   ${rewardPoints * pointsPerReward}",
+                    text = "Achieved:   $rewardCount",
                     fontSize = MaterialTheme.typography.titleMedium.fontSize,
                     fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
                     fontStyle = MaterialTheme.typography.titleMedium.fontStyle,

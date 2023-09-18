@@ -28,7 +28,6 @@ class TasksViewModel @Inject constructor(
     logService: LogService,
 
     private val accountService: AccountService,
-    //private val storageService: StorageService,
     private val usersStorageService: UsersStorageService,
     private val localTaskRepository: LocalTaskRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
@@ -125,9 +124,11 @@ class TasksViewModel @Inject constructor(
     }
 
 
-
-
-
+    fun onEditTaskClick(task: Task) {
+        launchCatching {
+            localTaskRepository.updateTask(task.copy(edit = !task.edit))
+        }
+    }
 
     fun onAddClick(openScreen: (String) -> Unit) = openScreen(EDIT_TASK_SCREEN)
 
@@ -135,7 +136,12 @@ class TasksViewModel @Inject constructor(
     fun onTaskActionClick(openScreen: (String) -> Unit, task: Task, action: String) {
         when (TaskActionOption.getByTitle(action)) {
             TaskActionOption.CompleteTask -> onTaskCompletedChange(task)
-            TaskActionOption.EditTask -> openScreen("$EDIT_TASK_SCREEN?$TASK_ID={${task.id}}")
+            TaskActionOption.EditTask -> {
+                launchCatching {
+                    onEditTaskClick(task)
+                }
+                openScreen(EDIT_TASK_SCREEN)
+            }
             TaskActionOption.DeleteTask -> onDeleteTaskChange(task)
         }
     }
@@ -143,7 +149,6 @@ class TasksViewModel @Inject constructor(
     private fun onDeleteTaskChange(task: Task) {
         launchCatching {
             localTaskRepository.deleteTask(task)
-            //storageService.delete(task.id)
         }
     }
 }

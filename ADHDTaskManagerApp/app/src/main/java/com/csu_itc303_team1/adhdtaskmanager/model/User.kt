@@ -1,5 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.model
 
+import com.csu_itc303_team1.adhdtaskmanager.REWARDS_COUNTS
 import com.google.firebase.Timestamp
 
 
@@ -18,11 +19,5 @@ data class FirestoreUser(
     var rewardPoints: Int = 0,
     var lastLogin: Timestamp = Timestamp.now(),
     var loginStreak: Int = 1,
-    val rewardsEarned: MutableMap<String, Int> = mutableMapOf(),
-
-
-
-
-) {
-
-}
+    val rewardsEarned: MutableMap<String, Int> = REWARDS_COUNTS.toMutableMap()
+)
