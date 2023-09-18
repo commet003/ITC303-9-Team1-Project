@@ -14,7 +14,8 @@ data class Users (
     val username: String? = null,
     val country: String? = null,
     val userID: String? = null,
-    val profileImage: String? = null
+    val profileImage: String? = null,
+    val loginNum: Int? = null,
         )
 
 // Final list of users ready for displaying

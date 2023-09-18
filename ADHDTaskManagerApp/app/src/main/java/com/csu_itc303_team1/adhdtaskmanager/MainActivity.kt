@@ -105,6 +105,9 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
 
@@ -200,6 +203,11 @@ class MainActivity : ComponentActivity() {
 
                 // Define contentView here
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
+                val db = FirebaseFirestore.getInstance()
+                val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
+                userRef.update("loginNum", FieldValue.increment(2))
+
+
 
                 // Capture and blur screenshot
                 captureScreenshotWhenReady(contentView) { screenshot ->
