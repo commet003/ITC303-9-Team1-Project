@@ -84,7 +84,7 @@ fun LeaderboardCard(user: Users, rank: Int, defaultProfileImageUrl: String?) {
                 fontSize = 18.sp  // Adjusted font size
             )
             Text(
-                text = user.points.toString(),
+                text = ((user?.points ?: 0) + (user?.loginNum ?: 0)).toString(),
                 modifier = Modifier.weight(1f),
                 color = LeaderboardBlue,
                 fontSize = 18.sp,  // Adjusted font size

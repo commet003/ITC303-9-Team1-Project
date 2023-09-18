@@ -1,4 +1,6 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.leaderboard_screen
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardCard
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LeaderboardScreen() {
@@ -28,6 +33,8 @@ fun LeaderboardScreen() {
     // get list of users and sort it by points
     val usersList = Final.finalDataList
     val sortedList = usersList.sortedWith(compareByDescending { it.points })
+
+
 
     Row(modifier = Modifier.padding(12.dp)) {
         Text(

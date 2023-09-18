@@ -16,6 +16,7 @@ data class Users (
     val userID: String? = null,
     val profileImage: String? = null,
     val loginNum: Int? = null,
+    val totalPoints: Int? = null,
         )
 
 // Final list of users ready for displaying

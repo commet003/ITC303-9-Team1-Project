@@ -15,7 +15,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -40,6 +43,25 @@ class UsersViewModel(
     private val storage = FirebaseStorage.getInstance()
     private val storageRef = storage.reference
 
+
+    fun fetchAndUpdateUserPoints(userId: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                getUser(userId)  // Fetch the user. _user value will be updated after this call.
+
+                // Wait for _user to be populated with the fetched user.
+                // This is a naive way to ensure it's updated; in more complex apps, you might handle this differently.
+                delay(500)
+
+                // Calculate totalPoints
+                val fetchedUser = _user.value
+                val totalPoints = (fetchedUser?.points ?: 0) + (fetchedUser?.loginNum ?: 0)
+
+                // Update Firestore
+                updateTotalPoints(userId, totalPoints)
+            }
+        }
+    }
 
     fun getUser(userId: String) {
         viewModelScope.launch {
@@ -74,8 +96,25 @@ class UsersViewModel(
             userID = authUiClient.getSignedInUser()?.userId,
             profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
             loginNum = 0,
+            totalPoints = 0,
         )
     }
+
+
+
+    fun updateTotalPoints(userId: String, totalPoints: Int) {
+        // Reference to the Firestore collection. Adjust the path as needed.
+        val db = FirebaseFirestore.getInstance().collection("users")
+
+        db.document(userId).update("totalPoints", totalPoints)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Document successfully updated!")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "Error updating document", e)
+            }
+    }
+
 
     fun addUserToFirebase() {
         repo.addToFirebaseDatabase(currentUser)

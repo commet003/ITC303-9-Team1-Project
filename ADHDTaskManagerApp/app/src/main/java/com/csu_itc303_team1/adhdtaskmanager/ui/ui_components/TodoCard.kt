@@ -145,24 +145,22 @@ fun TodoCard(
                 Checkbox(
                     checked = todo.isCompleted,
                     onCheckedChange = {
-                        onEvent(TodoEvent.toggleCompleted(todo))
+                        // Prevent unchecking the checkbox
+                        if (!todo.isCompleted) {
+                            onEvent(TodoEvent.toggleCompleted(todo))
 
-
-                        if (search.isNotEmpty()) {
-                            val completedReward = search[0]
-
-                            if (!todo.isCompleted) {
-                                completedReward.timesAchieved =
-                                    completedReward.timesAchieved + 1
+                            if (search.isNotEmpty()) {
+                                val completedReward = search[0]
+                                completedReward.timesAchieved = completedReward.timesAchieved + 1
                                 rewardViewModel.updateReward(completedReward)
                                 usersViewModel.completedTaskPoints()
 
                                 showToastTrigger.value += 1 // Increment to trigger the toast
                                 onEvent(TodoEvent.ToggleLottieAnimation(true))
                                 showLottieAnimation.value
+                            } else {
+                                println("Search Result on Todo Card is an empty list")
                             }
-                        } else {
-                            println("Search Result on Todo Card is an empty list")
                         }
                     },
                     colors = CheckboxDefaults.colors(
@@ -171,6 +169,7 @@ fun TodoCard(
                         checkmarkColor = MaterialTheme.colorScheme.primary
                     )
                 )
+
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     color = MaterialTheme.colorScheme.onPrimary,
