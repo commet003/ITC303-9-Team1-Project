@@ -129,9 +129,17 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             var username by remember { mutableStateOf("") }
-            TextField(value = username, onValueChange = {
-                username = it
-            })
+
+            TextField(
+                value = username,
+                onValueChange = { newValue ->
+                    if (newValue.length <= 8) {
+                        username = newValue
+                    }
+                },
+                label = { Text("Username") },
+                singleLine = true // This ensures the TextField behaves like a single-line input.
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
