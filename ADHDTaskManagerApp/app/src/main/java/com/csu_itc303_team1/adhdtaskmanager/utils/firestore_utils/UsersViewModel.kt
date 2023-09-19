@@ -16,6 +16,8 @@ import kotlinx.coroutines.withContext
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.delay
@@ -63,26 +65,26 @@ class UsersViewModel(
         }
     }
 
-    fun loginRewardProcedure(userId: String): Boolean {
-        var needReward = false
+    fun loginRewardProcedure(userId: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                Log.d("User", "Fetching User from Firestore.")
                 getUser(userId)
 
-                delay(500)
+                delay(2000)
+                Log.d("User", "Finished Delay Time.")
 
                 val lastLoginDate = _user.value?.lastLoginDate
                 val currentDate = LocalDate.now().toString()
 
                 if (lastLoginDate != currentDate) {
-                    needReward = true
                     updateLastLoginDate(userId, currentDate)
+                    updateLogInNum(userId)
+                } else {
+                    Log.d("User", "User has already claimed the log in reward today.")
                 }
-
-
             }
         }
-        return needReward
     }
 
     private fun updateLastLoginDate(userId: String, currentDate: String){
@@ -147,6 +149,18 @@ class UsersViewModel(
             }
             .addOnFailureListener { e ->
                 Log.w("Firestore", "Error updating document", e)
+            }
+    }
+
+    fun updateLogInNum(userId: String) {
+        val db = FirebaseFirestore.getInstance().collection("users")
+
+        db.document(userId).update("loginNum", FieldValue.increment(2))
+            .addOnSuccessListener {
+                Log.d("Firestore", "Updated LoginNum successfully !")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "Error updating loginNum", e)
             }
     }
 

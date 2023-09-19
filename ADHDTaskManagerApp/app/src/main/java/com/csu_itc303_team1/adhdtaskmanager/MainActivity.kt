@@ -202,16 +202,10 @@ class MainActivity : ComponentActivity() {
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
                 val db = FirebaseFirestore.getInstance()
                 val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
+                val uID = googleAuthUiClient.getSignedInUser()?.userId!!
+                userViewModel.loginRewardProcedure(uID)
+                // userRef.update("loginNum", FieldValue.increment(2))
 
-                // check if user has already logged in today, update login reward if they haven't.
-                val updateLogIn = googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                    userViewModel.loginRewardProcedure(
-                        it1
-                    )
-                }
-                if (updateLogIn == true) {
-                    userRef.update("loginNum", FieldValue.increment(2))
-                }
 
 
 
@@ -281,7 +275,7 @@ class MainActivity : ComponentActivity() {
             val signInState by signInViewModel.state.collectAsState()
             // Retrieve's Leaderboard data onCreate
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
-            userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
+            // userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
 
