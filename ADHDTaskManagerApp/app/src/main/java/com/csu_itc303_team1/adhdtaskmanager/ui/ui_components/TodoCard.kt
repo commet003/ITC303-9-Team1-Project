@@ -290,12 +290,3 @@ fun lottieLoaderAnimation(isVisible: Boolean) {
         )
     }
 }
-
-
-
-
-
-
-
-
-

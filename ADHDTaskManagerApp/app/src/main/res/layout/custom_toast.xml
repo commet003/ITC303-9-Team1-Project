@@ -12,17 +12,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/custom_toast_background"
-    android:textColor="#FFFFFF"
-    android:textSize="18sp"
-    android:text="Custom Toast Message"
-    android:gravity="center"
-    android:padding="8dp" /> <!-- Added padding for the TextView -->
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:text="Custom Toast Message"
+        android:gravity="center"
+        android:padding="8dp" /> <!-- Added padding for the TextView -->
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieAnimation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-    app:lottie_rawRes="@raw/animation_llewsrxr"/>
+        app:lottie_rawRes="@raw/animation_llewsrxr"/>
 
 </LinearLayout>

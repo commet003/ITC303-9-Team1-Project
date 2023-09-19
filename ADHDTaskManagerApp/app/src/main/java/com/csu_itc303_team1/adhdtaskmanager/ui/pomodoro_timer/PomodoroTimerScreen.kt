@@ -168,8 +168,8 @@ fun PomodoroTimerScreen(
                 color = if(isWorkTime){
                     activeBarColor
                 }else {
-                      Color.Green
-                      },
+                    Color.Green
+                },
                 startAngle = -215f,
                 sweepAngle = 250f * progress,
                 useCenter = false,
@@ -251,20 +251,20 @@ fun PomodoroTimerScreen(
                 contentColor = Color.White
             ),
             onClick = {
-            isTimerRunning = false
-            currentTime = workTime
-            isWorkTime = true
-            isBreakTime = false
-            timerRoundsCount = 4
+                isTimerRunning = false
+                currentTime = workTime
+                isWorkTime = true
+                isBreakTime = false
+                timerRoundsCount = 4
                 seconds = 0
                 if (!isDoNotDisturbEnabled(context)){
                     toggleDoNotDisturb(context, activity)
                 }
-        }) {
+            }) {
             Text(
                 text = "Stop",
                 fontWeight = FontWeight.Bold
-                )
+            )
         }
     }
     Spacer(modifier = Modifier.height(16.dp))

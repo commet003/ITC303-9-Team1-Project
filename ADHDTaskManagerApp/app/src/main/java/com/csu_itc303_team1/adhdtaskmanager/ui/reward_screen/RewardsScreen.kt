@@ -89,7 +89,3 @@ fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewMod
         }
     }
 }
-
-
-
-

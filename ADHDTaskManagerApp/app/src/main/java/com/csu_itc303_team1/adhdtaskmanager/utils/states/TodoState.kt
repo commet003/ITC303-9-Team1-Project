@@ -25,5 +25,4 @@ data class TodoState(
     val showEditTimeSelector: Boolean = false,
     val completedTodos: List<Todo> = emptyList(),
     var showLottieAnimation: Boolean = false
-
 )

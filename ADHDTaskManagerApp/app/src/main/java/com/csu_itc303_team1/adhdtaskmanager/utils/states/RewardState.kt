@@ -5,4 +5,4 @@ data class RewardState (
     val description: String = "",
     val pointsAwarded: Int = 0,
     val timesAchieved: Int = 0
-        )
+)

@@ -420,7 +420,7 @@ fun AddEditTodoDialog(
                         } else {
                             onEvent(TodoEvent.hideEditTimeSelector)
                         }
-                                       },
+                    },
                     confirmButton = {
                         Button(
                             colors = ButtonDefaults.buttonColors(
@@ -671,5 +671,3 @@ fun AddEditTodoDialog(
         }
     }
 }
-
-

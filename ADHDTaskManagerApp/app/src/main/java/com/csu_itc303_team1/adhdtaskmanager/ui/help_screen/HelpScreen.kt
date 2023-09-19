@@ -184,16 +184,8 @@ class WebViewActivity : ComponentActivity() {
         }
         // Set a custom WebChrome client to handle video playback
         webView.webChromeClient = WebChromeClient()
-
-
     }
-
-
 }
-
-
-
-
 
 @Preview
 @Composable

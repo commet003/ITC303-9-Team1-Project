@@ -79,6 +79,3 @@ fun LoginRewardCard(user: Users?) {
         }
     }
 }
-
-
-
