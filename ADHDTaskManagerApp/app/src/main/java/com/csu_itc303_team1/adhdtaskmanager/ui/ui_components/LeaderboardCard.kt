@@ -56,7 +56,7 @@ fun LeaderboardCard(user: Users, rank: Int, defaultProfileImageUrl: String?) {
                 text = rank.toString(),
                 modifier = Modifier.weight(0.8f),
                 color = LeaderboardBlue,
-                fontSize = 18.sp  // Adjusted font size
+                fontSize = 18.sp
             )
 
             val imageUrlToDisplay = user.profileImage ?: defaultProfileImageUrl
@@ -74,20 +74,20 @@ fun LeaderboardCard(user: Users, rank: Int, defaultProfileImageUrl: String?) {
                 text = user.username ?: "",
                 modifier = Modifier.weight(2f),
                 color = Color.Black,
-                fontSize = 18.sp,  // Adjusted font size
+                fontSize = 18.sp,
                 fontStyle = FontStyle.Italic // Added a cursive style for a playful look
             )
             Text(
                 text = user.country ?: "",
                 modifier = Modifier.weight(2f),
                 color = Color.Black,
-                fontSize = 18.sp  // Adjusted font size
+                fontSize = 18.sp
             )
             Text(
                 text = ((user?.points ?: 0) + (user?.loginNum ?: 0)).toString(),
                 modifier = Modifier.weight(1f),
                 color = LeaderboardBlue,
-                fontSize = 18.sp,  // Adjusted font size
+                fontSize = 18.sp,
                 textAlign = TextAlign.End
             )
         }

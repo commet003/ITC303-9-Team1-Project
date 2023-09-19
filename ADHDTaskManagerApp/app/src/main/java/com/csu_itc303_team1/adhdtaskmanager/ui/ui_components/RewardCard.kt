@@ -36,7 +36,7 @@ fun RewardCard(reward: Reward, title: String) {
             )
             .fillMaxWidth()
             .background(Color.White),
-        elevation = 4.dp // Simply set the elevation here
+        elevation = 4.dp // Sets the elevation here
     ) {
         Column {  // Wrap the Rows in a Column
             Row(

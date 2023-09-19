@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun LeaderboardScreen() {
 
-    // You should define or fetch this default image URL from a constant or Firebase Storage
+
     val defaultImageUrl = "https://firebasestorage.googleapis.com/v0/b/adhdtaskmanager-d532d.appspot.com/o/default-user-profile-picture%2FUntitled.png?alt=media&token=0461fb17-8ef2-4192-9c9d-25dfacfd7420"
 
     // get list of users and sort it by points

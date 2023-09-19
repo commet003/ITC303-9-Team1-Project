@@ -250,7 +250,7 @@ fun CustomToastMessage(
                     .wrapContentWidth(align = Alignment.CenterHorizontally) // Adjust width based on content
                     .wrapContentHeight(align = Alignment.CenterVertically) // Adjust height based on content
                     .background(
-                        Color(0xFF11143E), // Using the RGBA color you provided for the box background
+                        Color(0xFF11143E), // Using the RGBA color provided for the box background
                         shape = RoundedCornerShape(16.dp)
                     )
                     .padding(horizontal = 48.dp, vertical = 24.dp) // Adjust the padding to make the box larger

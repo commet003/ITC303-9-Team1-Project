@@ -50,7 +50,6 @@ class UsersViewModel(
                 getUser(userId)  // Fetch the user. _user value will be updated after this call.
 
                 // Wait for _user to be populated with the fetched user.
-                // This is a naive way to ensure it's updated; in more complex apps, you might handle this differently.
                 delay(500)
 
                 // Calculate totalPoints
@@ -103,7 +102,7 @@ class UsersViewModel(
 
 
     fun updateTotalPoints(userId: String, totalPoints: Int) {
-        // Reference to the Firestore collection. Adjust the path as needed.
+        // Reference to the Firestore collection.
         val db = FirebaseFirestore.getInstance().collection("users")
 
         db.document(userId).update("totalPoints", totalPoints)
