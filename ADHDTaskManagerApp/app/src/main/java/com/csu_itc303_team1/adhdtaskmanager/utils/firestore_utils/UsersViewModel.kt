@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 
 
 class UsersViewModel(
@@ -62,6 +63,24 @@ class UsersViewModel(
         }
     }
 
+    fun loginRewardProcedure(userId: String): Boolean {
+        var needReward = false
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                getUser(userId)
+
+                delay(500)
+
+                val lastLoginDate = _user.value?.lastLoginDate
+                val currentDate = LocalDate.now()
+
+                needReward = lastLoginDate != currentDate
+
+            }
+        }
+        return needReward
+    }
+
     fun getUser(userId: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -96,6 +115,7 @@ class UsersViewModel(
             profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
             loginNum = 0,
             totalPoints = 0,
+            lastLoginDate = LocalDate.now()
         )
     }
 

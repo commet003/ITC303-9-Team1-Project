@@ -196,6 +196,7 @@ class MainActivity : ComponentActivity() {
             }
         )
 
+        //userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
 
         googleAuthUiClient.addAuthStateListener {
             isSignedIn.value = it
@@ -205,7 +206,16 @@ class MainActivity : ComponentActivity() {
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
                 val db = FirebaseFirestore.getInstance()
                 val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
-                userRef.update("loginNum", FieldValue.increment(2))
+
+                // check if user has already logged in today, update login reward if they haven't.
+                //val updateLogIn = googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
+                //    userViewModel.loginRewardProcedure(
+                //        it1
+                //    )
+                // }
+                // if (updateLogIn == true) {
+                    userRef.update("loginNum", FieldValue.increment(2))
+                // }
 
 
 
