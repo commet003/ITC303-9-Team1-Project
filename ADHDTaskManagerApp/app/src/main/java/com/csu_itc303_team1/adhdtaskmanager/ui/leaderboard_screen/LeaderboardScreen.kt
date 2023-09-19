@@ -21,11 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Final
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardCard
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.NoInternetScreen
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserver
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun LeaderboardScreen() {
+fun LeaderboardScreen(connectivityObserver: ConnectivityObserverImpl) {
 
 
     val defaultImageUrl = "https://firebasestorage.googleapis.com/v0/b/adhdtaskmanager-d532d.appspot.com/o/default-user-profile-picture%2FUntitled.png?alt=media&token=0461fb17-8ef2-4192-9c9d-25dfacfd7420"
@@ -34,44 +37,50 @@ fun LeaderboardScreen() {
     val usersList = Final.finalDataList
     val sortedList = usersList.sortedWith(compareByDescending { it.points })
 
+    val observer = connectivityObserver.observeConnectivity().collectAsState(initial = ConnectivityObserver.Status.DISCONNECTED).value
 
 
-    Row(modifier = Modifier.padding(12.dp)) {
-        Text(
-            text = "Rank",
-            modifier = Modifier.weight(1f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-        // Added space for the Mascot header here
-        Spacer(modifier = Modifier.width(94.dp))
-        Text(
-            text = "Name",
-            modifier = Modifier.weight(2f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-        Text(
-            text = "Country",
-            modifier = Modifier.weight(2f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-        Text(
-            text = "Points",
-            modifier = Modifier.weight(1f),
-            color = LeaderboardBlue,
-            fontSize = 18.sp
-        )
-    }
-    Spacer(modifier = Modifier.height(20.dp))
+    when(observer){
+        ConnectivityObserver.Status.CONNECTED -> {
+            Row(modifier = Modifier.padding(12.dp)) {
+                Text(
+                    text = "Rank",
+                    modifier = Modifier.weight(1f),
+                    color = LeaderboardBlue,
+                    fontSize = 18.sp
+                )
+                // Added space for the Mascot header here
+                Spacer(modifier = Modifier.width(94.dp))
+                Text(
+                    text = "Name",
+                    modifier = Modifier.weight(2f),
+                    color = LeaderboardBlue,
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = "Country",
+                    modifier = Modifier.weight(2f),
+                    color = LeaderboardBlue,
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = "Points",
+                    modifier = Modifier.weight(1f),
+                    color = LeaderboardBlue,
+                    fontSize = 18.sp
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
 
-    LazyColumn(
-        modifier = Modifier,
-        contentPadding = PaddingValues(0.dp, 35.dp, 0.dp)
-    ) {
-        items(items = sortedList) { element ->
-            LeaderboardCard(user = element, rank = sortedList.indexOf(element) + 1, defaultProfileImageUrl = defaultImageUrl)
+            LazyColumn(
+                modifier = Modifier,
+                contentPadding = PaddingValues(0.dp, 35.dp, 0.dp)
+            ) {
+                items(items = sortedList) { element ->
+                    LeaderboardCard(user = element, rank = sortedList.indexOf(element) + 1, defaultProfileImageUrl = defaultImageUrl)
+                }
+            }
         }
+        else -> NoInternetScreen()
     }
 }
