@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
 import kotlinx.coroutines.launch
-
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 
 class RewardViewModel(application: Application): ViewModel() {
 
@@ -16,6 +17,8 @@ class RewardViewModel(application: Application): ViewModel() {
     private val repo: RewardRepo
     private var _searchResults = MutableLiveData<List<Reward>>((emptyList()))
     var searchResults: LiveData<List<Reward>> = _searchResults
+
+
 
 
     init {
@@ -29,6 +32,7 @@ class RewardViewModel(application: Application): ViewModel() {
     fun insertReward(reward: Reward) {
         repo.insertReward(reward)
     }
+
 
     fun findReward(name: String): LiveData<List<Reward>> {
         viewModelScope.launch {

@@ -20,6 +20,7 @@ class RewardRepo(private val rewardDao: RewardDao) {
         }
     }
 
+
     fun updateReward(updatedReward: Reward) {
         coroutineScope.launch(Dispatchers.IO) {
             rewardDao.updateReward(updatedReward)

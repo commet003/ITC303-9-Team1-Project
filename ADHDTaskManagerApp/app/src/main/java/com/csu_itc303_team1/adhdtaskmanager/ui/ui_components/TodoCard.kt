@@ -145,24 +145,22 @@ fun TodoCard(
                 Checkbox(
                     checked = todo.isCompleted,
                     onCheckedChange = {
-                        onEvent(TodoEvent.toggleCompleted(todo))
+                        // Prevent unchecking the checkbox
+                        if (!todo.isCompleted) {
+                            onEvent(TodoEvent.toggleCompleted(todo))
 
-
-                        if (search.isNotEmpty()) {
-                            val completedReward = search[0]
-
-                            if (!todo.isCompleted) {
-                                completedReward.timesAchieved =
-                                    completedReward.timesAchieved + 1
+                            if (search.isNotEmpty()) {
+                                val completedReward = search[0]
+                                completedReward.timesAchieved = completedReward.timesAchieved + 1
                                 rewardViewModel.updateReward(completedReward)
                                 usersViewModel.completedTaskPoints()
 
                                 showToastTrigger.value += 1 // Increment to trigger the toast
                                 onEvent(TodoEvent.ToggleLottieAnimation(true))
                                 showLottieAnimation.value
+                            } else {
+                                println("Search Result on Todo Card is an empty list")
                             }
-                        } else {
-                            println("Search Result on Todo Card is an empty list")
                         }
                     },
                     colors = CheckboxDefaults.colors(
@@ -171,6 +169,7 @@ fun TodoCard(
                         checkmarkColor = MaterialTheme.colorScheme.primary
                     )
                 )
+
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -251,7 +250,7 @@ fun CustomToastMessage(
                     .wrapContentWidth(align = Alignment.CenterHorizontally) // Adjust width based on content
                     .wrapContentHeight(align = Alignment.CenterVertically) // Adjust height based on content
                     .background(
-                        Color(0xFF11143E), // Using the RGBA color you provided for the box background
+                        Color(0xFF11143E), // Using the RGBA color provided for the box background
                         shape = RoundedCornerShape(16.dp)
                     )
                     .padding(horizontal = 48.dp, vertical = 24.dp) // Adjust the padding to make the box larger

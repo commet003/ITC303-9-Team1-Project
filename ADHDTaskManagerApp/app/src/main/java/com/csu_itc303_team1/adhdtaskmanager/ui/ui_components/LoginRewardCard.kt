@@ -16,14 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColor
-import androidx.core.graphics.toColorInt
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 import androidx.compose.material.Card
 
 @Composable
-fun RewardCard(reward: Reward, title: String) {
-    val total: Int = reward.timesAchieved * reward.pointsAwarded
+fun LoginRewardCard(user: Users?) {
+    val timesAchieved = user?.loginNum?.div(2) ?: 0
+    val total: Int? = user?.loginNum
 
     Card(
         shape = MaterialTheme.shapes.small,
@@ -36,7 +36,7 @@ fun RewardCard(reward: Reward, title: String) {
             )
             .fillMaxWidth()
             .background(Color.White),
-        elevation = 4.dp // Sets the elevation here
+        elevation = 4.dp
     ) {
         Column {  // Wrap the Rows in a Column
             Row(
@@ -44,16 +44,16 @@ fun RewardCard(reward: Reward, title: String) {
             ) {
                 Column {
                     Text(
-                        text = title,
+                        text = "Log in Reward",
                         fontSize = 24.sp,
                         color = Color.Black
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = if (reward.timesAchieved > 1)
-                            "You have achieved this reward ${reward.timesAchieved} Times"
+                        text = if (timesAchieved > 1)
+                            "You have achieved this reward $timesAchieved times"
                         else
-                            "You have achieved this reward ${reward.timesAchieved} Time",
+                            "You have achieved this reward $timesAchieved time",
                         fontSize = 20.sp,
                         color = Color.Black
                     )
@@ -64,16 +64,21 @@ fun RewardCard(reward: Reward, title: String) {
                 modifier = Modifier.padding(10.dp)
             ) {
                 Column {
-                    Text(
-                        text = if (total > 1)
-                            "You have earned $total points"
-                        else
-                            "You have earned $total point",
-                        fontSize = 20.sp,
-                        color = LeaderboardBlue
-                    )
+                    if (total != null) {
+                        Text(
+                            text = if (total > 1)
+                                "You have earned $total points"
+                            else
+                                "You have earned $total point",
+                            fontSize = 20.sp,
+                            color = LeaderboardBlue
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+
+
