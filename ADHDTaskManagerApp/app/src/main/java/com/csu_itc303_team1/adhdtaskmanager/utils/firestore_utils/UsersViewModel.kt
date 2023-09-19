@@ -72,13 +72,29 @@ class UsersViewModel(
                 delay(500)
 
                 val lastLoginDate = _user.value?.lastLoginDate
-                val currentDate = LocalDate.now()
+                val currentDate = LocalDate.now().toString()
 
-                needReward = lastLoginDate != currentDate
+                if (lastLoginDate != currentDate) {
+                    needReward = true
+                    updateLastLoginDate(userId, currentDate)
+                }
+
 
             }
         }
         return needReward
+    }
+
+    private fun updateLastLoginDate(userId: String, currentDate: String){
+        val db = FirebaseFirestore.getInstance().collection("users")
+
+        db.document(userId).update("lastLoginDate", currentDate)
+            .addOnSuccessListener {
+                Log.d("Firestore", "Document lastLoginDate successfully updated!")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "Error updating lastLoginDate", e)
+            }
     }
 
     fun getUser(userId: String) {
@@ -115,7 +131,7 @@ class UsersViewModel(
             profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
             loginNum = 0,
             totalPoints = 0,
-            lastLoginDate = LocalDate.now()
+            lastLoginDate = LocalDate.now().toString()
         )
     }
 

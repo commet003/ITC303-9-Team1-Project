@@ -19,7 +19,7 @@ data class Users (
     val profileImage: String? = null,
     val loginNum: Int? = null,
     val totalPoints: Int? = null,
-    val lastLoginDate: LocalDate = LocalDate.MIN
+    val lastLoginDate: String = LocalDate.MIN.toString()
         )
 
 // Final list of users ready for displaying
