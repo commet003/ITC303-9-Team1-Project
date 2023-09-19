@@ -93,4 +93,3 @@ fun LeaderboardCard(user: Users, rank: Int, defaultProfileImageUrl: String?) {
         }
     }
 }
-

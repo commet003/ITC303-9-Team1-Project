@@ -121,10 +121,6 @@ class MainActivity : ComponentActivity() {
         SettingsViewModelFactory(application, usersViewModel)
     }
 
-
-
-
-
     private val factory = SupportFactory(SQLiteDatabase.getBytes(BuildConfig.TODO_DATABASE_PASSPHRASE.toCharArray()))
     private val db by lazy {
         Room.databaseBuilder(
