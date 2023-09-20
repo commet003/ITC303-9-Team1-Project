@@ -71,7 +71,7 @@ class UsersViewModel(
                 Log.d("User", "Fetching User from Firestore.")
                 getUser(userId)
 
-                delay(2000)
+                delay(7000)
                 Log.d("User", "Finished Delay Time.")
 
                 val lastLoginDate = _user.value?.lastLoginDate
@@ -131,8 +131,8 @@ class UsersViewModel(
             country = null,
             userID = authUiClient.getSignedInUser()?.userId,
             profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
-            loginNum = 0,
-            totalPoints = 0,
+            loginNum = 2,
+            totalPoints = 2,
             lastLoginDate = LocalDate.now().toString()
         )
     }
