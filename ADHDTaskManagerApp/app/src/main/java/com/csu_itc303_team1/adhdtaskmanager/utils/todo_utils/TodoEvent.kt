@@ -7,6 +7,8 @@ sealed interface TodoEvent {
 
     data class ToggleLottieAnimation(val show: Boolean) : TodoEvent
 
+    data class toggleReminder(val todo: Todo): TodoEvent
+
     // Todo description error
     data class descriptionError(val error: Boolean): TodoEvent
 

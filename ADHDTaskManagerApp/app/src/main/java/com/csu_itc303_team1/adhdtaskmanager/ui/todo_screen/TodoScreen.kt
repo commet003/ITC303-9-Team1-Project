@@ -74,8 +74,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.draw
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-
-
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmScheduler
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -85,7 +85,8 @@ fun TodoScreen(
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel,
-    usersViewModel: UsersViewModel
+    usersViewModel: UsersViewModel,
+    alarmScheduler: AlarmSchedulerImpl
 ) {
 
     rewardViewModel.allRewards.observeAsState(listOf())
@@ -266,7 +267,7 @@ fun TodoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (state.showDialog || state.showEditTodoDialog) {
-                    AddEditTodoDialog(state = state, onEvent = onEvent, scope = scope, sheetState = sheetState)
+                    AddEditTodoDialog(state = state, onEvent = onEvent, scope = scope, sheetState = sheetState, alarmScheduler = alarmScheduler)
                 }
             }
         }

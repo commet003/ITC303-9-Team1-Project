@@ -13,6 +13,7 @@ data class TodoState(
     var dueTime: String = "",
     var userId: String = "",
     var isClicked: Boolean = false,
+    var reminderSet: Boolean = false,
     var id: Int = 0,
     val sortType: SortType = SortType.BY_NOT_COMPLETED,
     val titleError: Boolean = false,

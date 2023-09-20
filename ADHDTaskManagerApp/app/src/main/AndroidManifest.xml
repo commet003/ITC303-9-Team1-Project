@@ -9,6 +9,9 @@
     <!-- Your permissions remain unchanged -->
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <application
         android:name=".utils.notifications.NotificationsApp"
         android:allowBackup="true"
@@ -42,6 +45,7 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.ADHDTaskManager">
         </activity>
+        <receiver android:name=".utils.alarm_manager.AlarmReceiver" />
 
     </application>
 </manifest>

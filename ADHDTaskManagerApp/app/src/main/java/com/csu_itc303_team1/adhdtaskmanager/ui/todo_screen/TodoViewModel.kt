@@ -49,6 +49,17 @@ class TodoViewModel(
                 }
             }
 
+            // Toggle reminder set
+            is TodoEvent.toggleReminder -> {
+                viewModelScope.launch {
+                    todoDao.updateTodo(
+                        event.todo.copy(
+                            reminderSet = !event.todo.reminderSet
+                        )
+                    )
+                }
+            }
+
             is TodoEvent.ToggleLottieAnimation -> {
                 _state.value = _state.value.copy(showLottieAnimation = event.show)
             }

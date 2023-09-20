@@ -101,11 +101,13 @@ import android.widget.PopupWindow
 import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -116,7 +118,6 @@ import com.google.firebase.storage.FirebaseStorage
 class MainActivity : ComponentActivity() {
 
     private val connectivityObserver = ConnectivityObserverImpl(this)
-
 
     // Instantiate the UsersViewModel
     private val usersViewModel by viewModels<UsersViewModel>()
@@ -184,6 +185,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val alarmManager = AlarmSchedulerImpl(this)
+
 
         val viewModel by viewModels<TodoViewModel>(
             factoryProducer = {
@@ -286,24 +290,17 @@ class MainActivity : ComponentActivity() {
                  * This is where the Pomodoro Timer Notification is created
                  */
 
-                val context = LocalContext.current
-                var hasNotificationPermission by remember {
-                    mutableStateOf(ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED)
-                }
-
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        hasNotificationPermission = isGranted
-                    }
+                var permissions = rememberMultiplePermissionsState(
+                    permissions = listOf(
+                        Manifest.permission.POST_NOTIFICATIONS,
+                        Manifest.permission.SCHEDULE_EXACT_ALARM,
+                        Manifest.permission.USE_EXACT_ALARM
+                    )
                 )
 
-                LaunchedEffect(key1 = hasNotificationPermission) {
-                    if (!hasNotificationPermission) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                LaunchedEffect(key1 = permissions.allPermissionsGranted){
+                    if (!permissions.allPermissionsGranted) {
+                        permissions.launchMultiplePermissionRequest()
                     }
                 }
 
@@ -354,10 +351,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 actions = {
                                     IconButton(onClick = {
-                                        if (hasNotificationPermission){
-                                            showFocusNotification()
-                                            showBreakNotification()
-                                        }
+
                                     }) {
                                         Icon(
                                             tint = MaterialTheme.colorScheme.onPrimary,
@@ -563,7 +557,8 @@ class MainActivity : ComponentActivity() {
                                             state = state,
                                             onEvent = todoEvent,
                                             rewardViewModel = rewardViewModel,
-                                            usersViewModel = userViewModel
+                                            usersViewModel = userViewModel,
+                                            alarmScheduler = alarmManager,
                                         )
                                     }
 

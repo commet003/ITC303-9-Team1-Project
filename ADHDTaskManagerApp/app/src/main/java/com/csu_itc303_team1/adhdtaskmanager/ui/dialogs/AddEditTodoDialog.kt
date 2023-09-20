@@ -2,6 +2,7 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.dialogs
 
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,7 +29,9 @@ import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -51,15 +55,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmItem
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Priority
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 
@@ -71,9 +79,12 @@ fun AddEditTodoDialog(
     onEvent: (TodoEvent) -> Unit,
     scope: CoroutineScope,
     sheetState: SheetState,
+    alarmScheduler: AlarmSchedulerImpl,
     modifier: Modifier = Modifier
 ) {
     var thisTodo: Todo? = null
+    val reminderSet = remember { mutableStateOf(false) }
+    var alarmItem: AlarmItem? = null
 
     if (state.showEditTodoDialog) {
         for (todo in state.todos) {
@@ -87,6 +98,7 @@ fun AddEditTodoDialog(
         state.priority = thisTodo?.priority ?: Priority.LOW
         state.dueDate = (thisTodo?.dueDate ?: LocalDate.now()).toString()
         state.dueTime = (thisTodo?.dueTime ?: LocalTime.now()).toString()
+        state.reminderSet = thisTodo?.reminderSet ?: false
     }
 
 
@@ -102,7 +114,8 @@ fun AddEditTodoDialog(
     ) {
 
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -125,10 +138,11 @@ fun AddEditTodoDialog(
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
             TextField(
-                modifier = Modifier.border(
-                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-                    shape = MaterialTheme.shapes.medium
-                )
+                modifier = Modifier
+                    .border(
+                        BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                        shape = MaterialTheme.shapes.medium
+                    )
                     .width(280.dp),
                 singleLine = true,
                 value = if (state.showDialog){
@@ -154,10 +168,11 @@ fun AddEditTodoDialog(
                 label = { Text("Enter Title of the task") } // This line adds a hint to the TextField
             )
             TextField(
-                modifier = Modifier.border(
-                    BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
-                    shape = MaterialTheme.shapes.medium
-                )
+                modifier = Modifier
+                    .border(
+                        BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.primary),
+                        shape = MaterialTheme.shapes.medium
+                    )
                     .width(280.dp),
                 singleLine = false,
                 maxLines = 4,
@@ -184,57 +199,96 @@ fun AddEditTodoDialog(
             )
         }
 
-        ExposedDropdownMenuBox(
-            expanded = priorityExpandedMenu,
-            onExpandedChange = { priorityExpandedMenu = !priorityExpandedMenu }
-        )
-        {
-            Button(
-                modifier = Modifier
-                    .width(130.dp)
-                    .menuAnchor(),
-                onClick = { }) {
-                Text(
-                    text = prioritySelection.ifEmpty {
-                        "Priority"
-                    },
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = "Priority"
-                )
-            }
-
-            ExposedDropdownMenu(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.primary),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            ExposedDropdownMenuBox(
                 expanded = priorityExpandedMenu,
-                onDismissRequest = { priorityExpandedMenu = false }) {
-                Priority.values().forEach { priorityLevel ->
-                    DropdownMenuItem(
-                        modifier = Modifier.clip(MaterialTheme.shapes.medium),
-                        onClick = {
-                            if (state.showDialog){
-                                priorityExpandedMenu = false
-                                prioritySelection = priorityLevel.name
-                                onEvent(TodoEvent.setPriority(priorityLevel))
-                            } else if (state.showEditTodoDialog){
-                                priorityExpandedMenu = false
-                                thisTodo?.priority = priorityLevel
-                                onEvent(TodoEvent.setPriority(priorityLevel))
-                            }
-
+                onExpandedChange = { priorityExpandedMenu = !priorityExpandedMenu }
+            )
+            {
+                Button(
+                    modifier = Modifier
+                        .width(130.dp)
+                        .menuAnchor(),
+                    onClick = { }) {
+                    Text(
+                        text = prioritySelection.ifEmpty {
+                            "Priority"
                         },
-                        text = {
-                            Text(
-                                text = priorityLevel.name,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = "Priority"
+                    )
+                }
+
+                ExposedDropdownMenu(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primary),
+                    expanded = priorityExpandedMenu,
+                    onDismissRequest = { priorityExpandedMenu = false }) {
+                    Priority.values().forEach { priorityLevel ->
+                        DropdownMenuItem(
+                            modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                            onClick = {
+                                if (state.showDialog) {
+                                    priorityExpandedMenu = false
+                                    prioritySelection = priorityLevel.name
+                                    onEvent(TodoEvent.setPriority(priorityLevel))
+                                } else if (state.showEditTodoDialog) {
+                                    priorityExpandedMenu = false
+                                    thisTodo?.priority = priorityLevel
+                                    onEvent(TodoEvent.setPriority(priorityLevel))
+                                }
+
+                            },
+                            text = {
+                                Text(
+                                    text = priorityLevel.name,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = "Set Reminder", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(10.dp))
+                FilledIconToggleButton(
+                    checked = reminderSet.value,
+                    onCheckedChange = {
+                        if (state.showDialog) {
+                            reminderSet.value = !reminderSet.value
+                            state.reminderSet = reminderSet.value
+                            Log.d("Reminder", state.reminderSet.toString())
+                        } else if (state.showEditTodoDialog) {
+                            reminderSet.value = !reminderSet.value
+                            onEvent(TodoEvent.toggleReminder(thisTodo!!))
                         }
+                    },
+                    colors = IconToggleButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContentColor = MaterialTheme.colorScheme.onSurface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
+                        checkedContainerColor = MaterialTheme.colorScheme.secondary,
+                        checkedContentColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Alarm,
+                        contentDescription = "Set Reminder"
                     )
                 }
             }
@@ -286,14 +340,14 @@ fun AddEditTodoDialog(
         }
 
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = pickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+            initialSelectedDateMillis = pickedDate.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000,
             yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
             initialDisplayMode = DisplayMode.Picker,
             initialDisplayedMonthMillis = null
         )
 
         val editDatePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = editedPickedDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+            initialSelectedDateMillis = editedPickedDate.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000,
             yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
             initialDisplayMode = DisplayMode.Picker,
             initialDisplayedMonthMillis = null
@@ -612,12 +666,35 @@ fun AddEditTodoDialog(
                 ),
                 onClick = {
                     if (state.showDialog){
+                        alarmItem = AlarmItem(
+                            id = state.id,
+                            time = LocalDateTime.of(
+                                Instant.ofEpochMilli(datePickerState.selectedDateMillis!!).atZone(ZoneId.systemDefault()).toLocalDate(),
+                                LocalTime.of(timePickerState.hour, timePickerState.minute)
+                            ),
+                            title = state.title,
+                            description = state.description,
+                            isOn = state.reminderSet
+                        )
+                        Log.d("AlarmItem", alarmItem!!.time.toString() ?: "No Alarm")
+                        alarmItem?.let { alarmScheduler::scheduleAlarm }
                         onEvent(TodoEvent.resetState)
                         scope.launch {
                             sheetState.hide()
                         }
                     } else if (state.showEditTodoDialog){
-                        thisTodo?.let { TodoEvent.toggleIsClicked(it) }?.let { onEvent(it) }
+                        alarmItem = AlarmItem(
+                            id = thisTodo!!.id,
+                            time = LocalDateTime.of(
+                                LocalDate.ofEpochDay(editDatePickerState.selectedDateMillis!!),
+                                LocalTime.of(editTimePickerState.hour, editTimePickerState.minute)
+                            ),
+                            title = thisTodo.title,
+                            description = thisTodo.description,
+                            isOn = thisTodo.reminderSet
+                        )
+                        alarmItem?.let { alarmScheduler::scheduleAlarm }
+                        thisTodo.let { TodoEvent.toggleIsClicked(it) }.let { onEvent(it) }
                         onEvent(TodoEvent.resetState)
                         onEvent(TodoEvent.resetTodos)
                         scope.launch {
