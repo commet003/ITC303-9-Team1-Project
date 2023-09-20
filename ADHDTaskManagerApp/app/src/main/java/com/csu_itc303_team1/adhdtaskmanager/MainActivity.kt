@@ -103,12 +103,16 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Suppress("UNCHECKED_CAST")
@@ -200,69 +204,80 @@ class MainActivity : ComponentActivity() {
         googleAuthUiClient.addAuthStateListener {
             isSignedIn.value = it
             if (it) { // if signed in
-
-                // Define contentView here
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
                 val db = FirebaseFirestore.getInstance()
                 val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
-                userRef.update("loginNum", FieldValue.increment(2))
 
+                userRef.get().addOnSuccessListener { document ->
+                    val user = document.toObject(Users::class.java)
+                    val lastLoginDate = user?.lastLoginDate
+                    val currentDate = System.currentTimeMillis()
 
+                    // Convert both dates to just date without time for comparison
+                    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val lastLoginFormatted = formatter.format(Date(lastLoginDate ?: 0))
+                    val currentFormatted = formatter.format(Date(currentDate))
 
-                // Capture and blur screenshot
-                captureScreenshotWhenReady(contentView) { screenshot ->
-                    val blurredScreenshot = blurBitmap(screenshot, applicationContext)
-
-                    // Display blurred screenshot as a background
-                    val blurredBackground = ImageView(applicationContext)
-                    blurredBackground.setImageBitmap(blurredScreenshot)
-                    val params = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                    )
-                    contentView.addView(blurredBackground, params)
-
-                    // Inflate the custom toast layout
-                    val layoutInflater =
-                        getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
-
-                    val customToastMessage =
-                        customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
-                    customToastMessage.text =
-                        "Welcome back! Be sure to check out the leaderboard for the latest standings"
-
-                    // Find the LottieAnimationView and start the animation
-                    val lottieAnimation =
-                        customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
-                    lottieAnimation.playAnimation()
-
-                    // Create a PopupWindow with custom view
-                    val customPopup = PopupWindow(
-                        customToastRoot,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        false
-                    )
-                    customPopup.animationStyle = android.R.style.Animation_Toast
-                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                        customPopup.showAtLocation(
-                            findViewById(android.R.id.content),
-                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-                            0,
-                            0
+                    if (lastLoginFormatted != currentFormatted) {
+                        // User is logging in for the first time today
+                        userRef.update(
+                            "loginNum", FieldValue.increment(2),
+                            "lastLoginDate", currentDate  // Update the last login date to today
                         )
-                    }
 
-                    // Use a Handler to control the duration of the PopupWindow
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        customPopup.dismiss()
-                        // Remove or hide blurred background when done
-                        contentView.removeView(blurredBackground)
-                    }, 6000) // Dismiss popup after 6 seconds
+                        // Capture and blur screenshot
+                        captureScreenshotWhenReady(contentView) { screenshot ->
+                            val blurredScreenshot = blurBitmap(screenshot, applicationContext)
+
+                            // Display blurred screenshot as a background
+                            val blurredBackground = ImageView(applicationContext)
+                            blurredBackground.setImageBitmap(blurredScreenshot)
+                            val params = FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.MATCH_PARENT,
+                                FrameLayout.LayoutParams.MATCH_PARENT
+                            )
+                            contentView.addView(blurredBackground, params)
+
+                            // Inflate the custom toast layout
+                            val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                            val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
+
+                            val customToastMessage = customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
+                            customToastMessage.text = "Welcome back! Be sure to check out the leaderboard for the latest standings"
+
+                            // Find the LottieAnimationView and start the animation
+                            val lottieAnimation = customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
+                            lottieAnimation.playAnimation()
+
+                            // Create a PopupWindow with custom view
+                            val customPopup = PopupWindow(
+                                customToastRoot,
+                                WindowManager.LayoutParams.WRAP_CONTENT,
+                                WindowManager.LayoutParams.WRAP_CONTENT,
+                                false
+                            )
+                            customPopup.animationStyle = android.R.style.Animation_Toast
+                            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                                customPopup.showAtLocation(
+                                    findViewById(android.R.id.content),
+                                    Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                                    0,
+                                    0
+                                )
+                            }
+
+                            // Use a Handler to control the duration of the PopupWindow
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                customPopup.dismiss()
+                                // Remove or hide blurred background when done
+                                contentView.removeView(blurredBackground)
+                            }, 6000) // Dismiss popup after 6 seconds
+                        }
+                    }
                 }
             }
         }
+
 
         fetchDefaultProfileImage()
 

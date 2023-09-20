@@ -17,7 +17,8 @@ data class Users (
     val profileImage: String? = null,
     val loginNum: Int? = null,
     val totalPoints: Int? = null,
-        )
+    val lastLoginDate: Long? = null
+)
 
 // Final list of users ready for displaying
 class Final: ArrayList<Users>() {

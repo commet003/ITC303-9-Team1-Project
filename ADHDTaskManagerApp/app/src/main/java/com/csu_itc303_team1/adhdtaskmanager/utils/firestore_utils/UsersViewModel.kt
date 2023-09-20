@@ -96,6 +96,7 @@ class UsersViewModel(
             profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
             loginNum = 0,
             totalPoints = 0,
+            lastLoginDate = System.currentTimeMillis(),
         )
     }
 
