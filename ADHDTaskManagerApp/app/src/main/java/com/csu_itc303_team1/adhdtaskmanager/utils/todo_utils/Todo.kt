@@ -14,7 +14,6 @@ data class Todo(
     val isCompleted: Boolean = false,
     var completionDate: String = "",
     var isClicked: Boolean = false,
-    var reminderSet: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val userID: String

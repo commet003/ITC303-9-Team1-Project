@@ -63,12 +63,20 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 
 
 @SuppressLint("RememberReturnType")
@@ -83,7 +91,6 @@ fun AddEditTodoDialog(
     modifier: Modifier = Modifier
 ) {
     var thisTodo: Todo? = null
-    val reminderSet = remember { mutableStateOf(false) }
     var alarmItem: AlarmItem? = null
 
     if (state.showEditTodoDialog) {
@@ -98,7 +105,6 @@ fun AddEditTodoDialog(
         state.priority = thisTodo?.priority ?: Priority.LOW
         state.dueDate = (thisTodo?.dueDate ?: LocalDate.now()).toString()
         state.dueTime = (thisTodo?.dueTime ?: LocalTime.now()).toString()
-        state.reminderSet = thisTodo?.reminderSet ?: false
     }
 
 
@@ -259,96 +265,19 @@ fun AddEditTodoDialog(
                     }
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(text = "Set Reminder", fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(10.dp))
-                FilledIconToggleButton(
-                    checked = reminderSet.value,
-                    onCheckedChange = {
-                        if (state.showDialog) {
-                            reminderSet.value = !reminderSet.value
-                            state.reminderSet = reminderSet.value
-                            Log.d("Reminder", state.reminderSet.toString())
-                        } else if (state.showEditTodoDialog) {
-                            reminderSet.value = !reminderSet.value
-                            onEvent(TodoEvent.toggleReminder(thisTodo!!))
-                        }
-                    },
-                    colors = IconToggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                        disabledContainerColor = MaterialTheme.colorScheme.surface,
-                        checkedContainerColor = MaterialTheme.colorScheme.secondary,
-                        checkedContentColor = MaterialTheme.colorScheme.onSecondary
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Alarm,
-                        contentDescription = "Set Reminder"
-                    )
-                }
-            }
         }
 
-
-
-        // Date Picker && Time Picker
-        val pickedDate by remember {            // date variable stored to remember
-            mutableStateOf(LocalDateTime.now())
-        }
-
-        val editedPickedDate by remember { // date variable stored to remember
-            mutableStateOf(LocalDateTime.now())
-        }
-
-        val dateFormatter: DatePickerFormatter = remember {
-            object : DatePickerFormatter {
-                override fun formatDate(
-                    dateMillis: Long?,
-                    locale: CalendarLocale,
-                    forContentDescription: Boolean
-                ): String? {
-                    return dateMillis?.let {
-                        val date = LocalDateTime.ofEpochSecond(
-                            it / 1000,
-                            0,
-                            ZoneOffset.UTC
-                        )
-                        date.toString()
-                    }
-                }
-
-                override fun formatMonthYear(
-                    monthMillis: Long?,
-                    locale: CalendarLocale
-                ): String? {
-                    // Format month and year
-                    return monthMillis?.let {
-                        val date = LocalDateTime.ofEpochSecond(
-                            it / 1000,
-                            0,
-                            ZoneOffset.UTC
-                        )
-                        date.toString()
-                    }
-                }
-            }
-        }
 
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = pickedDate.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000,
-            yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
+            initialSelectedDateMillis = Instant.now().toEpochMilli(),
+            yearRange = IntRange(2023, 2026),
             initialDisplayMode = DisplayMode.Picker,
             initialDisplayedMonthMillis = null
         )
 
         val editDatePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = editedPickedDate.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000,
-            yearRange = (LocalDate.now().year..LocalDate.now().year + 3),
+            initialSelectedDateMillis = Instant.now().toEpochMilli(),
+            yearRange = IntRange(2023, 2026),
             initialDisplayMode = DisplayMode.Picker,
             initialDisplayedMonthMillis = null
         )
@@ -373,13 +302,12 @@ fun AddEditTodoDialog(
             mutableIntStateOf(0)
         }
 
-        val amPMEdited = remember {
-            mutableStateOf("")
-        }
-
-        val pmHoursEdited = remember {
-            mutableIntStateOf(0)
-        }
+        val timeFormatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
+        var selectedDate: OffsetDateTime? = null
+        var editedSelectedDate: OffsetDateTime? = null
+        val cal: Calendar = Calendar.getInstance()
+        val editCal: Calendar = Calendar.getInstance()
+        val calLocal: CalendarLocale = CalendarLocale.getDefault()
 
 
 
@@ -398,24 +326,18 @@ fun AddEditTodoDialog(
                             ),
                             onClick = {
                                 if (state.showDialog){
-                                    dateFormatter.formatDate(
-                                        datePickerState.selectedDateMillis,
-                                        CalendarLocale.getDefault()
-                                    )
-                                        ?.let { TodoEvent.setDueDate(it.dropLast(6)) }
-                                        ?.let { onEvent(it) }
+                                    selectedDate = datePickerState.selectedDateMillis?.let {
+                                        Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
+                                    }
+                                    Log.d("Date", selectedDate?.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString())
+                                    onEvent(TodoEvent.setDueDate(selectedDate?.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()))
                                     onEvent(TodoEvent.hideDateSelector)
                                 }else if (state.showEditTodoDialog){
-                                    TodoEvent.setDueDate(
-                                        dateFormatter.formatDate(
-                                            editDatePickerState.selectedDateMillis,
-                                            CalendarLocale.getDefault()
-                                        )?.dropLast(6) ?: ""
-                                    )
-                                    thisTodo?.dueDate = dateFormatter.formatDate(
-                                        editDatePickerState.selectedDateMillis,
-                                        CalendarLocale.getDefault()
-                                    )?.dropLast(6) ?: ""
+                                    editedSelectedDate = editDatePickerState.selectedDateMillis?.let {
+                                        Instant.ofEpochMilli(it).atOffset(ZoneOffset.UTC)
+                                    }
+                                    onEvent(TodoEvent.setDueDate(editedSelectedDate?.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()))
+                                    thisTodo?.dueDate = editedSelectedDate?.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()
                                     onEvent(TodoEvent.hideEditDateSelector)
                                 }
 
@@ -483,24 +405,19 @@ fun AddEditTodoDialog(
                             ),
                             onClick = {
                                 if (state.showDialog) {
-                                    onEvent(
-                                        TodoEvent.setDueTime(
-                                            ("%02d".format(timePickerState.hour)
-                                                    + ":" + "%02d".format(timePickerState.minute))
-                                        )
-                                    )
+                                    cal.isLenient = false
+                                    cal.timeZone = TimeZone.getDefault()
+                                    cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                                    cal.set(Calendar.MINUTE, timePickerState.minute)
+                                    onEvent(TodoEvent.setDueTime(timeFormatter.format(cal.time)))
                                     onEvent(TodoEvent.hideTimeSelector)
                                 } else{
-                                    onEvent(
-                                        TodoEvent.setDueTime(
-                                            ("%02d".format(editTimePickerState.hour)
-                                                    + ":" + "%02d".format(editTimePickerState.minute))
-                                        )
-                                    )
-
-                                    thisTodo?.dueTime = ("%02d".format(editTimePickerState.hour)
-                                            + ":" + "%02d".format(editTimePickerState.minute))
-
+                                    editCal.isLenient = false
+                                    editCal.timeZone = TimeZone.getDefault()
+                                    editCal.set(Calendar.HOUR_OF_DAY, editTimePickerState.hour)
+                                    editCal.set(Calendar.MINUTE, editTimePickerState.minute)
+                                    onEvent(TodoEvent.setDueTime(timeFormatter.format(editCal.time)))
+                                    thisTodo?.dueTime = timeFormatter.format(editCal.time)
                                     onEvent(TodoEvent.hideEditTimeSelector)
                                 }
 
@@ -597,7 +514,11 @@ fun AddEditTodoDialog(
                 {
                     Text(text = "Date", fontWeight = FontWeight.Bold)
                 }
-                Text(text = state.dueDate)
+                if (state.showDialog){
+                    Text(text = state.dueDate)
+                } else {
+                    Text(text = thisTodo?.dueDate ?: timeFormatter.format(LocalTime.now()))
+                }
             }
             // On Button Click it opens the Time Dialog Screen,
             // the text displays default or whatever is chosen
@@ -621,35 +542,9 @@ fun AddEditTodoDialog(
                     Text(text = "Time", fontWeight = FontWeight.Bold)
                 }
                 if (state.showDialog){
-                    if (timePickerState.hour > 12) {
-                        amPM.value = "PM"
-                        pmHours.value = timePickerState.hour - 12
-                        Text(
-                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
-                                timePickerState.minute
-                            ) + " ${amPM.value}")
-                        )
-                    } else if (timePickerState.hour <= 12) {
-                        amPM.value = "AM"
-                        Text(text = state.dueTime + " ${amPM.value}")
-                    } else {
-                        Text(text = "")
-                    }
+                    Text(text = timeFormatter.format(cal.time))
                 } else {
-                    if (editTimePickerState.hour > 12) {
-                        amPM.value = "PM"
-                        pmHours.value = editTimePickerState.hour - 12
-                        Text(
-                            text = ("%02d".format(pmHours.value) + ":" + "%02d".format(
-                                editTimePickerState.minute
-                            ) + " ${amPM.value}")
-                        )
-                    } else if (editTimePickerState.hour <= 12) {
-                        amPM.value = "AM"
-                        Text(text = state.dueTime + " ${amPM.value}")
-                    } else {
-                        Text(text = "")
-                    }
+                    Text(text = timeFormatter.format(editCal.time))
                 }
 
             }
@@ -666,35 +561,12 @@ fun AddEditTodoDialog(
                 ),
                 onClick = {
                     if (state.showDialog){
-                        alarmItem = AlarmItem(
-                            id = state.id,
-                            time = LocalDateTime.of(
-                                Instant.ofEpochMilli(datePickerState.selectedDateMillis!!).atZone(ZoneId.systemDefault()).toLocalDate(),
-                                LocalTime.of(timePickerState.hour, timePickerState.minute)
-                            ),
-                            title = state.title,
-                            description = state.description,
-                            isOn = state.reminderSet
-                        )
-                        Log.d("AlarmItem", alarmItem!!.time.toString() ?: "No Alarm")
-                        alarmItem?.let { alarmScheduler::scheduleAlarm }
                         onEvent(TodoEvent.resetState)
                         scope.launch {
                             sheetState.hide()
                         }
                     } else if (state.showEditTodoDialog){
-                        alarmItem = AlarmItem(
-                            id = thisTodo!!.id,
-                            time = LocalDateTime.of(
-                                LocalDate.ofEpochDay(editDatePickerState.selectedDateMillis!!),
-                                LocalTime.of(editTimePickerState.hour, editTimePickerState.minute)
-                            ),
-                            title = thisTodo.title,
-                            description = thisTodo.description,
-                            isOn = thisTodo.reminderSet
-                        )
-                        alarmItem?.let { alarmScheduler::scheduleAlarm }
-                        thisTodo.let { TodoEvent.toggleIsClicked(it) }.let { onEvent(it) }
+                        thisTodo.let { TodoEvent.toggleIsClicked(it!!) }.let { onEvent(it) }
                         onEvent(TodoEvent.resetState)
                         onEvent(TodoEvent.resetTodos)
                         scope.launch {
@@ -718,6 +590,17 @@ fun AddEditTodoDialog(
                                 sheetState.hide()
                             }
                         } else if (state.showEditTodoDialog) {
+                            alarmItem = AlarmItem(
+                                id = thisTodo?.id ?: 0,
+                                time = LocalDateTime.of(
+                                    editedSelectedDate?.toLocalDate() ?: LocalDate.now(),
+                                    editCal.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+                                ),
+                                title = thisTodo?.title ?: "",
+                                description = thisTodo?.description ?: ""
+                            )
+                            Log.d("SettingReminder", alarmItem!!.time.toString())
+                            alarmItem?.let { alarmScheduler::scheduleAlarm }
                             onEvent(TodoEvent.updateTodo(thisTodo!!))
                             onEvent(TodoEvent.toggleIsClicked(thisTodo))
                             onEvent(TodoEvent.resetState)

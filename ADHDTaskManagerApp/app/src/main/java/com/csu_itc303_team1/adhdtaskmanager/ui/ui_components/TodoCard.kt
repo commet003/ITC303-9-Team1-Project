@@ -189,20 +189,7 @@ fun TodoCard(
                 Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
                 if (todo.dueTime.isNotEmpty()) {
-                    if (todo.dueTime.slice(0..1).toInt() > 12) {
-                        hours.value = todo.dueTime.slice(0..1).toInt() - 12
-                        Text(
-                            text = "${hours.value}:${todo.dueTime.slice(3..4)} PM",
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
-                        Text(
-                            text = "${todo.dueTime} AM",
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Text(text = "")
-                    }
+                        Text(text = todo.dueTime, color = MaterialTheme.colorScheme.onPrimary)
                 } else {
                     Text(text = "")
                 }

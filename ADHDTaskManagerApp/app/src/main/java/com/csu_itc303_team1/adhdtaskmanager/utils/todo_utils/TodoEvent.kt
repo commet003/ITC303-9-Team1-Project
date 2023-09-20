@@ -2,14 +2,11 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils
 
 sealed interface TodoEvent {
 
-    // Todo title error
     data class titleError(val error: Boolean): TodoEvent
 
     data class ToggleLottieAnimation(val show: Boolean) : TodoEvent
 
-    data class toggleReminder(val todo: Todo): TodoEvent
 
-    // Todo description error
     data class descriptionError(val error: Boolean): TodoEvent
 
     // Data class to update todo

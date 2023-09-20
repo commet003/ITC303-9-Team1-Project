@@ -7,5 +7,4 @@ data class AlarmItem (
     var time: LocalDateTime,
     var title: String,
     var description: String,
-    var isOn: Boolean
 )

@@ -5,6 +5,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import java.time.ZoneId
 import java.time.ZoneOffset
 
@@ -16,8 +17,11 @@ class AlarmSchedulerImpl(
     @SuppressLint("ScheduleExactAlarm")
     override fun scheduleAlarm(alarmItem: AlarmItem) {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra("EXTRA_MESSAGE", alarmItem.description)
+            putExtra("EXTRA_TITLE", alarmItem.title)
+            putExtra("EXTRA_DESCRIPTION", alarmItem.description)
+            putExtra("EXTRA_TIME", alarmItem.time.toEpochSecond(ZoneOffset.systemDefault().rules.getOffset(alarmItem.time)))
         }
+        Log.d("AlarmSchedulerImpl", "Scheduling alarm for ${alarmItem.time.toLocalDate()}")
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             alarmItem.time.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000,
