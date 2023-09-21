@@ -109,6 +109,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.runBlocking
 
 
 @Suppress("UNCHECKED_CAST")
@@ -203,10 +204,10 @@ class MainActivity : ComponentActivity() {
                 val db = FirebaseFirestore.getInstance()
                 val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
                 val uID = googleAuthUiClient.getSignedInUser()?.userId!!
-                userViewModel.loginRewardProcedure(uID)
-                // userRef.update("loginNum", FieldValue.increment(2))
 
 
+                val id = googleAuthUiClient.getSignedInUser()?.userId.toString()
+                userViewModel.checkUserInFirestore(id, googleAuthUiClient)
 
 
                 // Capture and blur screenshot
@@ -275,7 +276,7 @@ class MainActivity : ComponentActivity() {
             val signInState by signInViewModel.state.collectAsState()
             // Retrieve's Leaderboard data onCreate
             leadViewModel = ViewModelProvider(this)[LeaderboardViewModel::class.java]
-            // userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
+            userViewModel = ViewModelProvider(this) [UsersViewModel::class.java]
             // Puts it into a readable format
             getResponseUsingCallback()
 
@@ -609,8 +610,9 @@ class MainActivity : ComponentActivity() {
                                         LaunchedEffect(key1 = Unit) {
                                             if (googleAuthUiClient.getSignedInUser() != null) {
                                                 navController.navigate("todo_screen")
-                                                userViewModel.getUser(googleAuthUiClient.getSignedInUser()?.userId.toString())
-                                                println("launched effect 1. user exists, I have run the code")
+                                                val id = googleAuthUiClient.getSignedInUser()?.userId.toString()
+                                                //userViewModel.checkUserInFirestore(id, googleAuthUiClient)
+
                                             }
                                         }
 
@@ -625,19 +627,8 @@ class MainActivity : ComponentActivity() {
 
                                                 navController.navigate("todo_screen")
                                                 signInViewModel.resetState()
-                                                val exist =
-                                                    googleAuthUiClient.getSignedInUser()?.userId?.let { it1 ->
-                                                        userViewModel.checkUserExists(
-                                                            it1
-                                                        )
-                                                    }
-                                                if (exist == false) {
-                                                    userViewModel.convertToUserFromAuth(
-                                                        googleAuthUiClient
-                                                    )
-                                                    userViewModel.addUserToFirebase()
-                                                    println("I'm trying to add another user again.")
-                                                }
+                                                val id = googleAuthUiClient.getSignedInUser()?.userId.toString()
+                                                //userViewModel.checkUserInFirestore(id, googleAuthUiClient)
                                             }
                                         }
 

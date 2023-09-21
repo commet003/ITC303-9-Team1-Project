@@ -3,17 +3,23 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class UsersRepo (
 
@@ -79,7 +85,7 @@ class UsersRepo (
         return userExist
     }
 
-    fun addToFirebaseDatabase(user: Users) {
+    suspend fun addToFirebaseDatabase(user: Users) {
         user.userID?.let {
             rootRef.collection("users").document(it).set(user)
                 .addOnSuccessListener {user
@@ -88,10 +94,44 @@ class UsersRepo (
                 .addOnFailureListener { e ->
                     Log.w(TAG, "Error adding document", e)
                 }
+                .await()
         }
     }
 
+    suspend fun getUserSnapshot(userId: String) {
 
+
+        val ref = userRef.document(userId)
+
+        ref.get()
+            .addOnSuccessListener { documentSnapshot ->
+                Log.d("User", "Looking for document")
+                val user = documentSnapshot.toObject(Users::class.java)
+                Log.d("User", "found document")
+            }
+            .addOnFailureListener {exception ->
+                Log.w("User", exception)
+            }
+            .await()
+
+    }
+
+
+    suspend fun getUserFromFirestore(documentId: String): Users? {
+        return withContext(Dispatchers.IO) {
+            val docRef: DocumentReference = rootRef.collection("users").document(documentId)
+            try {
+                val document = docRef.get().await()
+                if (document.exists()) {
+                    Log.d("User", "User Exists")
+                    return@withContext document.toObject(Users::class.java)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return@withContext null
+        }
+    }
 
 
     fun getUserTwo(userId: String): Flow<Users?> = callbackFlow {
