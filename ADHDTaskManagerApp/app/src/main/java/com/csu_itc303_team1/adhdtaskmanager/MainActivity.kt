@@ -197,14 +197,18 @@ class MainActivity : ComponentActivity() {
 
 
         googleAuthUiClient.addAuthStateListener {
-            isSignedIn.value = it
-            if (it) { // if signed in
+            val user = FirebaseAuth.getInstance().currentUser
+            if (user != null) {
+                isSignedIn.value = true
+
+                usersViewModel.handleUserLogin(user.uid)
 
                 // Define contentView here
                 val contentView = findViewById<ViewGroup>(android.R.id.content)
                 val db = FirebaseFirestore.getInstance()
                 val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
-                userRef.update("loginNum", FieldValue.increment(2))
+                usersViewModel.handleUserLogin(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
+
 
 
 

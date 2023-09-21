@@ -23,6 +23,11 @@ class UsersRepo (
     private val userRef: CollectionReference = rootRef.collection("users")
 ){
 
+
+    suspend fun fetchUserLoginDetails(userId: String): Users? {
+        return userRef.document(userId).get().await().toObject(Users::class.java)
+    }
+
     // This will either respond with the data if successful or the exception if not successful
     fun getResponse(callback: FirebaseCallback) {
         userRef.get().addOnCompleteListener { task ->
@@ -43,6 +48,8 @@ class UsersRepo (
             callback.onResponse(response)
         }
     }
+
+
 
     fun updateCountry(userId: String, newCountry: String) {
         val db = FirebaseFirestore.getInstance()

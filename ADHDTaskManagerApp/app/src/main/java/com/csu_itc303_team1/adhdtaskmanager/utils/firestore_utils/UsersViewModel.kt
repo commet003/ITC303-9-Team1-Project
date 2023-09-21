@@ -22,6 +22,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 class UsersViewModel(
@@ -43,6 +45,25 @@ class UsersViewModel(
     private val storage = FirebaseStorage.getInstance()
     private val storageRef = storage.reference
 
+
+    fun handleUserLogin(userId: String) {
+        viewModelScope.launch {
+            val userDetails = repo.fetchUserLoginDetails(userId)
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val currentDate = LocalDate.now().format(formatter)
+
+            // Check if the user has already logged in today
+            if (userDetails?.lastLoginDate != currentDate) {
+                // User has not logged in today, increment loginNum and update lastLoginDate
+                val updatedLoginNum = (userDetails?.loginNum ?: 0) + 2
+                val updatedData = hashMapOf(
+                    "loginNum" to updatedLoginNum,
+                    "lastLoginDate" to currentDate
+                )
+                repo.updateUser(userId, updatedData)
+            }
+        }
+    }
 
     fun fetchAndUpdateUserPoints(userId: String) {
         viewModelScope.launch {
