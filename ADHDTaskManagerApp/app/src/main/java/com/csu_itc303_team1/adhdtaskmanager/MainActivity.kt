@@ -103,6 +103,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.firebase.auth.FirebaseAuth
@@ -115,9 +116,11 @@ import kotlinx.coroutines.runBlocking
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
+    private val connectivityObserver = ConnectivityObserverImpl(this)
+
+
     // Instantiate the UsersViewModel
     private val usersViewModel by viewModels<UsersViewModel>()
-
     private val settingsViewModel by viewModels<SettingsViewModel> {
         SettingsViewModelFactory(application, usersViewModel)
     }
@@ -309,7 +312,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-
                 // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
@@ -383,8 +385,7 @@ class MainActivity : ComponentActivity() {
                             .padding(contentPadding),
                         color = MaterialTheme.colorScheme.background
                     ) {
-
-// icons to mimic drawer destinations
+                        // icons to mimic drawer destinations
                         val screenIcons = listOf(
                             R.drawable.ic_home,
                             R.drawable.ic_complete,
@@ -584,14 +585,14 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.LeaderboardScreen.route
                                     ) {
-                                        LeaderboardScreen()
+                                        LeaderboardScreen(connectivityObserver)
                                     }
 
                                     // Rewards Screen
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel)
+                                        RewardsScreen(rewardViewModel, userViewModel, connectivityObserver)
                                     }
 
                                     // Completed Task Screen

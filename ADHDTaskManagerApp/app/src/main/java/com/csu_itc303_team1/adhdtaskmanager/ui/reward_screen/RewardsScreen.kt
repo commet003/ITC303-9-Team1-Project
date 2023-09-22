@@ -13,79 +13,91 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardBlue
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LoginRewardCard
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.NoInternetScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.RewardCard
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserver
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewModel) {
+fun RewardsScreen(rewardViewModel: RewardViewModel, usersViewModel: UsersViewModel, connectivityObserver: ConnectivityObserverImpl) {
 
-    val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
-    val completedTaskRewards = allRewards.filter { it.title == "Completed Task Reward" }
+    val observer = connectivityObserver.observeConnectivity().collectAsState(initial = ConnectivityObserver.Status.DISCONNECTED).value
 
-    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    when(observer) {
+        ConnectivityObserver.Status.CONNECTED -> {
+            val allRewards by rewardViewModel.allRewards.observeAsState(listOf())
+            val completedTaskRewards = allRewards.filter { it.title == "Completed Task Reward" }
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            val user = usersViewModel.user.collectAsState(initial = Users()).value
 
-    val user = usersViewModel.user.collectAsState(initial = Users()).value
-
-    if (userId != null) {
-        usersViewModel.fetchAndUpdateUserPoints(userId)
-    }
-
-    // Using Column to organize the layout
-    Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(LeaderboardBlue, shape = RoundedCornerShape(10.dp))
-                .padding(12.dp)
-        ) {
-            Text(
-                text = user?.username ?: "Username Not Found",
-                fontSize = 30.sp,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Total Points",
-                fontSize = 26.sp,
-                color = LeaderboardBlue
-            )
-            Text(
-                text = ((user?.points ?: 0) + (user?.loginNum ?: 0)).toString(),
-                fontSize = 26.sp,
-                color = LeaderboardBlue
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        LazyColumn(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            items(completedTaskRewards) { reward ->
-                RewardCard(reward, "Completed Task Reward")
+            if (userId != null) {
+                usersViewModel.fetchAndUpdateUserPoints(userId)
             }
+            // Using Column to organize the layout
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(LeaderboardBlue, shape = RoundedCornerShape(10.dp))
+                        .padding(12.dp)
+                ) {
+                    Text(
+                        text = user?.username ?: "Username Not Found",
+                        fontSize = 30.sp,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
 
-            item {
-                LoginRewardCard(user)
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Total Points",
+                        fontSize = 26.sp,
+                        color = LeaderboardBlue
+                    )
+                    Text(
+                        text = ((user?.points ?: 0) + (user?.loginNum ?: 0)).toString(),
+                        fontSize = 26.sp,
+                        color = LeaderboardBlue
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                LazyColumn(
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    items(completedTaskRewards) { reward ->
+                        RewardCard(reward, "Completed Task Reward")
+                    }
+
+                    item {
+                        LoginRewardCard(user)
+                    }
+                }
             }
+        }
+        else -> {
+            NoInternetScreen()
         }
     }
 }
