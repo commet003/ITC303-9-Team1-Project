@@ -80,7 +80,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Paint
@@ -96,10 +98,13 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun TodoScreen(
+    hasShownWelcomePopup: Boolean,
+    onShowWelcomePopup: () -> Unit,
     state: TodoState,
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel,
-    usersViewModel: UsersViewModel
+    usersViewModel: UsersViewModel,
+
 ) {
 
     rewardViewModel.allRewards.observeAsState(listOf())
@@ -120,7 +125,10 @@ fun TodoScreen(
 
     val currentLifecycleState = rememberUpdatedState(currentLifecycle)
 
-    val shouldShowPopup by remember { mutableStateOf(true) }
+
+    var showPopup by remember { mutableStateOf(false) }
+
+
 
 
 
@@ -135,7 +143,15 @@ fun TodoScreen(
         sheetSwipeEnabled = false,
         sheetDragHandle = {},
         content = {
-            if (shouldShowPopup) {
+
+            LaunchedEffect(key1 = hasShownWelcomePopup) {
+                if (!hasShownWelcomePopup) {
+                    showPopup = true
+                    onShowWelcomePopup() // Update the state to remember that the popup has been shown
+                }
+            }
+
+            if (showPopup) {
                 DisplayWelcomePopup()
             }
 

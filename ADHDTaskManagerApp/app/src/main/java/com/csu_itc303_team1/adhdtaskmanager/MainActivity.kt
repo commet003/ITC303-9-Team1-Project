@@ -98,6 +98,7 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupWindow
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.Lifecycle
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
@@ -498,10 +499,14 @@ class MainActivity : ComponentActivity() {
                                     startDestination = if (isSignedIn.value) Screen.TodoScreen.route else Screen.SignInScreen.route,
                                 ) {
                                     // Home screen/to-do screen
-                                    composable(
-                                        route = Screen.TodoScreen.route
-                                    ) {
+                                    val todoViewModel: TodoViewModel by viewModels()
+
+                                    composable(route = Screen.TodoScreen.route) {
+                                        val hasShown by todoViewModel.hasShownWelcomePopup.observeAsState(initial = false)
+
                                         TodoScreen(
+                                            hasShownWelcomePopup = hasShown,
+                                            onShowWelcomePopup = { todoViewModel.showWelcomePopup() },
                                             state = state,
                                             onEvent = todoEvent,
                                             rewardViewModel = rewardViewModel,
