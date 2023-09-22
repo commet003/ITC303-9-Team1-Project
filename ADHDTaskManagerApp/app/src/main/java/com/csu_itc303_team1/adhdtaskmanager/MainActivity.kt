@@ -2,12 +2,19 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.NotificationManager
-import android.content.pm.PackageManager
-import androidx.activity.viewModels
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -38,18 +45,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -68,50 +72,36 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScree
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
-import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.LayoutInflater
-import android.widget.TextView
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupWindow
-import androidx.lifecycle.Lifecycle
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
 import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
 import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
+import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
-import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
+import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
 
 
 @Suppress("UNCHECKED_CAST")
@@ -131,7 +121,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
+        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
     }
 
     private val rewardViewModel by viewModels<RewardViewModel>(
@@ -290,17 +280,13 @@ class MainActivity : ComponentActivity() {
                  * This is where the Pomodoro Timer Notification is created
                  */
 
-                var permissions = rememberMultiplePermissionsState(
-                    permissions = listOf(
-                        Manifest.permission.POST_NOTIFICATIONS,
-                        Manifest.permission.SCHEDULE_EXACT_ALARM,
-                        Manifest.permission.USE_EXACT_ALARM
-                    )
+                var permission = rememberPermissionState(
+                    permission = Manifest.permission.POST_NOTIFICATIONS
                 )
 
-                LaunchedEffect(key1 = permissions.allPermissionsGranted){
-                    if (!permissions.allPermissionsGranted) {
-                        permissions.launchMultiplePermissionRequest()
+                LaunchedEffect(key1 = permission.hasPermission){
+                    if (!permission.hasPermission) {
+                        permission.launchPermissionRequest()
                     }
                 }
 
@@ -316,7 +302,7 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxSize(),
                     // Creating the Top Bar
                     topBar = {
                         if (isSignedIn.value) {
@@ -558,7 +544,7 @@ class MainActivity : ComponentActivity() {
                                             onEvent = todoEvent,
                                             rewardViewModel = rewardViewModel,
                                             usersViewModel = userViewModel,
-                                            alarmScheduler = alarmManager,
+                                            alarmScheduler = alarmManager
                                         )
                                     }
 
@@ -700,32 +686,6 @@ class MainActivity : ComponentActivity() {
             }
             rewardViewModel.allRewards.observeAsState(listOf())
         }
-    }
-
-    private fun showFocusNotification() {
-        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(
-            applicationContext,
-            "PomodoroTimer"
-        )
-            .setContentTitle("Pomodoro Timer")
-            .setContentText("It's time to focus!")
-            .setSmallIcon(R.drawable.ic_complete)
-            .build()
-        notificationManager.notify(1, notification)
-    }
-
-    private fun showBreakNotification() {
-        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(
-            applicationContext,
-            "PomodoroTimer"
-        )
-            .setContentTitle("Pomodoro Timer")
-            .setContentText("It's time for a break!")
-            .setSmallIcon(R.drawable.ic_complete)
-            .build()
-        notificationManager.notify(2, notification)
     }
 
     // creates Arraylist of users from the Firestore database

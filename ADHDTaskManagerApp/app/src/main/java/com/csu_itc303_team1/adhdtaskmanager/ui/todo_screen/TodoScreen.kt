@@ -211,10 +211,7 @@ fun TodoScreen(
                                 )
                             }
                         }
-
-
                     }
-
                     LazyColumn(
                         contentPadding = paddingValues,
                         modifier = Modifier.fillMaxSize(),
@@ -231,36 +228,22 @@ fun TodoScreen(
                                     index = state.todos.indexOf(todo),
                                     rewardViewModel = rewardViewModel,
                                     usersViewModel = usersViewModel,
-                                    showToast = showToast
-
+                                    showToast = showToast,
+                                    alarmScheduler = alarmScheduler
                                 )
                             }
                         }
                     }
-
-
                 }
-
-
                 lottieLoaderAnimation(isVisible = showToast.value)
-
                 CustomToastMessage(
                     message = "Congrats on completing a task!",
                     isVisible = showToast.value,
                 )
-
-
-
-
             }
         },
         sheetPeekHeight = 0.dp,
         sheetContent = {
-            var priorityExpandedMenu by remember { mutableStateOf(false) }
-            var prioritySelection by remember { mutableStateOf("") }
-            var titleError by remember { mutableStateOf(false) }
-            var descriptionError by remember { mutableStateOf(false) }
-
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceEvenly,
@@ -272,5 +255,4 @@ fun TodoScreen(
             }
         }
     )
-
 }

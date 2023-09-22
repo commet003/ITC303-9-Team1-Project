@@ -17,21 +17,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerFormatter
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -64,7 +60,6 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -72,7 +67,6 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
@@ -586,22 +580,33 @@ fun AddEditTodoDialog(
                     if (state.title.isNotEmpty() && state.description.isNotEmpty()) {
                         if (state.showDialog) {
                             onEvent(TodoEvent.saveTodo)
+                            alarmItem = AlarmItem(
+                                id = state.id,
+                                time = LocalDateTime.parse(
+                                    "${state.dueDate} ${state.dueTime}",
+                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                title = state.title,
+                                description = state.description
+                            )
+                            alarmItem?.let(alarmScheduler::schedule)
+                            Log.d("Alarm", alarmItem.toString())
                             scope.launch {
                                 sheetState.hide()
                             }
                         } else if (state.showEditTodoDialog) {
                             alarmItem = AlarmItem(
-                                id = thisTodo?.id ?: 0,
-                                time = LocalDateTime.of(
-                                    editedSelectedDate?.toLocalDate() ?: LocalDate.now(),
-                                    editCal.toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
-                                ),
-                                title = thisTodo?.title ?: "",
-                                description = thisTodo?.description ?: ""
+                                id = thisTodo?.id!!,
+                                time = LocalDateTime.parse(
+                                    "${thisTodo.dueDate} ${thisTodo.dueTime}",
+                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                title = thisTodo.title,
+                                description = thisTodo.description
                             )
-                            Log.d("SettingReminder", alarmItem!!.time.toString())
-                            alarmItem?.let { alarmScheduler::scheduleAlarm }
-                            onEvent(TodoEvent.updateTodo(thisTodo!!))
+                            alarmItem?.let(alarmScheduler::schedule)
+                            Log.d("Alarm", alarmItem.toString())
+                            onEvent(TodoEvent.updateTodo(thisTodo))
                             onEvent(TodoEvent.toggleIsClicked(thisTodo))
                             onEvent(TodoEvent.resetState)
                             scope.launch {
