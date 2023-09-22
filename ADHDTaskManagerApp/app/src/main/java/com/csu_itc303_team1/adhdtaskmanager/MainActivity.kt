@@ -195,77 +195,15 @@ class MainActivity : ComponentActivity() {
             }
         )
 
-
         googleAuthUiClient.addAuthStateListener {
             val user = FirebaseAuth.getInstance().currentUser
             if (user != null) {
                 isSignedIn.value = true
-
                 usersViewModel.handleUserLogin(user.uid)
-
-                // Define contentView here
-                val contentView = findViewById<ViewGroup>(android.R.id.content)
-                val db = FirebaseFirestore.getInstance()
-                val userRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
-                usersViewModel.handleUserLogin(FirebaseAuth.getInstance().currentUser?.uid ?: return@addAuthStateListener)
-
-
-
-
-                // Capture and blur screenshot
-                captureScreenshotWhenReady(contentView) { screenshot ->
-                    val blurredScreenshot = blurBitmap(screenshot, applicationContext)
-
-                    // Display blurred screenshot as a background
-                    val blurredBackground = ImageView(applicationContext)
-                    blurredBackground.setImageBitmap(blurredScreenshot)
-                    val params = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                    )
-                    contentView.addView(blurredBackground, params)
-
-                    // Inflate the custom toast layout
-                    val layoutInflater =
-                        getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val customToastRoot = layoutInflater.inflate(R.layout.custom_toast, null)
-
-                    val customToastMessage =
-                        customToastRoot.findViewById<TextView>(R.id.custom_toast_message)
-                    customToastMessage.text =
-                        "Welcome back! Be sure to check out the leaderboard for the latest standings"
-
-                    // Find the LottieAnimationView and start the animation
-                    val lottieAnimation =
-                        customToastRoot.findViewById<com.airbnb.lottie.LottieAnimationView>(R.id.lottieAnimation)
-                    lottieAnimation.playAnimation()
-
-                    // Create a PopupWindow with custom view
-                    val customPopup = PopupWindow(
-                        customToastRoot,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        false
-                    )
-                    customPopup.animationStyle = android.R.style.Animation_Toast
-                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-                        customPopup.showAtLocation(
-                            findViewById(android.R.id.content),
-                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-                            0,
-                            0
-                        )
-                    }
-
-                    // Use a Handler to control the duration of the PopupWindow
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        customPopup.dismiss()
-                        // Remove or hide blurred background when done
-                        contentView.removeView(blurredBackground)
-                    }, 6000) // Dismiss popup after 6 seconds
-                }
             }
         }
+
+
 
         fetchDefaultProfileImage()
 
@@ -710,6 +648,7 @@ class MainActivity : ComponentActivity() {
             rewardViewModel.allRewards.observeAsState(listOf())
         }
     }
+
 
     private fun showFocusNotification() {
         val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
