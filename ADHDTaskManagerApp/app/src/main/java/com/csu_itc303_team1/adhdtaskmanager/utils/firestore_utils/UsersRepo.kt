@@ -62,78 +62,6 @@ class UsersRepo (
             }
     }
 
-    fun checkExists(email: String): Boolean {
-        val checkUser = rootRef.collection("users").document(email)
-        var userExist = false
-        checkUser.get()
-            .addOnSuccessListener { document ->
-                userExist = if (document != null) {
-                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
-                    println("UserRepo.checkExists: User Exists")
-                    true
-
-                } else {
-                    Log.d(TAG, "No Such Document")
-                    println("UserRepo.checkExists: Does not exist")
-                    false
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with", exception)
-            }
-
-        return userExist
-    }
-
-    suspend fun addToFirebaseDatabase(user: Users) {
-        user.userID?.let {
-            rootRef.collection("users").document(it).set(user)
-                .addOnSuccessListener {user
-                    Log.d(TAG, "DocumentSnapshot written with ID: ${user.userID}")
-                }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "Error adding document", e)
-                }
-                .await()
-        }
-    }
-
-    suspend fun getUserSnapshot(userId: String) {
-
-
-        val ref = userRef.document(userId)
-
-        ref.get()
-            .addOnSuccessListener { documentSnapshot ->
-                Log.d("User", "Looking for document")
-                val user = documentSnapshot.toObject(Users::class.java)
-                Log.d("User", "found document")
-            }
-            .addOnFailureListener {exception ->
-                Log.w("User", exception)
-            }
-            .await()
-
-    }
-
-
-    suspend fun getUserFromFirestore(documentId: String): Users? {
-        return withContext(Dispatchers.IO) {
-            val docRef: DocumentReference = rootRef.collection("users").document(documentId)
-            try {
-                val document = docRef.get().await()
-                if (document.exists()) {
-                    Log.d("User", "User Exists")
-                    return@withContext document.toObject(Users::class.java)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return@withContext null
-        }
-    }
-
-
     fun getUserTwo(userId: String): Flow<Users?> = callbackFlow {
         val listener = object : EventListener<DocumentSnapshot> {
             override fun onEvent(snapshot: DocumentSnapshot?, exception: FirebaseFirestoreException?) {
@@ -150,24 +78,6 @@ class UsersRepo (
         }
         val registration = rootRef.collection("users").document(userId).addSnapshotListener(listener)
         awaitClose { registration.remove() }
-    }
-
-    fun getLeaderboardThree(): ArrayList<Users> {
-        val leaderboard = ArrayList<Users>()
-        userRef.addSnapshotListener { value, e ->
-            if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
-                return@addSnapshotListener
-            }
-
-            for (doc in value!!) {
-                doc?.let {
-                    leaderboard.add(it.toObject())
-                }
-            }
-            Log.d(TAG, "Current cites in CA: $leaderboard")
-        }
-        return leaderboard
     }
 
     fun updatePoints(user: Users, points: Int){

@@ -15,7 +15,6 @@ import kotlinx.coroutines.withContext
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -43,24 +42,32 @@ class UsersViewModel(
 
     fun checkUserInFirestore(userId: String, authUser: AuthUiClient) {
         userCollection.document(userId).get()
+            // When it has finished searching
             .addOnCompleteListener { task ->
+                // If it has found a an existing user
                 if (task.isSuccessful) {
                     Log.d("User", "Completed Searching for User in Firestore")
                     val documentSnapshot = task.result
+                    // If a snapshot exists and it is not null
                     if (documentSnapshot != null && documentSnapshot.exists()) {
                         Log.d("User", "Found User $userId in Firestore")
+                        // convert to Users Object
                         val user = documentSnapshot.toObject(Users::class.java)
                         val lastLogin = user?.lastLoginDate!!
                         val todaysDate = getCurrentDate()
+
+                        // If last login date does not equal todays date
                         if (todaysDate != lastLogin) {
                             Log.d("User", "User has not logged in today yet. Giving Log in Reward and updating last login date.")
-                            updateLastLoginDate2(userId)
-                            updateLoginNum2(userId)
+                            updateLastLoginDate(userId)
+                            updateLoginNum(userId)
                         } else {
                             Log.d("User", "User has already logged in today.")
                         }
+                        // Made the current user the found user
                         _user.value = user
                     } else {
+                        // If User did not exist in data base, add it
                         Log.d("User", "Did Not Find User in Firestore. Adding...")
                         val newUser = Users(
                             displayName = authUser.getSignedInUser()?.username,
@@ -83,12 +90,12 @@ class UsersViewModel(
             }
     }
 
-    private fun updateLastLoginDate2(userId: String) {
+    private fun updateLastLoginDate(userId: String) {
         val currentDate = getCurrentDate()
         userCollection.document(userId).update("lastLoginDate", currentDate)
     }
 
-    private fun updateLoginNum2(userId: String) {
+    private fun updateLoginNum(userId: String) {
         userCollection.document(userId).update("loginNum", FieldValue.increment(2))
     }
 
@@ -133,55 +140,6 @@ class UsersViewModel(
         }
     }
 
-    fun loginRewardProcedure(userId: String) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                var storedUser = Users()
-                val foundUser = repo.getUserFromFirestore(userId)
-
-                if (foundUser != null) {
-                    // Now you have the custom object stored in the 'customObject' variable
-                    // You can use it as needed
-                    storedUser = foundUser
-                    Log.d("User", "The Run blocking code did find the user: ${storedUser.userID}")
-                // ...
-                } else {
-                    // Handle the case where the custom object is null or an error occurred
-                    Log.w("User", "The Run blocking code did not find the user.")
-                }
-
-
-                //delay(7000)
-                //Log.d("User", "Finished Delay Time.")
-                if (storedUser.userID != null) {
-                    val lastLoginDate = storedUser.lastLoginDate
-                    val currentDate = LocalDate.now().toString()
-
-                    if (lastLoginDate != currentDate) {
-                        updateLastLoginDate(userId, currentDate)
-                        updateLogInNum(userId)
-                    } else {
-                        Log.d("User", "User has already claimed the log in reward today.")
-                    }
-                } else {
-                    Log.d("User", "Stored User was null")
-                }
-            }
-        }
-    }
-
-    private fun updateLastLoginDate(userId: String, currentDate: String){
-        val db = FirebaseFirestore.getInstance().collection("users")
-
-        db.document(userId).update("lastLoginDate", currentDate)
-            .addOnSuccessListener {
-                Log.d("Firestore", "Document lastLoginDate successfully updated!")
-            }
-            .addOnFailureListener { e ->
-                Log.w("Firestore", "Error updating lastLoginDate", e)
-            }
-    }
-
     fun getUser(userId: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -200,28 +158,6 @@ class UsersViewModel(
         }
     }
 
-    fun checkUserExists(id: String): Boolean {
-        return repo.checkExists(id)
-    }
-
-    fun convertToUserFromAuth(authUiClient: AuthUiClient) {
-        currentUser = Users(
-            displayName = authUiClient.getSignedInUser()?.username,
-            points = 0,
-            emailAddress = null,
-            password = null,
-            username = authUiClient.getSignedInUser()?.username,
-            country = null,
-            userID = authUiClient.getSignedInUser()?.userId,
-            profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
-            loginNum = 2,
-            totalPoints = 2,
-            lastLoginDate = LocalDate.now().toString()
-        )
-    }
-
-
-
     fun updateTotalPoints(userId: String, totalPoints: Int) {
         // Reference to the Firestore collection.
         val db = FirebaseFirestore.getInstance().collection("users")
@@ -233,26 +169,6 @@ class UsersViewModel(
             .addOnFailureListener { e ->
                 Log.w("Firestore", "Error updating document", e)
             }
-    }
-
-    fun updateLogInNum(userId: String) {
-        val db = FirebaseFirestore.getInstance().collection("users")
-
-        db.document(userId).update("loginNum", FieldValue.increment(2))
-            .addOnSuccessListener {
-                Log.d("Firestore", "Updated LoginNum successfully !")
-            }
-            .addOnFailureListener { e ->
-                Log.w("Firestore", "Error updating loginNum", e)
-            }
-    }
-
-
-    fun addUserToFirebase() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repo.addToFirebaseDatabase(currentUser)
-            _user.value = currentUser
-        }
     }
 
     fun completedTaskPoints() {
