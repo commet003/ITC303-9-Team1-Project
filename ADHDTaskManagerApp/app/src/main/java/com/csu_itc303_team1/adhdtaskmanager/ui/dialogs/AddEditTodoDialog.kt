@@ -511,7 +511,7 @@ fun AddEditTodoDialog(
                 if (state.showDialog){
                     Text(text = state.dueDate)
                 } else {
-                    Text(text = thisTodo?.dueDate ?: timeFormatter.format(LocalTime.now()))
+                    Text(text = thisTodo?.dueDate ?: "")
                 }
             }
             // On Button Click it opens the Time Dialog Screen,
@@ -536,9 +536,9 @@ fun AddEditTodoDialog(
                     Text(text = "Time", fontWeight = FontWeight.Bold)
                 }
                 if (state.showDialog){
-                    Text(text = timeFormatter.format(cal.time))
+                    Text(text = state.dueTime)
                 } else {
-                    Text(text = timeFormatter.format(editCal.time))
+                    Text(text = thisTodo?.dueTime ?: "")
                 }
 
             }
@@ -580,33 +580,37 @@ fun AddEditTodoDialog(
                     if (state.title.isNotEmpty() && state.description.isNotEmpty()) {
                         if (state.showDialog) {
                             onEvent(TodoEvent.saveTodo)
-                            alarmItem = AlarmItem(
-                                id = state.id,
-                                time = LocalDateTime.parse(
-                                    "${state.dueDate} ${state.dueTime}",
-                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
-                                ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                                title = state.title,
-                                description = state.description
-                            )
-                            alarmItem?.let(alarmScheduler::schedule)
+                            if (state.dueDate.isNotBlank() && state.dueTime.isNotBlank()){
+                                alarmItem = AlarmItem(
+                                    id = state.id,
+                                    time = LocalDateTime.parse(
+                                        "${state.dueDate} ${state.dueTime}",
+                                        DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                    ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                    title = state.title,
+                                    description = state.description
+                                )
+                                alarmItem?.let(alarmScheduler::schedule)
+                            }
                             Log.d("Alarm", alarmItem.toString())
                             scope.launch {
                                 sheetState.hide()
                             }
                         } else if (state.showEditTodoDialog) {
-                            alarmItem = AlarmItem(
-                                id = thisTodo?.id!!,
-                                time = LocalDateTime.parse(
-                                    "${thisTodo.dueDate} ${thisTodo.dueTime}",
-                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
-                                ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                                title = thisTodo.title,
-                                description = thisTodo.description
-                            )
-                            alarmItem?.let(alarmScheduler::schedule)
+                            if (thisTodo?.dueDate?.isNotBlank() == true && thisTodo.dueTime.isNotBlank()){
+                                alarmItem = AlarmItem(
+                                    id = thisTodo.id,
+                                    time = LocalDateTime.parse(
+                                        "${thisTodo.dueDate} ${thisTodo.dueTime}",
+                                        DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                    ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                    title = thisTodo.title,
+                                    description = thisTodo.description
+                                )
+                                alarmItem?.let(alarmScheduler::schedule)
+                            }
                             Log.d("Alarm", alarmItem.toString())
-                            onEvent(TodoEvent.updateTodo(thisTodo))
+                            onEvent(TodoEvent.updateTodo(thisTodo!!))
                             onEvent(TodoEvent.toggleIsClicked(thisTodo))
                             onEvent(TodoEvent.resetState)
                             scope.launch {

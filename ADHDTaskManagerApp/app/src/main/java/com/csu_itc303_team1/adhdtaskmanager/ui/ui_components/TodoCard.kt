@@ -40,9 +40,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TodoCard(
     todo: Todo,
-    todoState: TodoState,
     onEvent: (TodoEvent) -> Unit,
-    index: Int,
     rewardViewModel: RewardViewModel,
     usersViewModel: UsersViewModel,
     showToast: MutableState<Boolean>,

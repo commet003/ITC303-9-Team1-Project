@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.activity.ComponentActivity
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Task
 import androidx.core.app.NotificationCompat
 import com.csu_itc303_team1.adhdtaskmanager.MainActivity
 import com.csu_itc303_team1.adhdtaskmanager.R
@@ -15,7 +17,6 @@ class AlarmReceiver: BroadcastReceiver() {
         val title = intent?.getStringExtra("EXTRA_TITLE") ?: return
         val description = intent.getStringExtra("EXTRA_DESCRIPTION") ?: return
         val itemId = intent.getIntExtra("EXTRA_ID", 0)
-
 
         showNotification(context!!, itemId, title, description)
     }
@@ -29,7 +30,7 @@ class AlarmReceiver: BroadcastReceiver() {
             .setContentTitle(title)
             .setContentText(description)
             .addAction(
-                R.drawable.new_logo_round,
+                R.drawable.ic_calendar,
                 "View",
                 PendingIntent.getActivity(
                     context,
