@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.R
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.SignInState
 
 @Composable
@@ -38,10 +40,14 @@ fun SignInScreen(
             ).show()
         }
     }
-    Column {
-
-        // TODO: Add a logo image here
-
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = { SignInTopAppBar() }
+    ) {
+        Column(
+        modifier = Modifier.fillMaxSize().padding(it)
+        )
+        {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -91,4 +97,7 @@ fun SignInScreen(
             }
         }
     }
+    }
+
+
 }

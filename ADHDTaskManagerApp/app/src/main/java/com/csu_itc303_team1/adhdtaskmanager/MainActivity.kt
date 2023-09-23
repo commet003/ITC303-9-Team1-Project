@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
@@ -280,7 +281,7 @@ class MainActivity : ComponentActivity() {
                  * This is where the Pomodoro Timer Notification is created
                  */
 
-                var permission = rememberPermissionState(
+                val permission = rememberPermissionState(
                     permission = Manifest.permission.POST_NOTIFICATIONS
                 )
 
@@ -289,8 +290,6 @@ class MainActivity : ComponentActivity() {
                         permission.launchPermissionRequest()
                     }
                 }
-
-                // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -301,56 +300,7 @@ class MainActivity : ComponentActivity() {
 
 
                 Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    // Creating the Top Bar
-                    topBar = {
-                        if (isSignedIn.value) {
-                            CenterAlignedTopAppBar(
-                                colors = TopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                                ),
-                                title = {
-                                    Text(
-                                        "ADHD Task Manager",
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = {
-                                        scope.launch {
-                                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                                        }
-                                    }) {
-                                        Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            imageVector = Icons.Filled.Menu,
-                                            contentDescription = "Menu"
-                                        )
-                                    }
-                                },
-                                actions = {
-                                    IconButton(onClick = {
-
-                                    }) {
-                                        Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            imageVector = Icons.Filled.Person,
-                                            contentDescription = "Profile"
-                                        )
-                                    }
-                                }
-                            )
-                        } else {
-                            SignInTopAppBar()
-                        }
-                    },
+                    modifier = Modifier.fillMaxSize(),
                 ) { // In this Section is contents of the actual screen. A padding value had to
                     // be added in the lambda form.
                         contentPadding ->
@@ -392,45 +342,53 @@ class MainActivity : ComponentActivity() {
                             drawerState = drawerState,
                             gesturesEnabled = isSignedIn.value,
                             drawerContent = {
-                                if (isSignedIn.value) {
-                                    ModalDrawerSheet(
-                                        drawerContainerColor = MaterialTheme.colorScheme.background,
-                                        drawerTonalElevation = 2.dp
-                                    ) {
-                                        Spacer(Modifier.height(18.dp))
+                                ModalDrawerSheet(
+                                    drawerContainerColor = MaterialTheme.colorScheme.background,
+                                    drawerTonalElevation = 2.dp,
+                                    modifier = Modifier.padding(top = 64.dp)
+                                ) {
+                                    LazyColumn(content = {
                                         screens.forEach { screen ->
-                                            NavigationDrawerItem(
-                                                colors = NavigationDrawerItemDefaults.colors(
-                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
-                                                ),
-                                                icon = {
-                                                    Icon(
-                                                        painter = painterResource(id = screenIcons[screens.indexOf(screen)]),
-                                                        contentDescription = screen.title,
-                                                    )
-                                                },
-                                                label = {
-                                                    Text(text = screen.title)
-                                                },
-                                                selected = screen.route == selectedItem.value.route,
-                                                onClick = {
-                                                    selectedItem.value = screen
-                                                    scope.launch {
-                                                        drawerState.close()
-                                                    }
-                                                    navController.navigate(screen.route)
-                                                },
-                                                modifier = Modifier.padding(
-                                                    NavigationDrawerItemDefaults.ItemPadding
+                                            item {
+                                                NavigationDrawerItem(
+                                                    modifier = Modifier.padding(
+                                                        top = 20.dp,
+                                                        start = 12.dp,
+                                                        end = 12.dp
+                                                    ),
+                                                    colors = NavigationDrawerItemDefaults.colors(
+                                                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                        selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                        unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                        unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                        unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                    ),
+                                                    icon = {
+                                                        Icon(
+                                                            painter = painterResource(
+                                                                id = screenIcons[screens.indexOf(
+                                                                    screen
+                                                                )]
+                                                            ),
+                                                            contentDescription = screen.title,
+                                                        )
+                                                    },
+                                                    label = {
+                                                        Text(text = screen.title)
+                                                    },
+                                                    selected = screen.route == selectedItem.value.route,
+                                                    onClick = {
+                                                        selectedItem.value = screen
+                                                        scope.launch {
+                                                            drawerState.close()
+                                                        }
+                                                        navController.navigate(screen.route)
+                                                    },
                                                 )
-                                            )
+                                            }
                                         }
-                                        if (isSignedIn.value) {
+                                        item {
                                             NavigationDrawerItem(
                                                 colors = NavigationDrawerItemDefaults.colors(
                                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -473,7 +431,9 @@ class MainActivity : ComponentActivity() {
                                                     NavigationDrawerItemDefaults.ItemPadding
                                                 )
                                             )
+                                        }
 
+                                        item {
                                             if (googleAuthUiClient.isUserAnonymous()) {
                                                 Row(modifier = Modifier.fillMaxWidth()) {
                                                     Text(
@@ -494,6 +454,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
+                                    )
                                 }
                             }
                         ) {
@@ -544,7 +505,9 @@ class MainActivity : ComponentActivity() {
                                             onEvent = todoEvent,
                                             rewardViewModel = rewardViewModel,
                                             usersViewModel = userViewModel,
-                                            alarmScheduler = alarmManager
+                                            alarmScheduler = alarmManager,
+                                            navScope = scope,
+                                            drawerState = drawerState
                                         )
                                     }
 
@@ -554,28 +517,43 @@ class MainActivity : ComponentActivity() {
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
                                             context = applicationContext,
-                                            scope = scope
+                                            scope = scope,
+                                            drawerState = drawerState
                                         )
                                     }
                                     // Leaderboard Screen
                                     composable(
                                         route = Screen.LeaderboardScreen.route
                                     ) {
-                                        LeaderboardScreen(connectivityObserver)
+                                        LeaderboardScreen(
+                                            connectivityObserver,
+                                            scope,
+                                            drawerState
+                                            )
                                     }
 
                                     // Rewards Screen
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel, connectivityObserver)
+                                        RewardsScreen(
+                                            rewardViewModel,
+                                            userViewModel,
+                                            connectivityObserver,
+                                            scope,
+                                            drawerState
+                                            )
                                     }
 
                                     // Completed Task Screen
                                     composable(
                                         route = Screen.CompletedScreen.route
                                     ) {
-                                        CompletedScreen(state)
+                                        CompletedScreen(
+                                            state,
+                                            scope,
+                                            drawerState
+                                            )
                                     }
 
                                     // Sign In Screen
@@ -652,19 +630,16 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.HelpScreen.route
                                     ) {
-                                        HelpScreen()
+                                        HelpScreen(
+                                            scope,
+                                            drawerState
+                                        )
                                     }
 
                                     composable(
                                         route = Screen.PomodoroTimerScreen.route
                                     ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .background(MaterialTheme.colorScheme.background),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.SpaceAround
-                                        ){
+
                                             PomodoroTimerScreen(
                                                 settingsViewModel = settingsViewModel, // Pass the instance here
                                                 initialWorkTime = 1500L * 1000L,
@@ -674,9 +649,10 @@ class MainActivity : ComponentActivity() {
                                                 activeBarColor = MaterialTheme.colorScheme.primary,
                                                 context = applicationContext,
                                                 activity = this@MainActivity,
-                                                modifier = Modifier.size(300.dp)
+                                                modifier = Modifier.size(300.dp),
+                                                scope = scope,
+                                                drawerState = drawerState
                                             )
-                                        }
                                     }
                                 }
                             }

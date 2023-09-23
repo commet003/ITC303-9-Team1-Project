@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.csu_itc303_team1.adhdtaskmanager.ui.dialogs.AddEditTodoDialog
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CustomToastMessage
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
@@ -50,6 +52,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -61,7 +64,9 @@ fun TodoScreen(
     onEvent: (TodoEvent) -> Unit,
     rewardViewModel: RewardViewModel,
     usersViewModel: UsersViewModel,
-    alarmScheduler: AlarmSchedulerImpl
+    alarmScheduler: AlarmSchedulerImpl,
+    navScope: CoroutineScope,
+    drawerState: DrawerState
 ) {
 
     rewardViewModel.allRewards.observeAsState(listOf())
@@ -83,6 +88,7 @@ fun TodoScreen(
         scaffoldState = bottomSheetScaffoldState,
         sheetSwipeEnabled = false,
         sheetDragHandle = {},
+        topBar = { MainTopAppBar(scope = navScope, drawerState = drawerState)},
         content = {
             Scaffold(
                 floatingActionButton = {
