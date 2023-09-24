@@ -1,86 +1,55 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.ui_components
 
 import android.annotation.SuppressLint
-import android.view.ViewGroup
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
-import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
-import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.unit.Dp
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Canvas
-import androidx.compose.material3.R
-import androidx.compose.runtime.rememberUpdatedState
-import kotlin.math.cos
-import kotlin.math.sin
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import com.csu_itc303_team1.adhdtaskmanager.databinding.CustomToastBinding
-import androidx.compose.runtime.*
 import androidx.compose.ui.zIndex
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionResult
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-
-
+import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmItem
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
+import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
+import kotlinx.coroutines.delay
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
 @SuppressLint("RememberReturnType")
 @Composable
 fun TodoCard(
     todo: Todo,
-    todoState: TodoState,
     onEvent: (TodoEvent) -> Unit,
-    index: Int,
     rewardViewModel: RewardViewModel,
     usersViewModel: UsersViewModel,
-    showToast: MutableState<Boolean>
+    showToast: MutableState<Boolean>,
+    alarmScheduler: AlarmSchedulerImpl
 ) {
 
     val showToastTrigger = remember { mutableStateOf(0) } // For triggering the toast
     val showLottieAnimation = remember { mutableStateOf(false) }
+    var alarmItem: AlarmItem? = null
 
 
     LaunchedEffect(showToastTrigger.value) {
@@ -95,10 +64,6 @@ fun TodoCard(
     rewardViewModel.allRewards.observeAsState(listOf())
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
 
-
-    var hours = remember {
-        mutableIntStateOf(0)
-    }
 
     Card(
         modifier = Modifier
@@ -154,7 +119,16 @@ fun TodoCard(
                                 completedReward.timesAchieved = completedReward.timesAchieved + 1
                                 rewardViewModel.updateReward(completedReward)
                                 usersViewModel.completedTaskPoints()
-
+                                alarmItem = AlarmItem(
+                                    id = todo.id,
+                                    time = LocalDateTime.parse(
+                                        "${todo.dueDate} ${todo.dueTime}",
+                                        DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                    ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                    title = todo.title,
+                                    description = todo.description,
+                                )
+                                alarmItem?.let(alarmScheduler::cancel)
                                 showToastTrigger.value += 1 // Increment to trigger the toast
                                 onEvent(TodoEvent.ToggleLottieAnimation(true))
                                 showLottieAnimation.value
@@ -167,7 +141,8 @@ fun TodoCard(
                         checkedColor = MaterialTheme.colorScheme.onPrimary,
                         uncheckedColor = MaterialTheme.colorScheme.onPrimary,
                         checkmarkColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    enabled = !todo.isCompleted
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
@@ -189,26 +164,23 @@ fun TodoCard(
                 Text(text = todo.dueDate, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(4.dp))
                 if (todo.dueTime.isNotEmpty()) {
-                    if (todo.dueTime.slice(0..1).toInt() > 12) {
-                        hours.value = todo.dueTime.slice(0..1).toInt() - 12
-                        Text(
-                            text = "${hours.value}:${todo.dueTime.slice(3..4)} PM",
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else if (todo.dueTime.slice(0..1).toInt() <= 12) {
-                        Text(
-                            text = "${todo.dueTime} AM",
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Text(text = "")
-                    }
+                        Text(text = todo.dueTime, color = MaterialTheme.colorScheme.onPrimary)
                 } else {
                     Text(text = "")
                 }
                 Spacer(Modifier.weight(1f))
                 IconButton(
                     onClick = {
+                        alarmItem = AlarmItem(
+                            id = todo.id,
+                            time = LocalDateTime.parse(
+                                "${todo.dueDate} ${todo.dueTime}",
+                                DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                            ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                            title = todo.title,
+                            description = todo.description,
+                        )
+                        alarmItem?.let(alarmScheduler::cancel)
                         onEvent(TodoEvent.deleteTodo(todo))
                     }
                 ) {

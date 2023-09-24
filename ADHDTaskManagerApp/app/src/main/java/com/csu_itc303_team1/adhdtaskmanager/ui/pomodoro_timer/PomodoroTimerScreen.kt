@@ -1,16 +1,23 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -37,13 +44,16 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.isDoNotDisturbEnabled
 import com.csu_itc303_team1.adhdtaskmanager.utils.permissions.toggleDoNotDisturb
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PomodoroTimerScreen(
     settingsViewModel: SettingsViewModel,
@@ -56,7 +66,9 @@ fun PomodoroTimerScreen(
     initialValue: Float = 0f,
     strokeWidth: Dp = 5.dp,
     context: Context,
-    activity: Activity
+    activity: Activity,
+    scope: CoroutineScope,
+    drawerState: DrawerState
 ) {
     val workTime = settingsViewModel.workTimerValue.value?.let {
         it.toLong() * 60000 // Convert minutes to milliseconds
@@ -75,31 +87,6 @@ fun PomodoroTimerScreen(
     var isWorkTime by remember { mutableStateOf(true) }  // Set this to true
     var isBreakTime by remember { mutableStateOf(false) } // Set this to false
     var seconds by remember { mutableIntStateOf(0) }
-    var workTimeInput by remember { mutableStateOf("") }
-    var breakTimeInput by remember { mutableStateOf("") }
-
-
-    /*TextField(
-        value = workTimeInput,
-        onValueChange = {
-            if (it.all { char -> char.isDigit() }) {
-                workTimeInput = it
-            }
-        },
-        modifier = Modifier.padding(all = 16.dp),
-        label = { Text("Enter work time in minutes", color = Color(0, 50, 140)) } // Navy blue text
-    )
-
-    TextField(
-        value = breakTimeInput,
-        onValueChange = {
-            if (it.all { char -> char.isDigit() }) {
-                breakTimeInput = it
-            }
-        },
-        modifier = Modifier.padding(all = 16.dp),
-        label = { Text("Enter break time in minutes", color = Color(0, 50, 140)) } // Navy blue text
-    )*/
 
 
 
@@ -144,128 +131,168 @@ fun PomodoroTimerScreen(
         }
     }
 
+    Scaffold(
+        topBar = { MainTopAppBar(scope = scope, drawerState = drawerState)},
+        content = {paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    modifier = Modifier.padding(top = 20.dp)
+                ) {
+                    Text(
+                        text = "Pomodoro Timer",
+                        fontSize = 34.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Box(
+                        modifier = modifier.onSizeChanged { size = it },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Canvas(modifier = modifier) {
+                            drawArc(
+                                color = inactiveBarColor,
+                                startAngle = -215f,
+                                sweepAngle = 250f,
+                                useCenter = false,
+                                size = Size(size.width.toFloat(), size.height.toFloat()),
+                                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
+                            )
+                            drawArc(
+                                color = if (isWorkTime) {
+                                    activeBarColor
+                                } else {
+                                    Color.Green
+                                },
+                                startAngle = -215f,
+                                sweepAngle = 250f * progress,
+                                useCenter = false,
+                                size = Size(size.width.toFloat(), size.height.toFloat()),
+                                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
+                            )
 
-    Row {
-        Text(text = "Pomodoro Timer", fontSize = 34.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-    }
+                            val center = Offset(size.width / 2f, size.height / 2f)
+                            val beta = (250f * progress + 145f) * (Math.PI / 180f).toFloat()
+                            val radius = size.width / 2f
+                            val aSide = cos(beta) * radius
+                            val bSide = sin(beta) * radius
 
-
-
-    Box(
-        modifier = modifier.onSizeChanged { size = it },
-        contentAlignment = Alignment.Center
-    ){
-        Canvas(modifier = modifier) {
-            drawArc(
-                color = inactiveBarColor,
-                startAngle = -215f,
-                sweepAngle = 250f,
-                useCenter = false,
-                size = Size(size.width.toFloat(), size.height.toFloat()),
-                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
-            )
-            drawArc(
-                color = if(isWorkTime){
-                    activeBarColor
-                }else {
-                    Color.Green
-                },
-                startAngle = -215f,
-                sweepAngle = 250f * progress,
-                useCenter = false,
-                size = Size(size.width.toFloat(), size.height.toFloat()),
-                style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
-            )
-
-            val center = Offset(size.width / 2f, size.height / 2f)
-            val beta = (250f * progress + 145f) * (Math.PI / 180f).toFloat()
-            val radius = size.width / 2f
-            val aSide = cos(beta) * radius
-            val bSide = sin(beta) * radius
-
-            drawPoints(
-                listOf(
-                    Offset(center.x + aSide, center.y + bSide)
-                ),
-                pointMode = PointMode.Points,
-                color = if(isWorkTime){
-                    handleColor
-                }else {
-                    Color.Green
-                },
-                strokeWidth = (strokeWidth * 3f).toPx(),
-                cap = StrokeCap.Round
-            )
-        }
-        Text(
-            text = "%02d".format((currentTime / 1000L) / 60) + ":" + "%02d".format(seconds),
-            fontSize = 44.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Button(
-            onClick = {
-                if (currentTime <= 0L){
-                    currentTime = if (isWorkTime){
-                        workTime
-                    } else {
-                        breakTime
+                            drawPoints(
+                                listOf(
+                                    Offset(center.x + aSide, center.y + bSide)
+                                ),
+                                pointMode = PointMode.Points,
+                                color = if (isWorkTime) {
+                                    handleColor
+                                } else {
+                                    Color.Green
+                                },
+                                strokeWidth = (strokeWidth * 3f).toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        }
+                        Text(
+                            text = "%02d".format((currentTime / 1000L) / 60) + ":" + "%02d".format(
+                                seconds
+                            ),
+                            fontSize = 44.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     }
-                    isTimerRunning = true
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(paddingValues),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Button(
+                        modifier = Modifier
+                            .padding(top = 120.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = Color.White
+                        ),
+                        onClick = {
+                            isTimerRunning = false
+                            currentTime = workTime
+                            isWorkTime = true
+                            isBreakTime = false
 
-                } else isTimerRunning = !isTimerRunning
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(top = 120.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (!isTimerRunning || currentTime <= 0L){
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
-                contentColor = if (!isTimerRunning || currentTime <= 0L){
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.background
+                            timerRoundsCount = 4
+                            seconds = 0
+                            if (!isDoNotDisturbEnabled(context)) {
+                                toggleDoNotDisturb(context, activity)
+                            }
+                        }) {
+                        Text(
+                            text = "Stop",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (currentTime <= 0L) {
+                                currentTime = if (isWorkTime) {
+                                    workTime
+                                } else {
+                                    breakTime
+                                }
+                                isTimerRunning = true
+
+                            } else isTimerRunning = !isTimerRunning
+                        },
+                        modifier = Modifier
+                            .padding(top = 120.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (!isTimerRunning || currentTime <= 0L) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.primaryContainer
+                            },
+                            contentColor = if (!isTimerRunning || currentTime <= 0L) {
+                                MaterialTheme.colorScheme.onPrimary
+                            } else {
+                                MaterialTheme.colorScheme.background
+                            }
+                        )
+                    ) {
+                        Text(
+                            text = if (!isTimerRunning && currentTime <= 0L) {
+                                "Start"
+                            } else if (isTimerRunning && currentTime >= 0L) {
+                                "Pause"
+                            } else {
+                                "Resume"
+                            },
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
-            )
-        ) {
-            Text(
-                text = if (!isTimerRunning && currentTime <= 0L){
-                    "Start"
-                } else if (isTimerRunning && currentTime >= 0L) {
-                    "Pause"
-                } else {
-                    "Resume"
-                },
-                fontWeight = FontWeight.Bold
-            )
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
-        Button(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(top = 120.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error,
-                contentColor = Color.White
-            ),
-            onClick = {
-                isTimerRunning = false
-                currentTime = workTime
-                isWorkTime = true
-                isBreakTime = false
-                timerRoundsCount = 4
-                seconds = 0
-                if (!isDoNotDisturbEnabled(context)){
-                    toggleDoNotDisturb(context, activity)
-                }
-            }) {
-            Text(
-                text = "Stop",
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-    Spacer(modifier = Modifier.height(16.dp))
+    )
 }

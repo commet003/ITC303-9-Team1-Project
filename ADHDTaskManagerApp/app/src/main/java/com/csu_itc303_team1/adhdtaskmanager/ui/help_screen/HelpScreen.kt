@@ -32,6 +32,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -42,7 +44,10 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun HelpScreen() {
+fun HelpScreen(
+    scope: CoroutineScope,
+    drawerState: DrawerState
+) {
     val context = LocalContext.current
     var viewManualClicked by remember { mutableStateOf(false) }
     var viewArchitectureClicked by remember { mutableStateOf(false) }
@@ -50,13 +55,7 @@ fun HelpScreen() {
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Welcome to the Help Page")
-                }
-            )
-        }
+        topBar = { MainTopAppBar(scope = scope, drawerState = drawerState)}
     ) {
         Column(
             modifier = Modifier
@@ -185,10 +184,4 @@ class WebViewActivity : ComponentActivity() {
         // Set a custom WebChrome client to handle video playback
         webView.webChromeClient = WebChromeClient()
     }
-}
-
-@Preview
-@Composable
-fun HelpScreenPreview() {
-    HelpScreen()
 }

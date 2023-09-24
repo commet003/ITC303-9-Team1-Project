@@ -49,6 +49,7 @@ class TodoViewModel(
                 }
             }
 
+
             is TodoEvent.ToggleLottieAnimation -> {
                 _state.value = _state.value.copy(showLottieAnimation = event.show)
             }

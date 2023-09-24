@@ -2,12 +2,19 @@ package com.csu_itc303_team1.adhdtaskmanager
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.NotificationManager
-import android.content.pm.PackageManager
-import androidx.activity.viewModels
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,6 +33,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
@@ -38,18 +46,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -68,48 +73,36 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.pomodoro_timer.PomodoroTimerScree
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardsScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsScreen
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
+import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.sign_in.SignInViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.theme.ADHDTaskManagerTheme
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoScreen
 import com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen.TodoViewModel
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.SignInTopAppBar
+import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
+import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
+import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Response
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.view.LayoutInflater
-import android.widget.TextView
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupWindow
-import androidx.lifecycle.Lifecycle
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModel
-import com.csu_itc303_team1.adhdtaskmanager.ui.settings_screen.SettingsViewModelFactory
-import com.csu_itc303_team1.adhdtaskmanager.utils.blurBitmap
-import com.csu_itc303_team1.adhdtaskmanager.utils.captureScreenshotWhenReady
-import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
-import com.csu_itc303_team1.adhdtaskmanager.utils.takeScreenshot
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
+import net.sqlcipher.database.SQLiteDatabase
+import net.sqlcipher.database.SupportFactory
 import kotlinx.coroutines.runBlocking
 
 
@@ -117,7 +110,6 @@ import kotlinx.coroutines.runBlocking
 class MainActivity : ComponentActivity() {
 
     private val connectivityObserver = ConnectivityObserverImpl(this)
-
 
     // Instantiate the UsersViewModel
     private val usersViewModel by viewModels<UsersViewModel>()
@@ -131,7 +123,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
+        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
     }
 
     private val rewardViewModel by viewModels<RewardViewModel>(
@@ -185,6 +177,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val alarmManager = AlarmSchedulerImpl(this)
+
 
         val viewModel by viewModels<TodoViewModel>(
             factoryProducer = {
@@ -291,28 +286,15 @@ class MainActivity : ComponentActivity() {
                  * This is where the Pomodoro Timer Notification is created
                  */
 
-                val context = LocalContext.current
-                var hasNotificationPermission by remember {
-                    mutableStateOf(ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED)
-                }
-
-                val permissionLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        hasNotificationPermission = isGranted
-                    }
+                val permission = rememberPermissionState(
+                    permission = Manifest.permission.POST_NOTIFICATIONS
                 )
 
-                LaunchedEffect(key1 = hasNotificationPermission) {
-                    if (!hasNotificationPermission) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                LaunchedEffect(key1 = permission.hasPermission){
+                    if (!permission.hasPermission) {
+                        permission.launchPermissionRequest()
                     }
                 }
-
-                // The Navigation Bar and Drawer will appear on the Main Activity (Every Screen)
 
                 // variables for remembering the state of the Coroutine Scope and Scaffold
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -323,59 +305,7 @@ class MainActivity : ComponentActivity() {
 
 
                 Scaffold(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    // Creating the Top Bar
-                    topBar = {
-                        if (isSignedIn.value) {
-                            CenterAlignedTopAppBar(
-                                colors = TopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                                ),
-                                title = {
-                                    Text(
-                                        "ADHD Task Manager",
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                },
-                                navigationIcon = {
-                                    IconButton(onClick = {
-                                        scope.launch {
-                                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                                        }
-                                    }) {
-                                        Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            imageVector = Icons.Filled.Menu,
-                                            contentDescription = "Menu"
-                                        )
-                                    }
-                                },
-                                actions = {
-                                    IconButton(onClick = {
-                                        if (hasNotificationPermission){
-                                            showFocusNotification()
-                                            showBreakNotification()
-                                        }
-                                    }) {
-                                        Icon(
-                                            tint = MaterialTheme.colorScheme.onPrimary,
-                                            imageVector = Icons.Filled.Person,
-                                            contentDescription = "Profile"
-                                        )
-                                    }
-                                }
-                            )
-                        } else {
-                            SignInTopAppBar()
-                        }
-                    },
+                    modifier = Modifier.fillMaxSize(),
                 ) { // In this Section is contents of the actual screen. A padding value had to
                     // be added in the lambda form.
                         contentPadding ->
@@ -417,45 +347,53 @@ class MainActivity : ComponentActivity() {
                             drawerState = drawerState,
                             gesturesEnabled = isSignedIn.value,
                             drawerContent = {
-                                if (isSignedIn.value) {
-                                    ModalDrawerSheet(
-                                        drawerContainerColor = MaterialTheme.colorScheme.background,
-                                        drawerTonalElevation = 2.dp
-                                    ) {
-                                        Spacer(Modifier.height(18.dp))
+                                ModalDrawerSheet(
+                                    drawerContainerColor = MaterialTheme.colorScheme.background,
+                                    drawerTonalElevation = 2.dp,
+                                    modifier = Modifier.padding(top = 64.dp)
+                                ) {
+                                    LazyColumn(content = {
                                         screens.forEach { screen ->
-                                            NavigationDrawerItem(
-                                                colors = NavigationDrawerItemDefaults.colors(
-                                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                                                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
-                                                    unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                                    unselectedIconColor = MaterialTheme.colorScheme.primary,
-                                                    unselectedTextColor = MaterialTheme.colorScheme.primary
-                                                ),
-                                                icon = {
-                                                    Icon(
-                                                        painter = painterResource(id = screenIcons[screens.indexOf(screen)]),
-                                                        contentDescription = screen.title,
-                                                    )
-                                                },
-                                                label = {
-                                                    Text(text = screen.title)
-                                                },
-                                                selected = screen.route == selectedItem.value.route,
-                                                onClick = {
-                                                    selectedItem.value = screen
-                                                    scope.launch {
-                                                        drawerState.close()
-                                                    }
-                                                    navController.navigate(screen.route)
-                                                },
-                                                modifier = Modifier.padding(
-                                                    NavigationDrawerItemDefaults.ItemPadding
+                                            item {
+                                                NavigationDrawerItem(
+                                                    modifier = Modifier.padding(
+                                                        top = 20.dp,
+                                                        start = 12.dp,
+                                                        end = 12.dp
+                                                    ),
+                                                    colors = NavigationDrawerItemDefaults.colors(
+                                                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                                        selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                                                        unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                                        unselectedIconColor = MaterialTheme.colorScheme.primary,
+                                                        unselectedTextColor = MaterialTheme.colorScheme.primary
+                                                    ),
+                                                    icon = {
+                                                        Icon(
+                                                            painter = painterResource(
+                                                                id = screenIcons[screens.indexOf(
+                                                                    screen
+                                                                )]
+                                                            ),
+                                                            contentDescription = screen.title,
+                                                        )
+                                                    },
+                                                    label = {
+                                                        Text(text = screen.title)
+                                                    },
+                                                    selected = screen.route == selectedItem.value.route,
+                                                    onClick = {
+                                                        selectedItem.value = screen
+                                                        scope.launch {
+                                                            drawerState.close()
+                                                        }
+                                                        navController.navigate(screen.route)
+                                                    },
                                                 )
-                                            )
+                                            }
                                         }
-                                        if (isSignedIn.value) {
+                                        item {
                                             NavigationDrawerItem(
                                                 colors = NavigationDrawerItemDefaults.colors(
                                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -498,7 +436,9 @@ class MainActivity : ComponentActivity() {
                                                     NavigationDrawerItemDefaults.ItemPadding
                                                 )
                                             )
+                                        }
 
+                                        item {
                                             if (googleAuthUiClient.isUserAnonymous()) {
                                                 Row(modifier = Modifier.fillMaxWidth()) {
                                                     Text(
@@ -519,6 +459,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
+                                    )
                                 }
                             }
                         ) {
@@ -568,7 +509,10 @@ class MainActivity : ComponentActivity() {
                                             state = state,
                                             onEvent = todoEvent,
                                             rewardViewModel = rewardViewModel,
-                                            usersViewModel = userViewModel
+                                            usersViewModel = userViewModel,
+                                            alarmScheduler = alarmManager,
+                                            navScope = scope,
+                                            drawerState = drawerState
                                         )
                                     }
 
@@ -578,28 +522,43 @@ class MainActivity : ComponentActivity() {
                                             settingsViewModel = settingsViewModel,
                                             currentUser = googleAuthUiClient,
                                             context = applicationContext,
-                                            scope = scope
+                                            scope = scope,
+                                            drawerState = drawerState
                                         )
                                     }
                                     // Leaderboard Screen
                                     composable(
                                         route = Screen.LeaderboardScreen.route
                                     ) {
-                                        LeaderboardScreen(connectivityObserver)
+                                        LeaderboardScreen(
+                                            connectivityObserver,
+                                            scope,
+                                            drawerState
+                                            )
                                     }
 
                                     // Rewards Screen
                                     composable(
                                         route = Screen.RewardsScreen.route
                                     ) {
-                                        RewardsScreen(rewardViewModel, userViewModel, connectivityObserver)
+                                        RewardsScreen(
+                                            rewardViewModel,
+                                            userViewModel,
+                                            connectivityObserver,
+                                            scope,
+                                            drawerState
+                                            )
                                     }
 
                                     // Completed Task Screen
                                     composable(
                                         route = Screen.CompletedScreen.route
                                     ) {
-                                        CompletedScreen(state)
+                                        CompletedScreen(
+                                            state,
+                                            scope,
+                                            drawerState
+                                            )
                                     }
 
                                     // Sign In Screen
@@ -666,19 +625,16 @@ class MainActivity : ComponentActivity() {
                                     composable(
                                         route = Screen.HelpScreen.route
                                     ) {
-                                        HelpScreen()
+                                        HelpScreen(
+                                            scope,
+                                            drawerState
+                                        )
                                     }
 
                                     composable(
                                         route = Screen.PomodoroTimerScreen.route
                                     ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .background(MaterialTheme.colorScheme.background),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.SpaceAround
-                                        ){
+
                                             PomodoroTimerScreen(
                                                 settingsViewModel = settingsViewModel, // Pass the instance here
                                                 initialWorkTime = 1500L * 1000L,
@@ -688,9 +644,10 @@ class MainActivity : ComponentActivity() {
                                                 activeBarColor = MaterialTheme.colorScheme.primary,
                                                 context = applicationContext,
                                                 activity = this@MainActivity,
-                                                modifier = Modifier.size(300.dp)
+                                                modifier = Modifier.size(300.dp),
+                                                scope = scope,
+                                                drawerState = drawerState
                                             )
-                                        }
                                     }
                                 }
                             }
@@ -700,32 +657,6 @@ class MainActivity : ComponentActivity() {
             }
             rewardViewModel.allRewards.observeAsState(listOf())
         }
-    }
-
-    private fun showFocusNotification() {
-        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(
-            applicationContext,
-            "PomodoroTimer"
-        )
-            .setContentTitle("Pomodoro Timer")
-            .setContentText("It's time to focus!")
-            .setSmallIcon(R.drawable.ic_complete)
-            .build()
-        notificationManager.notify(1, notification)
-    }
-
-    private fun showBreakNotification() {
-        val notificationManager = getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-        val notification = NotificationCompat.Builder(
-            applicationContext,
-            "PomodoroTimer"
-        )
-            .setContentTitle("Pomodoro Timer")
-            .setContentText("It's time for a break!")
-            .setSmallIcon(R.drawable.ic_complete)
-            .build()
-        notificationManager.notify(2, notification)
     }
 
     // creates Arraylist of users from the Firestore database
