@@ -10,22 +10,23 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 
 
 class UsersViewModel(
-    private val repo: UsersRepo = UsersRepo()
+    private val repo: UsersRepo = UsersRepo(),
 ) : ViewModel() {
 
     private val _user = MutableStateFlow<Users?>(null)
@@ -34,7 +35,84 @@ class UsersViewModel(
 
     private var currentUser by mutableStateOf(Users())
 
+    private val db = FirebaseFirestore.getInstance()
+    private val userCollection = db.collection("users")
+
     private lateinit var authUiClient: AuthUiClient
+
+    fun checkUserInFirestore(userId: String, authUser: AuthUiClient) {
+        userCollection.document(userId).get()
+            // When it has finished searching
+            .addOnCompleteListener { task ->
+                // If it has found a an existing user
+                if (task.isSuccessful) {
+                    Log.d("User", "Completed Searching for User in Firestore")
+                    val documentSnapshot = task.result
+                    // If a snapshot exists and it is not null
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        Log.d("User", "Found User $userId in Firestore")
+                        // convert to Users Object
+                        val user = documentSnapshot.toObject(Users::class.java)
+                        val lastLogin = user?.lastLoginDate!!
+                        val todaysDate = getCurrentDate()
+
+                        // If last login date does not equal todays date
+                        if (todaysDate != lastLogin) {
+                            Log.d("User", "User has not logged in today yet. Giving Log in Reward and updating last login date.")
+                            updateLastLoginDate(userId)
+                            updateLoginNum(userId)
+                        } else {
+                            Log.d("User", "User has already logged in today.")
+                        }
+                        // Made the current user the found user
+                        _user.value = user
+                    } else {
+                        // If User did not exist in data base, add it
+                        Log.d("User", "Did Not Find User in Firestore. Adding...")
+                        val newUser = Users(
+                            displayName = authUser.getSignedInUser()?.username,
+                            points = 0,
+                            emailAddress = null,
+                            password = null,
+                            username = authUser.getSignedInUser()?.username,
+                            country = null,
+                            userID = authUser.getSignedInUser()?.userId,
+                            profileImage = authUser.getSignedInUser()?.profilePictureUrl,
+                            loginNum = 2,
+                            totalPoints = 2,
+                            lastLoginDate = LocalDate.now().toString()
+                        )
+                        addUserToFirestore(newUser)
+                    }
+                } else {
+                    task.exception?.printStackTrace()
+                }
+            }
+    }
+
+    private fun updateLastLoginDate(userId: String) {
+        val currentDate = getCurrentDate()
+        userCollection.document(userId).update("lastLoginDate", currentDate)
+    }
+
+    private fun updateLoginNum(userId: String) {
+        userCollection.document(userId).update("loginNum", FieldValue.increment(2))
+    }
+
+    private fun addUserToFirestore(newUser: Users) {
+        userCollection.document(newUser.userID.toString()).set(newUser)
+            .addOnSuccessListener {
+                _user.value = newUser
+                Log.d("User", "Successfully added new User ${newUser.userID} in Firestore and set them as the current user.")
+            }
+            .addOnFailureListener { e ->
+                Log.w("User", "There was an error user document in addToFirestore function", e)
+            }
+    }
+
+    private fun getCurrentDate(): String {
+        return LocalDate.now().toString()
+    }
 
     fun initializeAuthUiClient(context: Context, oneTapClient: SignInClient) {
         authUiClient = AuthUiClient(context, oneTapClient, repo)
@@ -80,27 +158,6 @@ class UsersViewModel(
         }
     }
 
-    fun checkUserExists(id: String): Boolean {
-        return repo.checkExists(id)
-    }
-
-    fun convertToUserFromAuth(authUiClient: AuthUiClient) {
-        currentUser = Users(
-            displayName = authUiClient.getSignedInUser()?.username,
-            points = 0,
-            emailAddress = null,
-            password = null,
-            username = authUiClient.getSignedInUser()?.username,
-            country = null,
-            userID = authUiClient.getSignedInUser()?.userId,
-            profileImage = authUiClient.getSignedInUser()?.profilePictureUrl,
-            loginNum = 0,
-            totalPoints = 0,
-        )
-    }
-
-
-
     fun updateTotalPoints(userId: String, totalPoints: Int) {
         // Reference to the Firestore collection.
         val db = FirebaseFirestore.getInstance().collection("users")
@@ -112,12 +169,6 @@ class UsersViewModel(
             .addOnFailureListener { e ->
                 Log.w("Firestore", "Error updating document", e)
             }
-    }
-
-
-    fun addUserToFirebase() {
-        repo.addToFirebaseDatabase(currentUser)
-        _user.value = currentUser
     }
 
     fun completedTaskPoints() {
