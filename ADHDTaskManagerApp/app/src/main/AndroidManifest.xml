@@ -35,6 +35,7 @@
         <activity android:name=".ui.help_screen.WebViewActivity" />
         <activity
             android:name=".MainActivity"
+            android:label="ADHD Task Manager"
             android:exported="true"
             android:theme="@style/Theme.ADHDTaskManager">
         </activity>

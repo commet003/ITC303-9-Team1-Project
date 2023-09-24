@@ -123,7 +123,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             TodoDatabase::class.java,
             "todo.db"
-        )/*.openHelperFactory(factory)*/.fallbackToDestructiveMigration().build()
+        ).openHelperFactory(factory).fallbackToDestructiveMigration().build()
     }
 
     private val rewardViewModel by viewModels<RewardViewModel>(
