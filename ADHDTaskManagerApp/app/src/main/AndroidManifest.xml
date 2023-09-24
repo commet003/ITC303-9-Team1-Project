@@ -16,7 +16,6 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/new_logo_round"
-        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.ADHDTaskManager"
         tools:targetApi="s">
