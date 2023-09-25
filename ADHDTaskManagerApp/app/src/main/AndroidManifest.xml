@@ -17,6 +17,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/new_logo_round"
         android:supportsRtl="true"
+        android:label="@string/app_name"
         android:theme="@style/Theme.ADHDTaskManager"
         tools:targetApi="s">
         <receiver
