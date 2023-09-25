@@ -1,5 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.todo_screen
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.utils.database_dao.TodoDao
@@ -16,6 +18,9 @@ import java.time.LocalDateTime
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
+
+    private val _hasShownWelcomePopup = MutableLiveData(false)
+    val hasShownWelcomePopup: LiveData<Boolean> get() = _hasShownWelcomePopup
 
     private val _state = MutableStateFlow(TodoState())
     private val _sortType = MutableStateFlow(SortType.BY_DATE_TIME)
@@ -36,7 +41,13 @@ class TodoViewModel(
             todos = todos,
             sortType = sortType
         )
+
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TodoState())
+
+
+    fun showWelcomePopup() {
+        _hasShownWelcomePopup.value = true
+    }
 
     fun onEvent(event: TodoEvent) {
         when (event) {
