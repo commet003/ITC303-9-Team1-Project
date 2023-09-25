@@ -119,16 +119,18 @@ fun TodoCard(
                                 completedReward.timesAchieved = completedReward.timesAchieved + 1
                                 rewardViewModel.updateReward(completedReward)
                                 usersViewModel.completedTaskPoints()
-                                alarmItem = AlarmItem(
-                                    id = todo.id,
-                                    time = LocalDateTime.parse(
-                                        "${todo.dueDate} ${todo.dueTime}",
-                                        DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
-                                    ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                                    title = todo.title,
-                                    description = todo.description,
-                                )
-                                alarmItem?.let(alarmScheduler::cancel)
+                                if(todo.dueDate.isNotBlank() && todo.dueTime.isNotBlank()){
+                                    alarmItem = AlarmItem(
+                                        id = todo.id,
+                                        time = LocalDateTime.parse(
+                                            "${todo.dueDate} ${todo.dueTime}",
+                                            DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                        ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                        title = todo.title,
+                                        description = todo.description,
+                                    )
+                                    alarmItem?.let(alarmScheduler::cancel)
+                                }
                                 showToastTrigger.value += 1 // Increment to trigger the toast
                                 onEvent(TodoEvent.ToggleLottieAnimation(true))
                                 showLottieAnimation.value
@@ -171,16 +173,18 @@ fun TodoCard(
                 Spacer(Modifier.weight(1f))
                 IconButton(
                     onClick = {
-                        alarmItem = AlarmItem(
-                            id = todo.id,
-                            time = LocalDateTime.parse(
-                                "${todo.dueDate} ${todo.dueTime}",
-                                DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
-                            ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                            title = todo.title,
-                            description = todo.description,
-                        )
-                        alarmItem?.let(alarmScheduler::cancel)
+                        if(todo.dueDate.isNotBlank() && todo.dueTime.isNotBlank()) {
+                            alarmItem = AlarmItem(
+                                id = todo.id,
+                                time = LocalDateTime.parse(
+                                    "${todo.dueDate} ${todo.dueTime}",
+                                    DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
+                                ).atZone(ZoneId.systemDefault()).toLocalDateTime(),
+                                title = todo.title,
+                                description = todo.description,
+                            )
+                            alarmItem?.let(alarmScheduler::cancel)
+                        }
                         onEvent(TodoEvent.deleteTodo(todo))
                     }
                 ) {
