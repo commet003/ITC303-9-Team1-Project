@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.CompletedTaskCard
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
+import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.CoroutineScope
 
 

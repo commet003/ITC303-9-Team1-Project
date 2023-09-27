@@ -4,4 +4,5 @@ enum class SortType {
     BY_PRIORITY,
     BY_DATE_TIME,
     BY_COMPLETED,
+    BY_NOT_COMPLETED
 }

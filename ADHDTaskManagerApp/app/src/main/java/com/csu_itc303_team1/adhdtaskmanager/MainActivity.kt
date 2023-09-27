@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -450,8 +451,8 @@ class MainActivity : ComponentActivity() {
                                 // on Default
                                 val state by viewModel.state.collectAsState()
                                 if (isSignedIn.value) {
-                                    state.userId =
-                                        googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                    state.userId = googleAuthUiClient.getSignedInUser()?.userId ?: ""
+                                    Log.d("MainActivity", "User ID: ${state.userId}")
                                 }
                                 //val rewardState by rewardViewModel.collectAsState()
                                 val todoEvent = viewModel::onEvent

@@ -61,6 +61,7 @@ fun TodoScreen(
 
 
 
+
     BottomSheetScaffold(
         scaffoldState = bottomSheetScaffoldState,
         sheetSwipeEnabled = false,
@@ -155,6 +156,12 @@ fun TodoScreen(
                                             "BY_COMPLETED" -> {
                                                 Text(
                                                     text = "By Completed",
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                            "BY_NOT_COMPLETED" -> {
+                                                Text(
+                                                    text = "By Not Completed",
                                                     color = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
