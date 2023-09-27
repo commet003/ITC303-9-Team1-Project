@@ -3,23 +3,12 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.Dispatchers
+import com.google.firebase.firestore.*
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class UsersRepo (
 

@@ -3,8 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.notifications
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import androidx.core.app.NotificationCompat
-import com.csu_itc303_team1.adhdtaskmanager.R
 
 class NotificationsApp: Application() {
     override fun onCreate() {

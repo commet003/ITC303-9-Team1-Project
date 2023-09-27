@@ -6,44 +6,11 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CalendarLocale
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDefaults
-import androidx.compose.material3.TimePickerLayoutType
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,17 +27,9 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.*
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 
 
 @SuppressLint("RememberReturnType")
@@ -266,14 +225,32 @@ fun AddEditTodoDialog(
             initialSelectedDateMillis = Instant.now().toEpochMilli(),
             yearRange = IntRange(2023, 2026),
             initialDisplayMode = DisplayMode.Picker,
-            initialDisplayedMonthMillis = null
+            initialDisplayedMonthMillis = null,
+            selectableDates = object : SelectableDates{
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneId.systemDefault()).toLocalDateTime().isAfter(LocalDateTime.now().minusDays(1))
+                }
+
+                override fun isSelectableYear(year: Int): Boolean {
+                    return year in LocalDateTime.now().year .. LocalDateTime.now().year + 3
+                }
+            }
         )
 
         val editDatePickerState = rememberDatePickerState(
             initialSelectedDateMillis = Instant.now().toEpochMilli(),
             yearRange = IntRange(2023, 2026),
             initialDisplayMode = DisplayMode.Picker,
-            initialDisplayedMonthMillis = null
+            initialDisplayedMonthMillis = null,
+            selectableDates = object : SelectableDates{
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneId.systemDefault()).toLocalDateTime().isAfter(LocalDateTime.now().minusDays(1))
+                }
+
+                override fun isSelectableYear(year: Int): Boolean {
+                    return year in LocalDateTime.now().year .. LocalDateTime.now().year + 3
+                }
+            }
         )
 
         val timePickerState = rememberTimePickerState(
@@ -288,20 +265,12 @@ fun AddEditTodoDialog(
             is24Hour = false
         )
 
-        val amPM = remember {
-            mutableStateOf("")
-        }
-
-        val pmHours = remember {
-            mutableIntStateOf(0)
-        }
 
         val timeFormatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
         var selectedDate: OffsetDateTime? = null
         var editedSelectedDate: OffsetDateTime? = null
         val cal: Calendar = Calendar.getInstance()
         val editCal: Calendar = Calendar.getInstance()
-        val calLocal: CalendarLocale = CalendarLocale.getDefault()
 
 
 
@@ -310,6 +279,7 @@ fun AddEditTodoDialog(
                 DatePickerDialog(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(10.dp)
                         .align(Alignment.CenterHorizontally),
                     onDismissRequest = { onEvent(TodoEvent.hideDateSelector) },
                     confirmButton = {
@@ -592,7 +562,6 @@ fun AddEditTodoDialog(
                                 )
                                 alarmItem?.let(alarmScheduler::schedule)
                             }
-                            Log.d("Alarm", alarmItem.toString())
                             scope.launch {
                                 sheetState.hide()
                             }
@@ -609,7 +578,6 @@ fun AddEditTodoDialog(
                                 )
                                 alarmItem?.let(alarmScheduler::schedule)
                             }
-                            Log.d("Alarm", alarmItem.toString())
                             onEvent(TodoEvent.updateTodo(thisTodo!!))
                             onEvent(TodoEvent.toggleIsClicked(thisTodo))
                             onEvent(TodoEvent.resetState)

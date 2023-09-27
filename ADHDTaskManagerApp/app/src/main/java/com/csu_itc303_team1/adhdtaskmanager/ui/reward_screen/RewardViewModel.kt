@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.RewardDatabase
 import kotlinx.coroutines.launch
-import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.FirebaseCallback
 
 class RewardViewModel(application: Application): ViewModel() {
 

@@ -5,8 +5,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
-import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserver.Status
 import androidx.annotation.RequiresApi
+import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserver.Status
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

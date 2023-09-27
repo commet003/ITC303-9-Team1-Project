@@ -27,7 +27,6 @@ class TodoViewModel(
                 SortType.BY_DATE_TIME -> todoDao.sortByDueDateAndTime()
                 SortType.BY_PRIORITY -> todoDao.sortByPriority()
                 SortType.BY_COMPLETED -> todoDao.sortByCompleted()
-                SortType.BY_NOT_COMPLETED -> todoDao.sortByNotCompleted()
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 

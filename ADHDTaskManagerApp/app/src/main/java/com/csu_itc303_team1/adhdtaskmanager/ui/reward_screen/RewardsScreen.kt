@@ -16,15 +16,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LeaderboardBlue
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.LoginRewardCard
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.NoInternetScreen
-import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.RewardCard
+import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.*
 import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserver
 import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObserverImpl
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users

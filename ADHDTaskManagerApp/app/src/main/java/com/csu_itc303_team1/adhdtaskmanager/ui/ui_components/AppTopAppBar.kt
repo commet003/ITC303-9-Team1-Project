@@ -3,12 +3,10 @@ package com.csu_itc303_team1.adhdtaskmanager.ui.ui_components
 import android.annotation.SuppressLint
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.csu_itc303_team1.adhdtaskmanager.utils.firebase.AuthUiClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

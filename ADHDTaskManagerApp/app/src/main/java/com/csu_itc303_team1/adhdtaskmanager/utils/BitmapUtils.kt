@@ -3,7 +3,6 @@ package com.csu_itc303_team1.adhdtaskmanager.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import androidx.compose.ui.graphics.asAndroidBitmap
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
