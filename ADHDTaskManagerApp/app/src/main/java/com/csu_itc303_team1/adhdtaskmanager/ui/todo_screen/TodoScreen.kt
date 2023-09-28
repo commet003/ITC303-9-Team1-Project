@@ -178,16 +178,28 @@ fun TodoScreen(
                     ) {
 
                         items(state.todos) { todo ->
-                            if (todo.userID == state.userId) {
-
-                                TodoCard(
-                                    todo = todo,
-                                    onEvent = onEvent,
-                                    rewardViewModel = rewardViewModel,
-                                    usersViewModel = usersViewModel,
-                                    showToast = showToast,
-                                    alarmScheduler = alarmScheduler
-                                )
+                            if (state.sortType != SortType.BY_COMPLETED) {
+                                if (todo.userID == state.userId && !todo.isCompleted) {
+                                    TodoCard(
+                                        todo = todo,
+                                        onEvent = onEvent,
+                                        rewardViewModel = rewardViewModel,
+                                        usersViewModel = usersViewModel,
+                                        showToast = showToast,
+                                        alarmScheduler = alarmScheduler
+                                    )
+                                }
+                            } else {
+                                if (todo.userID == state.userId) {
+                                    TodoCard(
+                                        todo = todo,
+                                        onEvent = onEvent,
+                                        rewardViewModel = rewardViewModel,
+                                        usersViewModel = usersViewModel,
+                                        showToast = showToast,
+                                        alarmScheduler = alarmScheduler
+                                    )
+                                }
                             }
                         }
                     }
