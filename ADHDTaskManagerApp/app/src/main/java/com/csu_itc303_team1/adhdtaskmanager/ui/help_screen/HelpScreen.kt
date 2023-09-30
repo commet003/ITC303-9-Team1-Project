@@ -11,6 +11,7 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -46,89 +47,100 @@ fun HelpScreen(
     var viewVideoClicked by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
+    val text = context.assets.open("UserManual.txt").bufferedReader().use { it.readText() }
+
     Scaffold(
         topBar = { MainTopAppBar(scope = scope, drawerState = drawerState)}
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(79.dp)
+                //.padding(79.dp)
+                .padding(10.dp, 80.dp, 10.dp, 10.dp)
         ) {
-            Text(
-                text = "Click on One Of the Options: ",
-                style = TextStyle(fontSize = 18.sp, fontStyle = FontStyle.Italic),
-                color = Color.Blue
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            // "View Manual" row
-            Row(
-                modifier = Modifier.clickable {
-                    viewManualClicked = true
-                    viewArchitectureClicked = false
-                    viewVideoClicked = false
-                    coroutineScope.launch {
-                        val intent = Intent(context, WebViewActivity::class.java)
-                        intent.putExtra("URL", "file:///android_asset/Manual.html")
-                        context.startActivity(intent)
-                    }
-                }
-            ) {
-                Text(
-                    text = "- View Manual",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        textDecoration = if (viewManualClicked) TextDecoration.Underline else TextDecoration.None
+//            Text(
+//                text = "Click on One Of the Options: ",
+//                style = TextStyle(fontSize = 18.sp, fontStyle = FontStyle.Italic),
+//                color = Color.Blue
+//            )
+//
+//            Spacer(modifier = Modifier.height(15.dp))
+//
+//            // "View Manual" row
+//            Row(
+//                modifier = Modifier.clickable {
+//                    viewManualClicked = true
+//                    viewArchitectureClicked = false
+//                    viewVideoClicked = false
+//                    coroutineScope.launch {
+//                        val intent = Intent(context, WebViewActivity::class.java)
+//                        intent.putExtra("URL", "file:///android_asset/Manual.html")
+//                        context.startActivity(intent)
+//                    }
+//                }
+//            ) {
+//                Text(
+//                    text = "- View Manual",
+//                    style = TextStyle(
+//                        fontSize = 20.sp,
+//                        textDecoration = if (viewManualClicked) TextDecoration.Underline else TextDecoration.None
+//                    )
+//                )
+//            }
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            // "View Architecture Diagram" row
+//            Row(
+//                modifier = Modifier.clickable {
+//                    viewManualClicked = false
+//                    viewArchitectureClicked = true
+//                    viewVideoClicked = false
+//                    coroutineScope.launch {
+//                        val intent = Intent(context, WebViewActivity::class.java)
+//                        intent.putExtra("URL", "file:///android_asset/Developers Delight.html")
+//                        context.startActivity(intent)
+//                    }
+//                }
+//            ) {
+//                Text(
+//                    text = "- Developers Resources",
+//                    style = TextStyle(
+//                        fontSize = 20.sp,
+//                        textDecoration = if (viewArchitectureClicked) TextDecoration.Underline else TextDecoration.None
+//                    )
+//                )
+//            }
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            // "View the Video" row
+//            Row(
+//                modifier = Modifier.clickable {
+//                    viewManualClicked = false
+//                    viewArchitectureClicked = false
+//                    viewVideoClicked = true
+//                    coroutineScope.launch {
+//                        val intent = Intent(context, WebViewActivity::class.java)
+//                        //intent.putExtra("URL", "file:///android_asset/p.mov")
+//                        intent.putExtra("URL", "https://youtu.be/H0hJHFFbrB0")
+//                        context.startActivity(intent)
+//                    }
+//                }
+//            ) {
+//                Text(
+//                    text = "- View the Demo Video",
+//                    style = TextStyle(
+//                        fontSize = 20.sp,
+//                        textDecoration = if (viewVideoClicked) TextDecoration.Underline else TextDecoration.None
+//                    )
+//                )
+//            }
+            LazyColumn {
+                item {
+                    Text(
+                        text = text,
+                        modifier = Modifier.padding(16.dp)
                     )
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // "View Architecture Diagram" row
-            Row(
-                modifier = Modifier.clickable {
-                    viewManualClicked = false
-                    viewArchitectureClicked = true
-                    viewVideoClicked = false
-                    coroutineScope.launch {
-                        val intent = Intent(context, WebViewActivity::class.java)
-                        intent.putExtra("URL", "file:///android_asset/Developers Delight.html")
-                        context.startActivity(intent)
-                    }
                 }
-            ) {
-                Text(
-                    text = "- Developers Resources",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        textDecoration = if (viewArchitectureClicked) TextDecoration.Underline else TextDecoration.None
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // "View the Video" row
-            Row(
-                modifier = Modifier.clickable {
-                    viewManualClicked = false
-                    viewArchitectureClicked = false
-                    viewVideoClicked = true
-                    coroutineScope.launch {
-                        val intent = Intent(context, WebViewActivity::class.java)
-                        //intent.putExtra("URL", "file:///android_asset/p.mov")
-                        intent.putExtra("URL", "https://youtu.be/H0hJHFFbrB0")
-                        context.startActivity(intent)
-                    }
-                }
-            ) {
-                Text(
-                    text = "- View the Demo Video",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        textDecoration = if (viewVideoClicked) TextDecoration.Underline else TextDecoration.None
-                    )
-                )
             }
         }
     }
