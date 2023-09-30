@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -268,7 +270,6 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-            // Image Picker Overlay: Moved outside of the main Column, but still inside the Box
             AnimatedVisibility(
                 visible = showImagePicker,
                 enter = slideInVertically(initialOffsetY = { it }) + fadeIn(initialAlpha = 0.3f),
@@ -276,11 +277,23 @@ fun SettingsScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize() // this ensures the Box takes up the entire screen space
+                        .fillMaxSize()
                         .background(Color(4, 94, 165, 255))
                 ) {
+                    IconButton(
+                        onClick = { showImagePicker = false },
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = 70.dp, start = 10.dp) // Adjust padding to ensure it's visible
+                            .background(shape = CircleShape, color = Color.White) // to ensure it's visible
+                    ) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Blue)
+                    }
+
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 120.dp), // Adjust the top padding if needed
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         items(imageList.chunked(2)) { rowImages ->
@@ -315,12 +328,9 @@ fun SettingsScreen(
                                     )
                                 }
                             }
-
-
                         }
                     }
                 }
-
             }
         }
     }
