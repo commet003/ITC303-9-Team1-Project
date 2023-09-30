@@ -30,6 +30,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -59,7 +60,12 @@ fun TodoScreen(
 
     val showToast = remember { mutableStateOf(false) }
 
-
+    LaunchedEffect(key1 = showToast.value) {
+        if (showToast.value) {
+            delay(3000) // 3 seconds
+            showToast.value = false
+        }
+    }
 
 
     BottomSheetScaffold(

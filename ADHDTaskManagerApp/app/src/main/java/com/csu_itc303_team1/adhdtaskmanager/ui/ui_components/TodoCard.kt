@@ -47,9 +47,8 @@ fun TodoCard(
     var alarmItem: AlarmItem? = null
 
 
-    LaunchedEffect(showToastTrigger.value) {
-        if (showToastTrigger.value > 0) {
-            showToast.value = true
+    LaunchedEffect(key1 = showToast.value) {
+        if (showToast.value) {
             delay(3000) // 3 seconds
             showToast.value = false
         }
@@ -109,6 +108,7 @@ fun TodoCard(
                         if (!todo.isCompleted) {
                             onEvent(TodoEvent.toggleCompleted(todo))
 
+
                             if (search.isNotEmpty()) {
                                 val completedReward = search[0]
                                 completedReward.timesAchieved = completedReward.timesAchieved + 1
@@ -126,7 +126,7 @@ fun TodoCard(
                                     )
                                     alarmItem?.let(alarmScheduler::cancel)
                                 }
-                                showToastTrigger.value += 1 // Increment to trigger the toast
+                                showToast.value = true // Directly set showToast to true here.
                                 onEvent(TodoEvent.ToggleLottieAnimation(true))
                                 showLottieAnimation.value
                             } else {
