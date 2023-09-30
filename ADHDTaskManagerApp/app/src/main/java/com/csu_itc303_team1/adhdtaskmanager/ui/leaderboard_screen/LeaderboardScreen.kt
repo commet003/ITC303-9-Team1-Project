@@ -35,7 +35,7 @@ fun LeaderboardScreen(
 
     // get list of users and sort it by points
     val usersList = Final.finalDataList
-    val sortedList = usersList.sortedWith(compareByDescending { it.points })
+    val sortedList = usersList.sortedWith(compareByDescending { it.points?.plus(it.loginNum!!) })
 
     val observer = connectivityObserver.observeConnectivity().collectAsState(initial = ConnectivityObserver.Status.DISCONNECTED).value
 
