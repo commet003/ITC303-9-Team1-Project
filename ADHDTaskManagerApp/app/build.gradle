@@ -180,6 +180,7 @@ dependencies {
 
 
 
+    implementation 'com.github.jeziellago:compose-markdown:0.2.6'
 
 
 

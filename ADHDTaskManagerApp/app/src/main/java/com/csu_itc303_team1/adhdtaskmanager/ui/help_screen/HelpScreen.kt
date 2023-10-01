@@ -1,33 +1,29 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.help_screen
 
 
+// Import MarkdownText
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
+import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -47,7 +43,7 @@ fun HelpScreen(
     var viewVideoClicked by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    val text = context.assets.open("UserManual.txt").bufferedReader().use { it.readText() }
+    val text = context.assets.open("UserManual.md").bufferedReader().use  { it.readText() }
 
     Scaffold(
         topBar = { MainTopAppBar(scope = scope, drawerState = drawerState)}
@@ -134,11 +130,29 @@ fun HelpScreen(
 //                    )
 //                )
 //            }
-            LazyColumn {
+
+            // USER MANUAL Title
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) { Text("USER MANUAL",
+                fontSize = 24.sp,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Bold,
+                color = LocalContentColor.current,
+                ) }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 item {
-                    Text(
-                        text = text,
-                        modifier = Modifier.padding(16.dp)
+                    MarkdownText(
+                        markdown = text,
+                        modifier = Modifier.padding(6.dp).wrapContentSize(),
+                        fontSize = 14.sp,
+                        color = LocalContentColor.current,
                     )
                 }
             }
