@@ -16,7 +16,7 @@ apikey.properties
 captures/
 .externalNativeBuild/
 .cxx/
-*.apk
+#*.apk
 output.json
 
 # IntelliJ
@@ -150,7 +150,7 @@ gradle-app.setting
 
 # Built application files
 *.ap_
-*.aab
+#*.aab
 
 # Files for the ART/Dalvik VM
 *.dex
