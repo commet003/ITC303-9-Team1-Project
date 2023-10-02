@@ -79,11 +79,7 @@ The next setting Adjusts the Time for the Pomodoro Timer. Type the number of min
 
 ### HELP SCREEN
 
-The help page has useful information for the app users. It has the following information:
-
-- User manual
-- Developers resources for those interested in what is under the hood
-- A demo video showing how the app functions.
+The Help Screen displays the User Manual as a scrollable list, able to be browsed at any time. Hopefully this should be able to answer any questions you may have. If not, let the dev team know during testing.
 
 
 ### LOGGING OUT
