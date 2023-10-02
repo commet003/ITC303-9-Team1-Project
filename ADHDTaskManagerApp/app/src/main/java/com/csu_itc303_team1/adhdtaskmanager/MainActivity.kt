@@ -72,6 +72,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.TodoDatabase
 import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
@@ -267,8 +268,8 @@ class MainActivity : ComponentActivity() {
                     permission = Manifest.permission.POST_NOTIFICATIONS
                 )
 
-                LaunchedEffect(key1 = permission.hasPermission){
-                    if (!permission.hasPermission) {
+                LaunchedEffect(key1 = permission.status.isGranted){
+                    if (!permission.status.isGranted) {
                         permission.launchPermissionRequest()
                     }
                 }
