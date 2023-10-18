@@ -11,10 +11,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.csu_itc303_team1.adhdtaskmanager.utils.local_database.Reward
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
+
 
 @Composable
-fun RewardCard(reward: Reward, title: String) {
-    val total: Int = reward.timesAchieved * reward.pointsAwarded
+fun RewardCard(reward: Reward, title: String, user: Users?) {
+    val total:  Int? = user?.points
+    val userAchieved: Int? = user?.points?.div(3);
+
+
 
     Card(
         shape = MaterialTheme.shapes.small,
@@ -40,14 +45,16 @@ fun RewardCard(reward: Reward, title: String) {
                         color = Color.Black
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = if (reward.timesAchieved > 1)
-                            "You have achieved this reward ${reward.timesAchieved} Times"
-                        else
-                            "You have achieved this reward ${reward.timesAchieved} Time",
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
+                    if (userAchieved != null) {
+                        Text(
+                            text = if (userAchieved > 1)
+                                "You have achieved this reward $userAchieved Times"
+                            else
+                                "You have achieved this reward $userAchieved Time",
+                            fontSize = 20.sp,
+                            color = Color.Black
+                        )
+                    }
                 }
             }
 
@@ -55,14 +62,16 @@ fun RewardCard(reward: Reward, title: String) {
                 modifier = Modifier.padding(10.dp)
             ) {
                 Column {
-                    Text(
-                        text = if (total > 1)
-                            "You have earned $total points"
-                        else
-                            "You have earned $total point",
-                        fontSize = 20.sp,
-                        color = LeaderboardBlue
-                    )
+                    if (total != null) {
+                        Text(
+                            text = if (total > 1)
+                                "You have earned $total points"
+                            else
+                                "You have earned $total point",
+                            fontSize = 20.sp,
+                            color = LeaderboardBlue
+                        )
+                    }
                 }
             }
         }

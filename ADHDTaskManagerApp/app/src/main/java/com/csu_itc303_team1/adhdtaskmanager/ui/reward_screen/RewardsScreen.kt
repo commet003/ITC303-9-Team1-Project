@@ -25,6 +25,7 @@ import com.csu_itc303_team1.adhdtaskmanager.utils.connectivity.ConnectivityObser
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.CoroutineScope
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -98,7 +99,7 @@ fun RewardsScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             items(completedTaskRewards) { reward ->
-                                RewardCard(reward, "Completed Task Reward")
+                                RewardCard(reward, "Completed Task Reward", user)
                             }
 
                             item {

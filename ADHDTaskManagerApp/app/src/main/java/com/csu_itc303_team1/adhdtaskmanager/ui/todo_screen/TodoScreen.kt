@@ -25,6 +25,7 @@ import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.MainTopAppBar
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.TodoCard
 import com.csu_itc303_team1.adhdtaskmanager.ui.ui_components.lottieLoaderAnimation
 import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.states.TodoState
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.SortType
@@ -192,7 +193,8 @@ fun TodoScreen(
                                         rewardViewModel = rewardViewModel,
                                         usersViewModel = usersViewModel,
                                         showToast = showToast,
-                                        alarmScheduler = alarmScheduler
+                                        alarmScheduler = alarmScheduler,
+                                        user = Users(),
                                     )
                                 }
                             } else {
@@ -203,7 +205,9 @@ fun TodoScreen(
                                         rewardViewModel = rewardViewModel,
                                         usersViewModel = usersViewModel,
                                         showToast = showToast,
-                                        alarmScheduler = alarmScheduler
+                                        alarmScheduler = alarmScheduler,
+                                        user = Users(),
+
                                     )
                                 }
                             }
