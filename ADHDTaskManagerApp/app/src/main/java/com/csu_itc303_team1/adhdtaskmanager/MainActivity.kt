@@ -395,19 +395,15 @@ class MainActivity : ComponentActivity() {
                                                 selected = false,
                                                 onClick = {
                                                     scope.launch {
-                                                        googleAuthUiClient.signOut()
-                                                        if (googleAuthUiClient.getSignedInUser() == null) {
-                                                            Toast
-                                                                .makeText(
-                                                                    applicationContext,
-                                                                    "Signed out",
-                                                                    Toast.LENGTH_LONG
-                                                                )
-                                                                .show()
-                                                        }
-                                                        navController.navigate(Screen.SignInScreen.route)
+                                                        googleAuthUiClient.signOut(navController = navController)
+                                                        Toast
+                                                            .makeText(
+                                                                applicationContext,
+                                                                "Signed out",
+                                                                Toast.LENGTH_LONG
+                                                            )
+                                                            .show()
                                                     }
-
                                                 },
                                                 modifier = Modifier.padding(
                                                     NavigationDrawerItemDefaults.ItemPadding
@@ -511,7 +507,7 @@ class MainActivity : ComponentActivity() {
                                             connectivityObserver,
                                             scope,
                                             drawerState
-                                            )
+                                        )
                                     }
 
                                     // Rewards Screen
@@ -524,7 +520,7 @@ class MainActivity : ComponentActivity() {
                                             connectivityObserver,
                                             scope,
                                             drawerState
-                                            )
+                                        )
                                     }
 
                                     // Completed Task Screen
@@ -535,7 +531,7 @@ class MainActivity : ComponentActivity() {
                                             state,
                                             scope,
                                             drawerState
-                                            )
+                                        )
                                     }
 
                                     // Sign In Screen
@@ -612,19 +608,19 @@ class MainActivity : ComponentActivity() {
                                         route = Screen.PomodoroTimerScreen.route
                                     ) {
 
-                                            PomodoroTimerScreen(
-                                                settingsViewModel = settingsViewModel, // Pass the instance here
-                                                initialWorkTime = 1500L * 1000L,
-                                                initialBreakTime = 300L * 1000L,
-                                                handleColor = MaterialTheme.colorScheme.primary,
-                                                inactiveBarColor = MaterialTheme.colorScheme.surface,
-                                                activeBarColor = MaterialTheme.colorScheme.primary,
-                                                context = applicationContext,
-                                                activity = this@MainActivity,
-                                                modifier = Modifier.size(300.dp),
-                                                scope = scope,
-                                                drawerState = drawerState
-                                            )
+                                        PomodoroTimerScreen(
+                                            settingsViewModel = settingsViewModel, // Pass the instance here
+                                            initialWorkTime = 1500L * 1000L,
+                                            initialBreakTime = 300L * 1000L,
+                                            handleColor = MaterialTheme.colorScheme.primary,
+                                            inactiveBarColor = MaterialTheme.colorScheme.surface,
+                                            activeBarColor = MaterialTheme.colorScheme.primary,
+                                            context = applicationContext,
+                                            activity = this@MainActivity,
+                                            modifier = Modifier.size(300.dp),
+                                            scope = scope,
+                                            drawerState = drawerState
+                                        )
                                     }
                                 }
                             }

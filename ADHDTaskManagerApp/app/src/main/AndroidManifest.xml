@@ -13,8 +13,6 @@
     <application
         android:name=".utils.notifications.NotificationsApp"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/new_logo_round"
         android:supportsRtl="true"
         android:label="@string/app_name"

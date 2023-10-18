@@ -3,8 +3,10 @@ package com.csu_itc303_team1.adhdtaskmanager.utils.firebase
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import androidx.navigation.NavController
 import com.csu_itc303_team1.adhdtaskmanager.BuildConfig
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersRepo
+import com.csu_itc303_team1.adhdtaskmanager.utils.nav_utils.Screen
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
@@ -81,10 +83,11 @@ class AuthUiClient(
 
 
 
-    suspend fun signOut() {
+    suspend fun signOut(navController: NavController) {
         try {
             oneTapClient.signOut().await()
             auth.signOut()
+            navController.navigate(Screen.SignInScreen.route)
         } catch(e: Exception) {
             e.printStackTrace()
             if(e is CancellationException) throw e
