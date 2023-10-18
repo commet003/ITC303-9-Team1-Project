@@ -1,6 +1,7 @@
 package com.csu_itc303_team1.adhdtaskmanager.ui.ui_components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,13 +23,25 @@ import com.airbnb.lottie.compose.*
 import com.csu_itc303_team1.adhdtaskmanager.ui.reward_screen.RewardViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmItem
 import com.csu_itc303_team1.adhdtaskmanager.utils.alarm_manager.AlarmSchedulerImpl
+import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.Users
 import com.csu_itc303_team1.adhdtaskmanager.utils.firestore_utils.UsersViewModel
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.Todo
 import com.csu_itc303_team1.adhdtaskmanager.utils.todo_utils.TodoEvent
+import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.delay
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+
+
+
 
 
 @SuppressLint("RememberReturnType")
@@ -39,7 +52,8 @@ fun TodoCard(
     rewardViewModel: RewardViewModel,
     usersViewModel: UsersViewModel,
     showToast: MutableState<Boolean>,
-    alarmScheduler: AlarmSchedulerImpl
+    alarmScheduler: AlarmSchedulerImpl,
+    user: Users?
 ) {
 
     val showToastTrigger = remember { mutableStateOf(0) } // For triggering the toast
@@ -112,7 +126,20 @@ fun TodoCard(
                             if (search.isNotEmpty()) {
                                 val completedReward = search[0]
                                 completedReward.timesAchieved = completedReward.timesAchieved + 1
+
                                 rewardViewModel.updateReward(completedReward)
+
+                                val db = FirebaseFirestore.getInstance()
+
+                                db.collection("users")
+                                    .document("THE_USER_ID")
+                                    .update("points", FieldValue.increment(3))
+                                    .addOnSuccessListener {
+                                        Log.d("Firestore", "Points successfully incremented!")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.w("Firestore", "Error incrementing points", e)
+                                    }
                                 usersViewModel.completedTaskPoints()
                                 if(todo.dueDate.isNotBlank() && todo.dueTime.isNotBlank()){
                                     alarmItem = AlarmItem(
