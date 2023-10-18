@@ -414,7 +414,7 @@ fun AddEditTodoDialog(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            TimePicker(
+                            TimeInput(
                                 colors = TimePickerDefaults.colors(
                                     clockDialColor = MaterialTheme.colorScheme.background,
                                     clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -437,7 +437,7 @@ fun AddEditTodoDialog(
                                 } else{
                                     editTimePickerState
                                 },
-                                layoutType = TimePickerLayoutType.Vertical
+                                //layoutType = TimePickerLayoutType.Vertical
                             )
                         }
                     },
