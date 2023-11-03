@@ -83,6 +83,11 @@ import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 
+/**
+ * Main activity
+ *
+ * @constructor Create empty Main activity
+ */
 @Suppress("UNCHECKED_CAST")
 class MainActivity : ComponentActivity() {
 
@@ -90,6 +95,8 @@ class MainActivity : ComponentActivity() {
 
     // Instantiate the UsersViewModel
     private val usersViewModel by viewModels<UsersViewModel>()
+
+
     private val settingsViewModel by viewModels<SettingsViewModel> {
         SettingsViewModelFactory(application, usersViewModel)
     }
@@ -137,6 +144,10 @@ class MainActivity : ComponentActivity() {
 
     private var defaultProfileImageUrl: String? = null
 
+    /**
+     * Fetch default profile image
+     *
+     */
     fun fetchDefaultProfileImage() {
         val storageReference = FirebaseStorage.getInstance().reference
         val defaultProfileImageRef = storageReference.child("default-user-profile-picture/default_image.jpg")

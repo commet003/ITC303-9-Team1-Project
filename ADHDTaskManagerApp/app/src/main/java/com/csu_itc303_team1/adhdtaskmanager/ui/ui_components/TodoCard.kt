@@ -55,24 +55,17 @@ fun TodoCard(
     alarmScheduler: AlarmSchedulerImpl,
     user: Users?
 ) {
-
     val showToastTrigger = remember { mutableStateOf(0) } // For triggering the toast
     val showLottieAnimation = remember { mutableStateOf(false) }
     var alarmItem: AlarmItem? = null
-
-
     LaunchedEffect(key1 = showToast.value) {
         if (showToast.value) {
             delay(3000) // 3 seconds
             showToast.value = false
         }
     }
-
-
     rewardViewModel.allRewards.observeAsState(listOf())
     val search by rewardViewModel.findReward("Completed Task Reward").observeAsState(listOf())
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,15 +212,9 @@ fun TodoCard(
             }
         }
     }
-
-
     lottieLoaderAnimation(isVisible = showToast.value)
 }
-
-
-
 // Custom Toast Composable
-
 @Composable
 fun CustomToastMessage(
     message: String,
@@ -263,10 +250,6 @@ fun CustomToastMessage(
         }
     }
 }
-
-
-
-
 @Composable
 fun lottieLoaderAnimation(isVisible: Boolean) {
     if (isVisible) {

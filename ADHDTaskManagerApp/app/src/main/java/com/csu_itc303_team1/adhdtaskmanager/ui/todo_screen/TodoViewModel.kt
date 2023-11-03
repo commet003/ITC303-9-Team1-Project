@@ -16,10 +16,8 @@ import java.time.LocalDateTime
 class TodoViewModel(
     private val todoDao: TodoDao
 ): ViewModel() {
-
     private val _state = MutableStateFlow(TodoState())
     private val _sortType = MutableStateFlow(SortType.BY_DATE_TIME)
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _todos = _sortType
         .flatMapLatest { sortType ->
@@ -30,7 +28,6 @@ class TodoViewModel(
                 SortType.BY_NOT_COMPLETED -> todoDao.sortByNotCompleted()
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     val state = combine(_state, _sortType, _todos) { state, sortType, todos ->
         state.copy(
             todos = todos,
@@ -48,13 +45,9 @@ class TodoViewModel(
                     )
                 }
             }
-
-
             is TodoEvent.ToggleLottieAnimation -> {
                 _state.value = _state.value.copy(showLottieAnimation = event.show)
             }
-
-            // Todo Description Error
             is TodoEvent.descriptionError -> {
                 _state.update {
                     it.copy(
@@ -62,7 +55,6 @@ class TodoViewModel(
                     )
                 }
             }
-
             // Update Todo
             is TodoEvent.updateTodo -> {
                 viewModelScope.launch {
@@ -78,7 +70,6 @@ class TodoViewModel(
                     )
                 }
             }
-
             // Toggle isClicked state of the todo
             is TodoEvent.toggleIsClicked -> {
                 viewModelScope.launch {
@@ -89,58 +80,46 @@ class TodoViewModel(
                     )
                 }
             }
-
-
             // Delete Todo
             is TodoEvent.deleteTodo -> {
                 viewModelScope.launch {
                     todoDao.deleteTodo(event.todo)
                 }
             }
-
             TodoEvent.showDialog -> {
                 _state.update {
                     it.copy(showDialog = true)
                 }
             }
-
             TodoEvent.hideDialog -> {
                 _state.update {
                     it.copy(showDialog = false)
                 }
             }
-
             // Show edit date
             TodoEvent.showEditDateSelector -> {
                 _state.update {
                     it.copy(showEditDateSelector = true)
                 }
             }
-
             // Hide edit date
             TodoEvent.hideEditDateSelector -> {
                 _state.update {
                     it.copy(showEditDateSelector = false)
                 }
             }
-
             // Show edit time
             TodoEvent.showEditTimeSelector -> {
                 _state.update {
                     it.copy(showEditTimeSelector = true)
                 }
             }
-
             // Hide edit time
             TodoEvent.hideEditTimeSelector -> {
                 _state.update {
                     it.copy(showEditTimeSelector = false)
                 }
             }
-
-
-
-
             TodoEvent.saveTodo -> {
                 val title = state.value.title
                 val description = state.value.description
@@ -231,31 +210,26 @@ class TodoViewModel(
                     it.copy(showEditTodoDialog = true)
                 }
             }
-
             TodoEvent.hideDateSelector -> {
                 _state.update {
                     it.copy(showDateSelector = false)
                 }
             }
-
             TodoEvent.showDateSelector -> {
                 _state.update {
                     it.copy(showDateSelector = true)
                 }
             }
-
             TodoEvent.hideTimeSelector -> {
                 _state.update {
                     it.copy(showTimeSelector = false)
                 }
             }
-
             TodoEvent.showTimeSelector -> {
                 _state.update {
                     it.copy(showTimeSelector = true)
                 }
             }
-
             // Toggle the completed state of the todo
             is TodoEvent.toggleCompleted -> {
                 viewModelScope.launch {
@@ -271,7 +245,6 @@ class TodoViewModel(
                     )
                 }
             }
-
             is TodoEvent.setUserId -> {
                 _state.update {
                     it.copy(userId = event.userId)
@@ -283,7 +256,6 @@ class TodoViewModel(
                     todoDao.getTodoById(event.id)
                 }
             }
-
             // Reset State Todos to values from database
             TodoEvent.resetTodos -> {
                 viewModelScope.launch {
@@ -292,7 +264,6 @@ class TodoViewModel(
                     }
                 }
             }
-
             // Reset State
             TodoEvent.resetState -> {
                 _state.update {
@@ -309,8 +280,6 @@ class TodoViewModel(
                     )
                 }
             }
-
-
             else -> {}
         }
     }

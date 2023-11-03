@@ -114,6 +114,4 @@ fun RewardsScreen(
             }
         }
     )
-
-
 }

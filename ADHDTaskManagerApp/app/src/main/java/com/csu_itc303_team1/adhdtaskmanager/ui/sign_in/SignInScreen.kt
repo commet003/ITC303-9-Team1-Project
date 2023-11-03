@@ -96,8 +96,6 @@ fun SignInScreen(
                 }
             }
         }
+        }
     }
-    }
-
-
 }
